@@ -3,6 +3,7 @@ package app;
 import data_access.FileUserDataAccessObject;
 import entity.UserFactory;
 import interface_adapter.ViewManagerModel;
+import interface_adapter.calendar.CalendarViewModel;
 import interface_adapter.logged_in.ChangePasswordController;
 import interface_adapter.logged_in.ChangePasswordPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
@@ -50,12 +51,15 @@ public class AppBuilder {
     // DAO version using a shared external database
     // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
 
+//    COMMENTED CODE IS FOR ALEXTQWANG TO WORK ON LATER ON HIS PERSONAL PC!!! PLEASE DON'T TOUCH!!!!!!! PLEASE!!!!!!
     private SignupView signupView;
     private SignupViewModel signupViewModel;
     private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
+//    private CalendarViewModel calendarViewModel;
     private LoggedInView loggedInView;
     private LoginView loginView;
+//    private CalendarView calendarView;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -81,6 +85,13 @@ public class AppBuilder {
         cardPanel.add(loggedInView, loggedInView.getViewName());
         return this;
     }
+//    COMMENTED CODE IS FOR ALEXTQWANG TO WORK ON LATER ON HIS PERSONAL PC!!! PLEASE DON'T TOUCH!!!!!!! PLEASE!!!!!!
+//    public AppBuilder addCalendarView() {
+//        calendarViewModel = new CalendarViewModel();
+//        calendarView = new CalendarView(CalendarViewModel);
+//
+//
+//    }
 
     public AppBuilder addSignupUseCase() {
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel,
