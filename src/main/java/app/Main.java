@@ -15,6 +15,7 @@ public class Main {
                 .addLogoutUseCase()
                 .addChangePasswordUseCase()
                 .addShowPlansUseCase()
+                .addDeletePlanUseCase()
                 .build();
 
         application.pack();

@@ -1,6 +1,7 @@
 package view;
 
 import entity.Plan;
+import interface_adapter.delete_plan.DeletePlanController;
 import interface_adapter.show_plans.ShowPlansController;
 import interface_adapter.show_plans.ShowPlansState;
 import interface_adapter.show_plans.ShowPlansViewModel;
@@ -25,6 +26,7 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     private final String viewName = "show plans";
     private final ShowPlansViewModel showPlansViewModel;
     private ShowPlansController showPlansController;
+    private DeletePlanController deletePlanController;
 
     private final JPanel plansGridPanel;
     private final JButton previousButton;
@@ -37,11 +39,32 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
         this.setLayout(new BorderLayout());
 
-        // Title
+        // Title panel with back button
+        final JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Back button on the left
+        final JButton backButton = new JButton("← Back");
+        backButton.addActionListener(e -> {
+            if (showPlansController != null) {
+                showPlansController.switchToLoggedInView();
+            }
+        });
+        titlePanel.add(backButton, BorderLayout.WEST);
+
+        // Title in the center
         final JLabel title = new JLabel(ShowPlansViewModel.TITLE_LABEL);
         title.setFont(new Font("Arial", Font.BOLD, 24));
         title.setHorizontalAlignment(SwingConstants.CENTER);
-        this.add(title, BorderLayout.NORTH);
+        titlePanel.add(title, BorderLayout.CENTER);
+
+        // Invisible spacer on the right to balance the back button and center the title
+        final JPanel spacer = new JPanel();
+        spacer.setPreferredSize(backButton.getPreferredSize());
+        spacer.setOpaque(false);
+        titlePanel.add(spacer, BorderLayout.EAST);
+
+        this.add(titlePanel, BorderLayout.NORTH);
 
         // Plans grid panel
         plansGridPanel = new JPanel();
@@ -153,9 +176,38 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         final JButton subgoalsButton = new JButton(ShowPlansViewModel.SUBGOALS_BUTTON_LABEL);
         final JButton deleteButton = new JButton(ShowPlansViewModel.DELETE_BUTTON_LABEL);
 
-        // Buttons don't need to work yet - they're just for display
+        // Subgoals button not implemented yet
         subgoalsButton.setEnabled(false);
-        deleteButton.setEnabled(false);
+
+        // Enable delete button and add action listener
+        deleteButton.addActionListener(e -> {
+            final int choice = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to delete plan: " + plan.getName() + "?",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+            );
+
+            if (choice == JOptionPane.YES_OPTION && deletePlanController != null) {
+                final ShowPlansState state = showPlansViewModel.getState();
+                final String username = state.getUsername();
+                final int currentPage = state.getCurrentPage();
+
+                // Delete the plan
+                deletePlanController.execute(plan.getPlanId(), username);
+
+                // Small delay to ensure deletion is processed
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+
+                // Reload - go to page 0 to avoid issues with empty pages
+                loadPlans(username, 0);
+            }
+        });
 
         buttonsPanel.add(subgoalsButton);
         buttonsPanel.add(deleteButton);
@@ -164,6 +216,7 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
         return panel;
     }
+
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -180,15 +233,7 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         this.showPlansController = controller;
     }
 
-    /**
-     * Initializes the view with a username.
-     * @param username the username whose plans to show
-     */
-    public void initializeWithUsername(String username) {
-        final ShowPlansState state = showPlansViewModel.getState();
-        state.setUsername(username);
-        showPlansViewModel.setState(state);
-        loadPlans(username, 0);
+    public void setDeletePlanController(DeletePlanController controller) {
+        this.deletePlanController = controller;
     }
 }
-

@@ -37,7 +37,7 @@ public class ShowPlansInteractor implements ShowPlansInputBoundary {
             final boolean hasPreviousPage = page > 0;
 
             final ShowPlansOutputData outputData = new ShowPlansOutputData(
-                    plans, page, totalPages, hasNextPage, hasPreviousPage
+                    plans, page, totalPages, hasNextPage, hasPreviousPage, username
             );
 
             presenter.prepareSuccessView(outputData);
@@ -51,5 +51,9 @@ public class ShowPlansInteractor implements ShowPlansInputBoundary {
     public void switchToShowPlansView() {
         presenter.switchToShowPlansView();
     }
-}
 
+    @Override
+    public void switchToLoggedInView() {
+        presenter.switchToLoggedInView();
+    }
+}

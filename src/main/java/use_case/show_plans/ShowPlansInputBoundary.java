@@ -15,5 +15,9 @@ public interface ShowPlansInputBoundary {
      * Executes the show plans use case to switch to the show plans view.
      */
     void switchToShowPlansView();
-}
 
+    /**
+     * Switches back to the logged in view.
+     */
+    void switchToLoggedInView();
+}

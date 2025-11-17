@@ -4,6 +4,8 @@ import data_access.FileUserDataAccessObject;
 import data_access.InMemoryPlanDataAccessObject;
 import entity.UserFactory;
 import interface_adapter.ViewManagerModel;
+import interface_adapter.delete_plan.DeletePlanController;
+import interface_adapter.delete_plan.DeletePlanPresenter;
 import interface_adapter.logged_in.ChangePasswordController;
 import interface_adapter.logged_in.ChangePasswordPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
@@ -21,6 +23,9 @@ import interface_adapter.signup.SignupViewModel;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
+import use_case.delete_plan.DeletePlanInputBoundary;
+import use_case.delete_plan.DeletePlanInteractor;
+import use_case.delete_plan.DeletePlanOutputBoundary;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -42,6 +47,7 @@ import view.ViewManager;
 import javax.swing.*;
 import java.awt.*;
 
+// Delete Plan functionality added
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -50,15 +56,16 @@ public class AppBuilder {
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
     // set which data access implementation to use, can be any
-    // Plan data access object
-    final InMemoryPlanDataAccessObject planDataAccessObject = new InMemoryPlanDataAccessObject();
-
     // of the classes from the data_access package
 
     // DAO version using local file storage
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
 
-    // DAO version using a shared external database
+    // Plan data access object - loads from JSON file
+    // To use JSON file: new InMemoryPlanDataAccessObject("plans.json")
+    // To use demo data: new InMemoryPlanDataAccessObject()
+    final InMemoryPlanDataAccessObject planDataAccessObject = new InMemoryPlanDataAccessObject("plans.json");
+
     private ShowPlansView showPlansView;
     private ShowPlansViewModel showPlansViewModel;
     // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
@@ -142,7 +149,7 @@ public class AppBuilder {
      */
     public AppBuilder addShowPlansUseCase() {
         final ShowPlansOutputBoundary showPlansOutputBoundary = new ShowPlansPresenter(
-                viewManagerModel, showPlansViewModel);
+                viewManagerModel, showPlansViewModel, loggedInViewModel);
 
         final ShowPlansInputBoundary showPlansInteractor =
                 new ShowPlansInteractor(planDataAccessObject, showPlansOutputBoundary);
@@ -150,6 +157,21 @@ public class AppBuilder {
         final ShowPlansController showPlansController = new ShowPlansController(showPlansInteractor);
         showPlansView.setShowPlansController(showPlansController);
         loggedInView.setShowPlansController(showPlansController);
+        return this;
+    }
+
+    /**
+     * Adds the Delete Plan Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addDeletePlanUseCase() {
+        final DeletePlanOutputBoundary deletePlanOutputBoundary = new DeletePlanPresenter(showPlansViewModel);
+
+        final DeletePlanInputBoundary deletePlanInteractor =
+                new DeletePlanInteractor(planDataAccessObject, deletePlanOutputBoundary);
+
+        final DeletePlanController deletePlanController = new DeletePlanController(deletePlanInteractor);
+        showPlansView.setDeletePlanController(deletePlanController);
         return this;
     }
 

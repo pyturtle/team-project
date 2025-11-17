@@ -13,6 +13,7 @@ public class ShowPlansOutputData {
     private final int totalPages;
     private final boolean hasNextPage;
     private final boolean hasPreviousPage;
+    private final String username;
 
     /**
      * Creates output data for showing plans.
@@ -21,14 +22,16 @@ public class ShowPlansOutputData {
      * @param totalPages the total number of pages
      * @param hasNextPage whether there is a next page
      * @param hasPreviousPage whether there is a previous page
+     * @param username the username whose plans are being displayed
      */
     public ShowPlansOutputData(List<Plan> plans, int currentPage, int totalPages,
-                               boolean hasNextPage, boolean hasPreviousPage) {
+                               boolean hasNextPage, boolean hasPreviousPage, String username) {
         this.plans = plans;
         this.currentPage = currentPage;
         this.totalPages = totalPages;
         this.hasNextPage = hasNextPage;
         this.hasPreviousPage = hasPreviousPage;
+        this.username = username;
     }
 
     public List<Plan> getPlans() {
@@ -50,5 +53,8 @@ public class ShowPlansOutputData {
     public boolean hasPreviousPage() {
         return hasPreviousPage;
     }
-}
 
+    public String getUsername() {
+        return username;
+    }
+}

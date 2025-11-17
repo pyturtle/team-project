@@ -131,7 +131,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 showPlansController.execute(currentUsername, 0, 6);
             }
         }
-        System.out.println("Click " + evt.getActionCommand());
     }
 
     @Override

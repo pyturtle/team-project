@@ -35,5 +35,11 @@ public class ShowPlansController {
     public void switchToShowPlansView() {
         showPlansInteractor.switchToShowPlansView();
     }
-}
 
+    /**
+     * Switches back to the Logged In view.
+     */
+    public void switchToLoggedInView() {
+        showPlansInteractor.switchToLoggedInView();
+    }
+}
