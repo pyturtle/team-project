@@ -3,7 +3,7 @@ package use_case.show_subgoal;
 /**
  * Input boundary for the ShowSubgoal use case.
  * Controllers call this interface to trigger showing a subgoal,
- * and to update its priority status.
+ * and to update its priority or completion status.
  */
 public interface ShowSubgoalInputBoundary {
 
@@ -20,4 +20,11 @@ public interface ShowSubgoalInputBoundary {
      * @param inputData the input data containing the subgoal ID and new priority value
      */
     void setPriority(SetPriorityInputData inputData);
+
+    /**
+     * Executes the use case to update the completion flag of a subgoal.
+     *
+     * @param inputData the input data containing the subgoal ID and new completed value
+     */
+    void setCompleted(SetCompletedInputData inputData);
 }

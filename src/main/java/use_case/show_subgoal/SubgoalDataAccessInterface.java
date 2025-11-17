@@ -24,4 +24,12 @@ public interface SubgoalDataAccessInterface {
      * @param priority the new priority value
      */
     void updatePriority(int id, boolean priority);
+
+    /**
+     * Updates the completion flag of the Subgoal with the given ID.
+     *
+     * @param id the ID of the subgoal to update
+     * @param completed the new completed value
+     */
+    void updateCompleted(int id, boolean completed);
 }

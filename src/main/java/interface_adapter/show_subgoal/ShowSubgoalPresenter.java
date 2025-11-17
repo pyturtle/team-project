@@ -11,11 +11,6 @@ public class ShowSubgoalPresenter implements ShowSubgoalOutputBoundary {
 
     private final ShowSubgoalViewModel viewModel;
 
-    /**
-     * Constructs a ShowSubgoalPresenter.
-     *
-     * @param viewModel the ViewModel to update with subgoal data
-     */
     public ShowSubgoalPresenter(ShowSubgoalViewModel viewModel) {
         this.viewModel = viewModel;
     }
@@ -26,17 +21,17 @@ public class ShowSubgoalPresenter implements ShowSubgoalOutputBoundary {
         state.setName(outputData.getName());
         state.setDescription(outputData.getDescription());
         state.setPriority(outputData.isPriority());
+        state.setCompleted(outputData.isCompleted());
         state.setErrorMessage("");
 
         viewModel.setState(state);
-        viewModel.firePropertyChange();
+        viewModel.firePropertyChange();  // note: no "d"
     }
 
     @Override
     public void presentError(String message) {
         ShowSubgoalState state = viewModel.getState();
         state.setErrorMessage(message);
-
         viewModel.setState(state);
         viewModel.firePropertyChange();
     }

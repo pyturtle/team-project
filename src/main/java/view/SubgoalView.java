@@ -24,6 +24,7 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
     private final JLabel nameLabel = new JLabel();
     private final JTextArea descriptionArea = new JTextArea(5, 30);
     private final JCheckBox priorityCheckBox = new JCheckBox("Priority");
+    private final JCheckBox completeCheckBox = new JCheckBox("Complete");
     private final JButton qaButton = new JButton("Q/A");
 
     // We need to remember which subgoal is currently being displayed
@@ -71,6 +72,7 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
         // Bottom: priority + Q/A button
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         bottomPanel.add(priorityCheckBox);
+        bottomPanel.add(completeCheckBox);
         bottomPanel.add(qaButton);
         content.add(bottomPanel, BorderLayout.SOUTH);
 
@@ -83,21 +85,28 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
      * Sets up listeners for UI interactions.
      */
     private void setupListeners() {
-        // When the priority checkbox is toggled, update via controller
+        // Priority checkbox
         priorityCheckBox.addActionListener(e -> {
             if (currentSubgoalId != -1) {
                 controller.setPriority(currentSubgoalId, priorityCheckBox.isSelected());
             }
         });
 
-        // Q/A button will later open the Q/A chat.
-        // For now, just show a placeholder message.
+        // Complete checkbox
+        completeCheckBox.addActionListener(e -> {
+            if (currentSubgoalId != -1) {
+                controller.setCompleted(currentSubgoalId, completeCheckBox.isSelected());
+            }
+        });
+
+        // Q/A button (placeholder for now)
         qaButton.addActionListener(e ->
                 JOptionPane.showMessageDialog(this,
                         "Q/A chat not implemented yet.",
                         "Q/A",
                         JOptionPane.INFORMATION_MESSAGE));
     }
+
 
     /**
      * Opens the dialog for a specific subgoal.
@@ -123,6 +132,7 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
         nameLabel.setText(state.getName());
         descriptionArea.setText(state.getDescription());
         priorityCheckBox.setSelected(state.isPriority());
+        completeCheckBox.setSelected(state.isCompleted());
 
         if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
             JOptionPane.showMessageDialog(this,

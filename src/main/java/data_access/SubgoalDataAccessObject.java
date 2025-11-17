@@ -72,4 +72,26 @@ public class SubgoalDataAccessObject implements SubgoalDataAccessInterface {
 
         subgoals.put(id, updated);
     }
+
+    @Override
+    public void updateCompleted(int id, boolean completed) {
+        Subgoal old = subgoals.get(id);
+        if (old == null) {
+            return;
+        }
+
+        Subgoal updated = new Subgoal(
+                old.getId(),
+                old.getPlanId(),
+                old.getUserId(),
+                old.getName(),
+                old.getDescription(),
+                old.getDeadline(),
+                completed,
+                old.isPriority()
+        );
+
+        subgoals.put(id, updated);
+    }
+
 }

@@ -23,11 +23,6 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
         this.presenter = presenter;
     }
 
-    /**
-     * Loads a subgoal by ID and passes its information to the Presenter.
-     *
-     * @param inputData the input data containing the subgoal ID
-     */
     @Override
     public void execute(ShowSubgoalInputData inputData) {
         int id = inputData.getSubgoalId();
@@ -41,17 +36,13 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
         ShowSubgoalOutputData out = new ShowSubgoalOutputData(
                 s.getName(),
                 s.getDescription(),
-                s.isPriority()
+                s.isPriority(),
+                s.isCompleted()
         );
 
         presenter.present(out);
     }
 
-    /**
-     * Updates the priority flag of a subgoal and refreshes its displayed data.
-     *
-     * @param inputData the input data containing the subgoal ID and new priority value
-     */
     @Override
     public void setPriority(SetPriorityInputData inputData) {
         int id = inputData.getSubgoalId();
@@ -59,7 +50,6 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
 
         subgoalDAO.updatePriority(id, priority);
 
-        // Reload the subgoal to keep UI in sync
         Subgoal s = subgoalDAO.getSubgoalById(id);
         if (s == null) {
             presenter.presentError("Subgoal with id " + id + " was not found after updating priority.");
@@ -69,7 +59,31 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
         ShowSubgoalOutputData out = new ShowSubgoalOutputData(
                 s.getName(),
                 s.getDescription(),
-                s.isPriority()
+                s.isPriority(),
+                s.isCompleted()
+        );
+
+        presenter.present(out);
+    }
+
+    @Override
+    public void setCompleted(SetCompletedInputData inputData) {
+        int id = inputData.getSubgoalId();
+        boolean completed = inputData.isCompleted();
+
+        subgoalDAO.updateCompleted(id, completed);
+
+        Subgoal s = subgoalDAO.getSubgoalById(id);
+        if (s == null) {
+            presenter.presentError("Subgoal with id " + id + " was not found after updating completion.");
+            return;
+        }
+
+        ShowSubgoalOutputData out = new ShowSubgoalOutputData(
+                s.getName(),
+                s.getDescription(),
+                s.isPriority(),
+                s.isCompleted()
         );
 
         presenter.present(out);
