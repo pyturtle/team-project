@@ -12,9 +12,9 @@ import java.time.LocalDate;
  */
 public class Subgoal {
 
-    private final int id;
-    private final int planId;
-    private final int userId;
+    private final String id;
+    private final String planId;
+    private final String userEmail;
 
     private final String name;
     private final String description;
@@ -28,7 +28,7 @@ public class Subgoal {
      *
      * @param id the unique identifier of the subgoal
      * @param planId the identifier of the plan this subgoal belongs to
-     * @param userId the identifier of the user who owns this subgoal
+     * @param userEmail the identifier of the user who owns this subgoal
      * @param name the name/title of the subgoal
      * @param description the description of what the subgoal requires
      * @param deadline the deadline by which the subgoal should be completed
@@ -38,9 +38,9 @@ public class Subgoal {
      * @throws IllegalArgumentException if {@code name} or {@code description} are empty
      *                                  or if {@code deadline} is null
      */
-    public Subgoal(int id,
-                   int planId,
-                   int userId,
+    public Subgoal(String id,
+                   String planId,
+                   String userEmail,
                    String name,
                    String description,
                    LocalDate deadline,
@@ -59,7 +59,7 @@ public class Subgoal {
 
         this.id = id;
         this.planId = planId;
-        this.userId = userId;
+        this.userEmail = userEmail;
         this.name = name;
         this.description = description;
         this.deadline = deadline;
@@ -68,13 +68,13 @@ public class Subgoal {
     }
 
     /** @return the unique ID of the subgoal */
-    public int getId() { return id; }
+    public String getId() { return id; }
 
     /** @return the ID of the plan this subgoal belongs to */
-    public int getPlanId() { return planId; }
+    public String getPlanId() { return planId; }
 
     /** @return the ID of the user who owns this subgoal */
-    public int getUserId() { return userId; }
+    public String getUserEmail() { return userEmail; }
 
     /** @return the name/title of the subgoal */
     public String getName() { return name; }
