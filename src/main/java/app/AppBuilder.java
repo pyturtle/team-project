@@ -1,6 +1,7 @@
 package app;
 
 import data_access.FileUserDataAccessObject;
+import data_access.InMemoryPlanDataAccessObject;
 import entity.UserFactory;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.ChangePasswordController;
@@ -11,6 +12,9 @@ import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.logout.LogoutPresenter;
+import interface_adapter.show_plans.ShowPlansController;
+import interface_adapter.show_plans.ShowPlansPresenter;
+import interface_adapter.show_plans.ShowPlansViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -23,11 +27,15 @@ import use_case.login.LoginOutputBoundary;
 import use_case.logout.LogoutInputBoundary;
 import use_case.logout.LogoutInteractor;
 import use_case.logout.LogoutOutputBoundary;
+import use_case.show_plans.ShowPlansInputBoundary;
+import use_case.show_plans.ShowPlansInteractor;
+import use_case.show_plans.ShowPlansOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
 import view.LoggedInView;
 import view.LoginView;
+import view.ShowPlansView;
 import view.SignupView;
 import view.ViewManager;
 
@@ -42,12 +50,17 @@ public class AppBuilder {
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
     // set which data access implementation to use, can be any
+    // Plan data access object
+    final InMemoryPlanDataAccessObject planDataAccessObject = new InMemoryPlanDataAccessObject();
+
     // of the classes from the data_access package
 
     // DAO version using local file storage
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
 
     // DAO version using a shared external database
+    private ShowPlansView showPlansView;
+    private ShowPlansViewModel showPlansViewModel;
     // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
 
     private SignupView signupView;
@@ -65,6 +78,13 @@ public class AppBuilder {
         signupViewModel = new SignupViewModel();
         signupView = new SignupView(signupViewModel);
         cardPanel.add(signupView, signupView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addShowPlansView() {
+        showPlansViewModel = new ShowPlansViewModel();
+        showPlansView = new ShowPlansView(showPlansViewModel);
+        cardPanel.add(showPlansView, showPlansView.getViewName());
         return this;
     }
 
@@ -113,6 +133,23 @@ public class AppBuilder {
 
         ChangePasswordController changePasswordController = new ChangePasswordController(changePasswordInteractor);
         loggedInView.setChangePasswordController(changePasswordController);
+        return this;
+    }
+
+    /**
+     * Adds the Show Plans Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addShowPlansUseCase() {
+        final ShowPlansOutputBoundary showPlansOutputBoundary = new ShowPlansPresenter(
+                viewManagerModel, showPlansViewModel);
+
+        final ShowPlansInputBoundary showPlansInteractor =
+                new ShowPlansInteractor(planDataAccessObject, showPlansOutputBoundary);
+
+        final ShowPlansController showPlansController = new ShowPlansController(showPlansInteractor);
+        showPlansView.setShowPlansController(showPlansController);
+        loggedInView.setShowPlansController(showPlansController);
         return this;
     }
 
