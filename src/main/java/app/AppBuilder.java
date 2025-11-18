@@ -4,6 +4,7 @@ import data_access.FileUserDataAccessObject;
 import data_access.InMemoryPlanDataAccessObject;
 import entity.UserFactory;
 import interface_adapter.ViewManagerModel;
+import interface_adapter.calendar.CalendarViewModel;
 import interface_adapter.delete_plan.DeletePlanController;
 import interface_adapter.delete_plan.DeletePlanPresenter;
 import interface_adapter.logged_in.ChangePasswordController;
@@ -38,11 +39,7 @@ import use_case.show_plans.ShowPlansOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
-import view.LoggedInView;
-import view.LoginView;
-import view.ShowPlansView;
-import view.SignupView;
-import view.ViewManager;
+import view.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -69,13 +66,14 @@ public class AppBuilder {
     private ShowPlansView showPlansView;
     private ShowPlansViewModel showPlansViewModel;
     // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
-
     private SignupView signupView;
     private SignupViewModel signupViewModel;
     private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
+    private CalendarViewModel calendarViewModel;
     private LoggedInView loggedInView;
     private LoginView loginView;
+    private CalendarView calendarView;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -106,6 +104,12 @@ public class AppBuilder {
         loggedInViewModel = new LoggedInViewModel();
         loggedInView = new LoggedInView(loggedInViewModel);
         cardPanel.add(loggedInView, loggedInView.getViewName());
+        return this;
+    }
+    public AppBuilder addCalendarView() {
+        calendarViewModel = new CalendarViewModel();
+        calendarView = new CalendarView(calendarViewModel, viewManagerModel);
+        cardPanel.add(calendarView, calendarView.getViewName());
         return this;
     }
 

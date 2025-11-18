@@ -38,7 +38,11 @@ public class LoginPresenter implements LoginOutputBoundary {
         loginViewModel.setState(new LoginState());
 
         // switch to the logged in view
-        this.viewManagerModel.setState(loggedInViewModel.getViewName());
+//        this.viewManagerModel.setState(loggedInViewModel.getViewName());
+//        this.viewManagerModel.firePropertyChange();
+        // HELLO THIS IS ALEXTQ WANG. IVE CHANGED THIS SO THAT IT REDIRECTS TO CALENDARVIEW WHICH IS WHAT IS
+        // WRITTEN DOWN IN THE DIAGRAMS, BUT I AM NOT SURE WHERE YOU WANT TO INCORPORATE LOGGEDIN VIEW.
+        this.viewManagerModel.setState("CalendarView");
         this.viewManagerModel.firePropertyChange();
     }
 
