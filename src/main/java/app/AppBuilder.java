@@ -1,9 +1,12 @@
 package app;
 
 import data_access.FileUserDataAccessObject;
+import data_access.InMemoryPlanDataAccessObject;
 import entity.UserFactory;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.calendar.CalendarViewModel;
+import interface_adapter.delete_plan.DeletePlanController;
+import interface_adapter.delete_plan.DeletePlanPresenter;
 import interface_adapter.logged_in.ChangePasswordController;
 import interface_adapter.logged_in.ChangePasswordPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
@@ -12,29 +15,40 @@ import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.logout.LogoutPresenter;
+import interface_adapter.show_plans.ShowPlansController;
+import interface_adapter.show_plans.ShowPlansPresenter;
+import interface_adapter.show_plans.ShowPlansViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
+import use_case.delete_plan.DeletePlanInputBoundary;
+import use_case.delete_plan.DeletePlanInteractor;
+import use_case.delete_plan.DeletePlanOutputBoundary;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
 import use_case.logout.LogoutInputBoundary;
 import use_case.logout.LogoutInteractor;
 import use_case.logout.LogoutOutputBoundary;
+import use_case.show_plans.ShowPlansInputBoundary;
+import use_case.show_plans.ShowPlansInteractor;
+import use_case.show_plans.ShowPlansOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
 import view.LoggedInView;
 import view.LoginView;
+import view.ShowPlansView;
 import view.SignupView;
 import view.ViewManager;
 
 import javax.swing.*;
 import java.awt.*;
 
+// Delete Plan functionality added
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -48,7 +62,13 @@ public class AppBuilder {
     // DAO version using local file storage
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
 
-    // DAO version using a shared external database
+    // Plan data access object - loads from JSON file
+    // To use JSON file: new InMemoryPlanDataAccessObject("plans.json")
+    // To use demo data: new InMemoryPlanDataAccessObject()
+    final InMemoryPlanDataAccessObject planDataAccessObject = new InMemoryPlanDataAccessObject("plans.json");
+
+    private ShowPlansView showPlansView;
+    private ShowPlansViewModel showPlansViewModel;
     // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
 
 //    COMMENTED CODE IS FOR ALEXTQWANG TO WORK ON LATER ON HIS PERSONAL PC!!! PLEASE DON'T TOUCH!!!!!!! PLEASE!!!!!!
@@ -69,6 +89,13 @@ public class AppBuilder {
         signupViewModel = new SignupViewModel();
         signupView = new SignupView(signupViewModel);
         cardPanel.add(signupView, signupView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addShowPlansView() {
+        showPlansViewModel = new ShowPlansViewModel();
+        showPlansView = new ShowPlansView(showPlansViewModel);
+        cardPanel.add(showPlansView, showPlansView.getViewName());
         return this;
     }
 
@@ -124,6 +151,38 @@ public class AppBuilder {
 
         ChangePasswordController changePasswordController = new ChangePasswordController(changePasswordInteractor);
         loggedInView.setChangePasswordController(changePasswordController);
+        return this;
+    }
+
+    /**
+     * Adds the Show Plans Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addShowPlansUseCase() {
+        final ShowPlansOutputBoundary showPlansOutputBoundary = new ShowPlansPresenter(
+                viewManagerModel, showPlansViewModel, loggedInViewModel);
+
+        final ShowPlansInputBoundary showPlansInteractor =
+                new ShowPlansInteractor(planDataAccessObject, showPlansOutputBoundary);
+
+        final ShowPlansController showPlansController = new ShowPlansController(showPlansInteractor);
+        showPlansView.setShowPlansController(showPlansController);
+        loggedInView.setShowPlansController(showPlansController);
+        return this;
+    }
+
+    /**
+     * Adds the Delete Plan Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addDeletePlanUseCase() {
+        final DeletePlanOutputBoundary deletePlanOutputBoundary = new DeletePlanPresenter(showPlansViewModel);
+
+        final DeletePlanInputBoundary deletePlanInteractor =
+                new DeletePlanInteractor(planDataAccessObject, deletePlanOutputBoundary);
+
+        final DeletePlanController deletePlanController = new DeletePlanController(deletePlanInteractor);
+        showPlansView.setDeletePlanController(deletePlanController);
         return this;
     }
 
