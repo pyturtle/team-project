@@ -59,11 +59,5 @@ public class ShowPlansPresenter implements ShowPlansOutputBoundary {
         // Trigger view update to load plans
         showPlansViewModel.firePropertyChange();
     }
-
-    @Override
-    public void switchToLoggedInView() {
-        viewManagerModel.setState(loggedInViewModel.getViewName());
-        viewManagerModel.firePropertyChange();
-    }
 }
 

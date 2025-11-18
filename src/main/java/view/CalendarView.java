@@ -2,6 +2,8 @@ package view;
 
 import interface_adapter.calendar.CalendarViewModel;
 import interface_adapter.calendar.CalendarState;
+import interface_adapter.logout.LogoutController;
+import interface_adapter.show_plans.ShowPlansController;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -19,6 +21,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     private JButton calendarButton;
     private JButton myPlansButton;
     private JButton createPlanButton;
+    private JButton logoutButton;
 
     // Month changing, ie. left/right buttons, and show current month.
     private JButton prevMonthButton;
@@ -43,6 +46,12 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     // For switching views. This is not a button
     private interface_adapter.ViewManagerModel viewManagerModel;
 
+    // Logout controller
+    private LogoutController logoutController;
+
+    // Show Plans controller for loading plans when switching views
+    private ShowPlansController showPlansController;
+
     public CalendarView(CalendarViewModel viewModel, interface_adapter.ViewManagerModel viewManagerModel) {
         this.viewModel = viewModel;
         this.viewManagerModel = viewManagerModel;
@@ -51,13 +60,24 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         setLayout(new BorderLayout());
 
         //View buttons to change view.
-        JPanel topPanel = new JPanel();
+        JPanel topPanel = new JPanel(new BorderLayout());
+
+        // Navigation buttons on the left
+        JPanel navButtons = new JPanel();
         calendarButton = new JButton("Calendar");
         myPlansButton = new JButton("My Plans");
         createPlanButton = new JButton("Create Plan");
-        topPanel.add(calendarButton);
-        topPanel.add(myPlansButton);
-        topPanel.add(createPlanButton);
+        navButtons.add(calendarButton);
+        navButtons.add(myPlansButton);
+        navButtons.add(createPlanButton);
+        topPanel.add(navButtons, BorderLayout.WEST);
+
+        // Logout button on the right
+        JPanel logoutPanel = new JPanel();
+        logoutButton = new JButton("Logout");
+        logoutPanel.add(logoutButton);
+        topPanel.add(logoutPanel, BorderLayout.EAST);
+
         add(topPanel, BorderLayout.NORTH);
 
         //Changing months
@@ -94,6 +114,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         calendarButton.addActionListener(this);
         myPlansButton.addActionListener(this);
         createPlanButton.addActionListener(this);
+        logoutButton.addActionListener(this);
         prevMonthButton.addActionListener(this);
         nextMonthButton.addActionListener(this);
         addGoalButton.addActionListener(this);
@@ -157,11 +178,23 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
             viewManagerModel.setState("CalendarView");
             viewManagerModel.firePropertyChange();
         } else if (src == myPlansButton) {
+            // Load plans for current user before switching view
+            if (showPlansController != null) {
+                final CalendarState calendarState = viewModel.getCalendarState();
+                final String currentUsername = calendarState.getUsername();
+                if (currentUsername != null && !currentUsername.isEmpty()) {
+                    showPlansController.execute(currentUsername, 0, 6);
+                }
+            }
             viewManagerModel.setState("ShowPlansView");
             viewManagerModel.firePropertyChange();
         } else if (src == createPlanButton) {
             viewManagerModel.setState("CreatePlanView");
             viewManagerModel.firePropertyChange();
+        } else if (src == logoutButton) {
+            if (logoutController != null) {
+                logoutController.execute();
+            }
         }
 
         // changing months
@@ -224,5 +257,14 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     }
     public String getViewName() {
         return "CalendarView";
+    }
+
+    public void setLogoutController(LogoutController logoutController) {
+        this.logoutController = logoutController;
+    }
+
+
+    public void setShowPlansController(ShowPlansController showPlansController) {
+        this.showPlansController = showPlansController;
     }
 }

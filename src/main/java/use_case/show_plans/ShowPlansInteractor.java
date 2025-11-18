@@ -51,9 +51,4 @@ public class ShowPlansInteractor implements ShowPlansInputBoundary {
     public void switchToShowPlansView() {
         presenter.switchToShowPlansView();
     }
-
-    @Override
-    public void switchToLoggedInView() {
-        presenter.switchToLoggedInView();
-    }
 }

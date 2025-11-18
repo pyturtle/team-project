@@ -12,7 +12,7 @@ public class ShowPlansViewModel extends ViewModel<ShowPlansState> {
     public static final String DELETE_BUTTON_LABEL = "Delete";
 
     public ShowPlansViewModel() {
-        super("show plans");
+        super("ShowPlansView");
         setState(new ShowPlansState());
     }
 }
