@@ -39,11 +39,7 @@ import use_case.show_plans.ShowPlansOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
-import view.LoggedInView;
-import view.LoginView;
-import view.ShowPlansView;
-import view.SignupView;
-import view.ViewManager;
+import view.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,16 +66,14 @@ public class AppBuilder {
     private ShowPlansView showPlansView;
     private ShowPlansViewModel showPlansViewModel;
     // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
-
-//    COMMENTED CODE IS FOR ALEXTQWANG TO WORK ON LATER ON HIS PERSONAL PC!!! PLEASE DON'T TOUCH!!!!!!! PLEASE!!!!!!
     private SignupView signupView;
     private SignupViewModel signupViewModel;
     private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
-//    private CalendarViewModel calendarViewModel;
+    private CalendarViewModel calendarViewModel;
     private LoggedInView loggedInView;
     private LoginView loginView;
-//    private CalendarView calendarView;
+    private CalendarView calendarView;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -112,13 +106,12 @@ public class AppBuilder {
         cardPanel.add(loggedInView, loggedInView.getViewName());
         return this;
     }
-//    COMMENTED CODE IS FOR ALEXTQWANG TO WORK ON LATER ON HIS PERSONAL PC!!! PLEASE DON'T TOUCH!!!!!!! PLEASE!!!!!!
-//    public AppBuilder addCalendarView() {
-//        calendarViewModel = new CalendarViewModel();
-//        calendarView = new CalendarView(CalendarViewModel);
-//
-//
-//    }
+    public AppBuilder addCalendarView() {
+        calendarViewModel = new CalendarViewModel();
+        calendarView = new CalendarView(calendarViewModel, viewManagerModel);
+        cardPanel.add(calendarView, calendarView.getViewName());
+        return this;
+    }
 
     public AppBuilder addSignupUseCase() {
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel,
