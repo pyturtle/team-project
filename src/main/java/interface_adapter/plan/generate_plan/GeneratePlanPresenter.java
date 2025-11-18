@@ -14,6 +14,7 @@ public class GeneratePlanPresenter implements GeneratePlanOutputBoundary {
     public void prepareView(GeneratePlanOutputData outputData) {
         final GeneratePlanState generatePlanState = generatePlanViewModel.getState();
         generatePlanState.setResponseMessage(outputData.getResponseMessage());
+        generatePlanState.setResponseObject(outputData.getResponseObject());
         generatePlanState.setUserMessage(outputData.getUserMessage());
         generatePlanState.setSuccess(outputData.isSuccess());
         generatePlanViewModel.firePropertyChange();

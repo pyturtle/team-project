@@ -1,7 +1,7 @@
 package interface_adapter;
 
 public class DialogManagerModel extends ViewModel<String>{
-    public DialogManagerModel(String viewName) {
+    public DialogManagerModel() {
         super("dialog manager");
         this.setState("");
     }

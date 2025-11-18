@@ -10,6 +10,7 @@ public class Main {
                 .addSignupView()
                 .addLoggedInView()
                 .addGeneratePlanView()
+                .addShowPlanView()
                 .addSignupUseCase()
                 .addLoginUseCase()
                 .addChangePasswordUseCase()

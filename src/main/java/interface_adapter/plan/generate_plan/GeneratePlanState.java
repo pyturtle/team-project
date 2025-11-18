@@ -1,8 +1,11 @@
 package interface_adapter.plan.generate_plan;
 
+import org.json.JSONObject;
+
 public class GeneratePlanState {
     private String userMessage = "";
     private String responseMessage = "";
+    private JSONObject responseObject = new JSONObject();
     private boolean success = false;
 
     public String getResponseMessage() {
@@ -27,5 +30,13 @@ public class GeneratePlanState {
 
     public void setUserMessage(String userMessage) {
         this.userMessage = userMessage;
+    }
+
+    public JSONObject getResponseObject() {
+        return responseObject;
+    }
+
+    public void setResponseObject(JSONObject responseObject) {
+        this.responseObject = responseObject;
     }
 }

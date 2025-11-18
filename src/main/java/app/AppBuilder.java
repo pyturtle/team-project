@@ -3,6 +3,7 @@ package app;
 import data_access.FileUserDataAccessObject;
 import data_access.GeminiApiDataAccessObject;
 import entity.UserFactory;
+import interface_adapter.DialogManagerModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.ChangePasswordController;
 import interface_adapter.logged_in.ChangePasswordPresenter;
@@ -18,6 +19,9 @@ import interface_adapter.message.SendMessageViewModel;
 import interface_adapter.plan.generate_plan.GeneratePlanController;
 import interface_adapter.plan.generate_plan.GeneratePlanPresenter;
 import interface_adapter.plan.generate_plan.GeneratePlanViewModel;
+import interface_adapter.plan.show_plan.ShowPlanController;
+import interface_adapter.plan.show_plan.ShowPlanPresenter;
+import interface_adapter.plan.show_plan.ShowPlanViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -36,6 +40,10 @@ import use_case.message.SendMessageOutputBoundary;
 import use_case.plan.generate_plan.GeneratePlanInputBoundary;
 import use_case.plan.generate_plan.GeneratePlanInteractor;
 import use_case.plan.generate_plan.GeneratePlanOutputBoundary;
+import use_case.plan.show_plan.ShowPlanInputBoundary;
+import use_case.plan.show_plan.ShowPlanInteractor;
+import use_case.plan.show_plan.ShowPlanOutputBoundary;
+import use_case.plan.show_plan.ShowPlanOutputData;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -45,13 +53,17 @@ import javax.swing.*;
 import java.awt.*;
 
 public class AppBuilder {
-    private final JPanel cardPanel = new JPanel();
-    private final JDialog dialog = new JDialog();
-    private final CardLayout cardLayout = new CardLayout();
     final UserFactory userFactory = new UserFactory();
+
+    private final JPanel cardPanel = new JPanel();
+    private final CardLayout cardLayout = new CardLayout();
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
+    private final JPanel dialogCardPanel = new JPanel();
+    private final CardLayout dialogCardLayout = new CardLayout();
+    final DialogManagerModel dialogManagerModel = new DialogManagerModel();
+    DialogManager dialogManager = new DialogManager(dialogCardPanel, dialogCardLayout, dialogManagerModel);
     // set which data access implementation to use, can be any
     // of the classes from the data_access package
 
@@ -69,12 +81,15 @@ public class AppBuilder {
     private LoggedInViewModel loggedInViewModel;
     private GeneratePlanViewModel generatePlanViewModel;
     private SendMessageViewModel sendMessageViewModel;
+    private ShowPlanViewModel showPlanViewModel;
     private LoggedInView loggedInView;
     private LoginView loginView;
     private GeneratePlanView generatePlanView;
+    private ShowPlanView showPlanView;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
+        dialogCardPanel.setLayout(dialogCardLayout);
     }
 
     public AppBuilder addSignupView() {
@@ -103,6 +118,13 @@ public class AppBuilder {
         sendMessageViewModel = new SendMessageViewModel();
         generatePlanView = new GeneratePlanView(generatePlanViewModel, sendMessageViewModel);
         cardPanel.add(generatePlanView, generatePlanView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addShowPlanView() {
+        showPlanViewModel = new ShowPlanViewModel();
+        showPlanView = new ShowPlanView(showPlanViewModel);
+        dialogCardPanel.add(showPlanView, showPlanView.getViewName());
         return this;
     }
 
@@ -150,8 +172,14 @@ public class AppBuilder {
         final SendMessageInputBoundary sendMessageInteractor = new SendMessageInteractor(sendMessageOutputBoundary);
         SendMessageController sendMessageController = new SendMessageController(sendMessageInteractor);
 
+        final ShowPlanOutputBoundary showPlanOutputBoundary = new ShowPlanPresenter(showPlanViewModel,
+                dialogManagerModel);
+        final ShowPlanInputBoundary showPlanInteractor = new ShowPlanInteractor(showPlanOutputBoundary);
+        ShowPlanController showPlanController = new ShowPlanController(showPlanInteractor);
+
         generatePlanView.setGeneratePlanController(generatePlanController);
         generatePlanView.setSendMessageController(sendMessageController);
+        generatePlanView.setShowPlanController(showPlanController);
         return this;
     }
 
@@ -175,11 +203,6 @@ public class AppBuilder {
         final JFrame application = new JFrame("Generate Plan Example");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         application.add(cardPanel);
-        JDialog dialog = new JDialog(application, "My Popup", false);
-        dialog.setSize(400, 300);
-        dialog.setLocationRelativeTo(null);   // center on screen
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialog.setVisible(false);
 
         viewManagerModel.setState(generatePlanView.getViewName());
         viewManagerModel.firePropertyChange();
