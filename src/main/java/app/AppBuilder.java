@@ -7,8 +7,6 @@ import interface_adapter.ViewManagerModel;
 import interface_adapter.calendar.CalendarViewModel;
 import interface_adapter.delete_plan.DeletePlanController;
 import interface_adapter.delete_plan.DeletePlanPresenter;
-import interface_adapter.logged_in.ChangePasswordController;
-import interface_adapter.logged_in.ChangePasswordPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
@@ -21,9 +19,6 @@ import interface_adapter.show_plans.ShowPlansViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
-import use_case.change_password.ChangePasswordInputBoundary;
-import use_case.change_password.ChangePasswordInteractor;
-import use_case.change_password.ChangePasswordOutputBoundary;
 import use_case.delete_plan.DeletePlanInputBoundary;
 import use_case.delete_plan.DeletePlanInteractor;
 import use_case.delete_plan.DeletePlanOutputBoundary;
@@ -71,7 +66,6 @@ public class AppBuilder {
     private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
     private CalendarViewModel calendarViewModel;
-    private LoggedInView loggedInView;
     private LoginView loginView;
     private CalendarView calendarView;
 
@@ -88,7 +82,7 @@ public class AppBuilder {
 
     public AppBuilder addShowPlansView() {
         showPlansViewModel = new ShowPlansViewModel();
-        showPlansView = new ShowPlansView(showPlansViewModel);
+        showPlansView = new ShowPlansView(showPlansViewModel, viewManagerModel);
         cardPanel.add(showPlansView, showPlansView.getViewName());
         return this;
     }
@@ -101,9 +95,8 @@ public class AppBuilder {
     }
 
     public AppBuilder addLoggedInView() {
+        // LoggedInViewModel is still needed by presenters, but we don't need the view anymore
         loggedInViewModel = new LoggedInViewModel();
-        loggedInView = new LoggedInView(loggedInViewModel);
-        cardPanel.add(loggedInView, loggedInView.getViewName());
         return this;
     }
     public AppBuilder addCalendarView() {
@@ -126,24 +119,12 @@ public class AppBuilder {
 
     public AppBuilder addLoginUseCase() {
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel,
-                loggedInViewModel, loginViewModel, signupViewModel);
+                loggedInViewModel, loginViewModel, signupViewModel, calendarViewModel, showPlansViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(
                 userDataAccessObject, loginOutputBoundary);
 
         LoginController loginController = new LoginController(loginInteractor);
         loginView.setLoginController(loginController);
-        return this;
-    }
-
-    public AppBuilder addChangePasswordUseCase() {
-        final ChangePasswordOutputBoundary changePasswordOutputBoundary = new ChangePasswordPresenter(viewManagerModel,
-                loggedInViewModel);
-
-        final ChangePasswordInputBoundary changePasswordInteractor =
-                new ChangePasswordInteractor(userDataAccessObject, changePasswordOutputBoundary, userFactory);
-
-        ChangePasswordController changePasswordController = new ChangePasswordController(changePasswordInteractor);
-        loggedInView.setChangePasswordController(changePasswordController);
         return this;
     }
 
@@ -160,7 +141,7 @@ public class AppBuilder {
 
         final ShowPlansController showPlansController = new ShowPlansController(showPlansInteractor);
         showPlansView.setShowPlansController(showPlansController);
-        loggedInView.setShowPlansController(showPlansController);
+        calendarView.setShowPlansController(showPlansController);
         return this;
     }
 
@@ -191,7 +172,8 @@ public class AppBuilder {
                 new LogoutInteractor(userDataAccessObject, logoutOutputBoundary);
 
         final LogoutController logoutController = new LogoutController(logoutInteractor);
-        loggedInView.setLogoutController(logoutController);
+        calendarView.setLogoutController(logoutController);
+        showPlansView.setLogoutController(logoutController);
         return this;
     }
 

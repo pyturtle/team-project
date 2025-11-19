@@ -8,18 +8,17 @@ public class Main {
         JFrame application = appBuilder
                 .addLoginView()
                 .addSignupView()
-                .addLoggedInView()
+                .addLoggedInView() // Still needed for LoggedInViewModel (used by presenters)
                 .addCalendarView()
                 .addShowPlansView()
                 .addSignupUseCase()
                 .addLoginUseCase()
                 .addLogoutUseCase()
-                .addChangePasswordUseCase()
                 .addShowPlansUseCase()
                 .addDeletePlanUseCase()
                 .build();
 
-        application.pack();
+        application.setSize(1000, 600);
         application.setLocationRelativeTo(null);
         application.setVisible(true);
     }

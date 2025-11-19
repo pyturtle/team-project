@@ -2,6 +2,7 @@ package view;
 
 import entity.Plan;
 import interface_adapter.delete_plan.DeletePlanController;
+import interface_adapter.logout.LogoutController;
 import interface_adapter.show_plans.ShowPlansController;
 import interface_adapter.show_plans.ShowPlansState;
 import interface_adapter.show_plans.ShowPlansViewModel;
@@ -23,48 +24,78 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     private static final int PANEL_WIDTH = 180;
     private static final int PANEL_HEIGHT = 120;
 
-    private final String viewName = "show plans";
+    private final String viewName = "ShowPlansView";
     private final ShowPlansViewModel showPlansViewModel;
     private ShowPlansController showPlansController;
     private DeletePlanController deletePlanController;
+    private LogoutController logoutController;
+
+    // View navigation buttons
+    private JButton calendarButton;
+    private JButton myPlansButton;
+    private JButton createPlanButton;
+    private JButton logoutButton;
 
     private final JPanel plansGridPanel;
     private final JButton previousButton;
     private final JButton nextButton;
     private final JLabel pageLabel;
 
-    public ShowPlansView(ShowPlansViewModel showPlansViewModel) {
+    // For switching views
+    private interface_adapter.ViewManagerModel viewManagerModel;
+
+    public ShowPlansView(ShowPlansViewModel showPlansViewModel, interface_adapter.ViewManagerModel viewManagerModel) {
         this.showPlansViewModel = showPlansViewModel;
+        this.viewManagerModel = viewManagerModel;
         this.showPlansViewModel.addPropertyChangeListener(this);
 
         this.setLayout(new BorderLayout());
 
-        // Title panel with back button
-        final JPanel titlePanel = new JPanel(new BorderLayout());
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        // View navigation buttons (Calendar, My Plans, Create Plan)
+        final JPanel topPanel = new JPanel(new BorderLayout());
 
-        // Back button on the left
-        final JButton backButton = new JButton("← Back");
-        backButton.addActionListener(e -> {
-            if (showPlansController != null) {
-                showPlansController.switchToLoggedInView();
+        // Navigation buttons on the left
+        final JPanel navButtons = new JPanel();
+        calendarButton = new JButton("Calendar");
+        myPlansButton = new JButton("My Plans");
+        createPlanButton = new JButton("Create Plan");
+
+        calendarButton.addActionListener(e -> {
+            viewManagerModel.setState("CalendarView");
+            viewManagerModel.firePropertyChange();
+        });
+
+        myPlansButton.addActionListener(e -> {
+            // Reload plans for current user before switching view
+            final ShowPlansState state = showPlansViewModel.getState();
+            final String currentUsername = state.getUsername();
+            if (currentUsername != null && !currentUsername.isEmpty() && showPlansController != null) {
+                showPlansController.execute(currentUsername, 0, PLANS_PER_PAGE);
+            }
+            viewManagerModel.setState("ShowPlansView");
+            viewManagerModel.firePropertyChange();
+        });
+
+        // Create Plan button handler will be added later when Create Plan feature is implemented
+        createPlanButton.setEnabled(false);
+
+        navButtons.add(calendarButton);
+        navButtons.add(myPlansButton);
+        navButtons.add(createPlanButton);
+        topPanel.add(navButtons, BorderLayout.WEST);
+
+        // Logout button on the right
+        final JPanel logoutPanel = new JPanel();
+        logoutButton = new JButton("Logout");
+        logoutButton.addActionListener(e -> {
+            if (logoutController != null) {
+                logoutController.execute();
             }
         });
-        titlePanel.add(backButton, BorderLayout.WEST);
+        logoutPanel.add(logoutButton);
+        topPanel.add(logoutPanel, BorderLayout.EAST);
 
-        // Title in the center
-        final JLabel title = new JLabel(ShowPlansViewModel.TITLE_LABEL);
-        title.setFont(new Font("Arial", Font.BOLD, 24));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        titlePanel.add(title, BorderLayout.CENTER);
-
-        // Invisible spacer on the right to balance the back button and center the title
-        final JPanel spacer = new JPanel();
-        spacer.setPreferredSize(backButton.getPreferredSize());
-        spacer.setOpaque(false);
-        titlePanel.add(spacer, BorderLayout.EAST);
-
-        this.add(titlePanel, BorderLayout.NORTH);
+        this.add(topPanel, BorderLayout.NORTH);
 
         // Plans grid panel
         plansGridPanel = new JPanel();
@@ -235,5 +266,9 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
     public void setDeletePlanController(DeletePlanController controller) {
         this.deletePlanController = controller;
+    }
+
+    public void setLogoutController(LogoutController controller) {
+        this.logoutController = controller;
     }
 }

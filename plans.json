@@ -12,21 +12,33 @@
     "userId": "testuser"
   },
   {
-    "name": "Fitness Goal",
-    "description": "Run a half marathon by summer",
-    "planId": "plan-005",
-    "userId": "testuser"
-  },
-  {
     "name": "Learn Cooking",
     "description": "Master 20 new recipes",
     "planId": "plan-007",
     "userId": "testuser"
   },
   {
-    "name": "Side Project",
+    "name": "Side Project1",
     "description": "Build and launch a mobile app",
     "planId": "plan-008",
+    "userId": "testuser"
+  },
+  {
+    "name": "Side Project2",
+    "description": "Build and launch a mobile app",
+    "planId": "plan-009",
+    "userId": "testuser"
+  },
+  {
+    "name": "Side Project3",
+    "description": "Build and launch a mobile app",
+    "planId": "plan-010",
+    "userId": "testuser"
+  },
+  {
+    "name": "Side Project4",
+    "description": "Build and launch a mobile app",
+    "planId": "plan-011",
     "userId": "testuser"
   }
 ]

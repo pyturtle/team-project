@@ -10,6 +10,15 @@ public class CalendarState {
     private LocalDate selectedDate = LocalDate.now();
     private Map<LocalDate, List<String>> goalsByDate = new HashMap<>();
     private String errorMessage;
+    private String username;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public LocalDate getSelectedDate() {
         return selectedDate;

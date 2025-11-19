@@ -21,9 +21,4 @@ public interface ShowPlansOutputBoundary {
      * Switches to the Show Plans view.
      */
     void switchToShowPlansView();
-
-    /**
-     * Switches back to the Logged In view.
-     */
-    void switchToLoggedInView();
 }
