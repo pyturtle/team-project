@@ -11,6 +11,7 @@ public class Main {
                 .addLoggedInView()
                 .addGeneratePlanView()
                 .addShowPlanView()
+                .addSavePlanView()
                 .addSignupUseCase()
                 .addLoginUseCase()
                 .addChangePasswordUseCase()

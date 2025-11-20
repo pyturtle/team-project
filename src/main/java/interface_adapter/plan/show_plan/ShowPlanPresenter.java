@@ -1,7 +1,6 @@
 package interface_adapter.plan.show_plan;
 
 import interface_adapter.DialogManagerModel;
-import use_case.plan.show_plan.ShowPlanInputData;
 import use_case.plan.show_plan.ShowPlanOutputBoundary;
 import use_case.plan.show_plan.ShowPlanOutputData;
 

@@ -1,11 +1,12 @@
 package use_case.plan.show_plan;
 
-import entity.Subgoal;
+import entity.subgoal.Subgoal;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ShowPlanInteractor implements ShowPlanInputBoundary {
     ShowPlanOutputBoundary showPlanPresenter;
@@ -19,18 +20,13 @@ public class ShowPlanInteractor implements ShowPlanInputBoundary {
         JSONObject planObject = showPlanInputData.getPlanObject();
         String planName = planObject.getString("name");
         String planDescription = planObject.getString("description");
-        ArrayList<Subgoal> subgoalsList = new ArrayList<>();
+        ArrayList<HashMap<String, String>> subgoalsList = new ArrayList<>();
         JSONArray subgoals = planObject.getJSONArray("subgoals");
         for (int i = 0; i < subgoals.length(); i++) {
-            Subgoal subgoal = new Subgoal(
-                    subgoals.getJSONObject(i).getString("id"),
-                    planObject.getString("id"),
-                    planObject.getString("user_email"),
-                    subgoals.getJSONObject(i).getString("name"),
-                    subgoals.getJSONObject(i).getString("description"),
-                    LocalDate.parse(subgoals.getJSONObject(i).getString("deadline")),
-                    false,
-                    false);
+            HashMap<String, String> subgoal = new HashMap<>();
+            subgoal.put("name", subgoals.getJSONObject(i).getString("name"));
+            subgoal.put("description", subgoals.getJSONObject(i).getString("description"));
+            subgoal.put("deadline", subgoals.getJSONObject(i).getString("deadline"));
             subgoalsList.add(subgoal);
         }
         final ShowPlanOutputData showPlanOutputData =

@@ -1,7 +1,7 @@
 package interface_adapter.show_subgoal;
 
-import use_case.show_subgoal.ShowSubgoalOutputBoundary;
-import use_case.show_subgoal.ShowSubgoalOutputData;
+import use_case.subgoal.show_subgoal.ShowSubgoalOutputBoundary;
+import use_case.subgoal.show_subgoal.ShowSubgoalOutputData;
 
 /**
  * Presenter for the ShowSubgoal use case.

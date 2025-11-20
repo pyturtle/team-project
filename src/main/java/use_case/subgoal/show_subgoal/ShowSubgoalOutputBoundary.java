@@ -1,4 +1,4 @@
-package use_case.show_subgoal;
+package use_case.subgoal.show_subgoal;
 
 /**
  * Output boundary for the ShowSubgoal use case.

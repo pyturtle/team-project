@@ -1,8 +1,12 @@
 package app;
 
+import data_access.FilePlanDataAccessObject;
+import data_access.FileSubgoalDataAccessObject;
 import data_access.FileUserDataAccessObject;
 import data_access.GeminiApiDataAccessObject;
-import entity.UserFactory;
+import entity.plan.PlanFactory;
+import entity.subgoal.SubgoalFactory;
+import entity.user.UserFactory;
 import interface_adapter.DialogManagerModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.ChangePasswordController;
@@ -19,6 +23,9 @@ import interface_adapter.message.SendMessageViewModel;
 import interface_adapter.plan.generate_plan.GeneratePlanController;
 import interface_adapter.plan.generate_plan.GeneratePlanPresenter;
 import interface_adapter.plan.generate_plan.GeneratePlanViewModel;
+import interface_adapter.plan.save_plan.SavePlanController;
+import interface_adapter.plan.save_plan.SavePlanPresenter;
+import interface_adapter.plan.save_plan.SavePlanViewModel;
 import interface_adapter.plan.show_plan.ShowPlanController;
 import interface_adapter.plan.show_plan.ShowPlanPresenter;
 import interface_adapter.plan.show_plan.ShowPlanViewModel;
@@ -40,40 +47,50 @@ import use_case.message.SendMessageOutputBoundary;
 import use_case.plan.generate_plan.GeneratePlanInputBoundary;
 import use_case.plan.generate_plan.GeneratePlanInteractor;
 import use_case.plan.generate_plan.GeneratePlanOutputBoundary;
+import use_case.plan.save_plan.SavePlanInputBoundary;
+import use_case.plan.save_plan.SavePlanInteractor;
+import use_case.plan.save_plan.SavePlanOutputBoundary;
 import use_case.plan.show_plan.ShowPlanInputBoundary;
 import use_case.plan.show_plan.ShowPlanInteractor;
 import use_case.plan.show_plan.ShowPlanOutputBoundary;
-import use_case.plan.show_plan.ShowPlanOutputData;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
 import view.*;
+import view.plan.GeneratePlanView;
+import view.plan.SavePlanView;
+import view.plan.ShowPlanView;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
 
 public class AppBuilder {
     final UserFactory userFactory = new UserFactory();
+    final SubgoalFactory subgoalFactory = new SubgoalFactory();
+    final PlanFactory planFactory = new PlanFactory();
 
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
-    private final JPanel dialogCardPanel = new JPanel();
-    private final CardLayout dialogCardLayout = new CardLayout();
+    private final HashMap<String, JPanel> dialogViews = new HashMap<>();
     final DialogManagerModel dialogManagerModel = new DialogManagerModel();
-    DialogManager dialogManager = new DialogManager(dialogCardPanel, dialogCardLayout, dialogManagerModel);
+    DialogManager dialogManager = new DialogManager(dialogViews, dialogManagerModel);
     // set which data access implementation to use, can be any
     // of the classes from the data_access package
 
     // DAO version using local file storage
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
-
+    final FileSubgoalDataAccessObject subgoalDataAccessObject = new FileSubgoalDataAccessObject("subgoals.csv",
+            subgoalFactory);
+    final FilePlanDataAccessObject planDataAccessObject = new FilePlanDataAccessObject("plans.csv", planFactory);
     // DAO version using a shared external database
     // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
 
     final GeminiApiDataAccessObject generatePlanDataAccessObject = new GeminiApiDataAccessObject();
+
 
     private SignupView signupView;
     private SignupViewModel signupViewModel;
@@ -82,14 +99,15 @@ public class AppBuilder {
     private GeneratePlanViewModel generatePlanViewModel;
     private SendMessageViewModel sendMessageViewModel;
     private ShowPlanViewModel showPlanViewModel;
+    private SavePlanViewModel savePlanViewModel;
     private LoggedInView loggedInView;
     private LoginView loginView;
     private GeneratePlanView generatePlanView;
     private ShowPlanView showPlanView;
+    private SavePlanView savePlanView;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
-        dialogCardPanel.setLayout(dialogCardLayout);
     }
 
     public AppBuilder addSignupView() {
@@ -123,8 +141,15 @@ public class AppBuilder {
 
     public AppBuilder addShowPlanView() {
         showPlanViewModel = new ShowPlanViewModel();
-        showPlanView = new ShowPlanView(showPlanViewModel);
-        dialogCardPanel.add(showPlanView, showPlanView.getViewName());
+        showPlanView = new ShowPlanView(showPlanViewModel, loggedInViewModel);
+        dialogViews.put(showPlanView.getViewName(), showPlanView);
+        return this;
+    }
+
+    public AppBuilder addSavePlanView() {
+        savePlanViewModel = new SavePlanViewModel();
+        savePlanView = new SavePlanView(savePlanViewModel);
+        dialogViews.put(savePlanView.getViewName(), savePlanView);
         return this;
     }
 
@@ -177,9 +202,16 @@ public class AppBuilder {
         final ShowPlanInputBoundary showPlanInteractor = new ShowPlanInteractor(showPlanOutputBoundary);
         ShowPlanController showPlanController = new ShowPlanController(showPlanInteractor);
 
+        final SavePlanOutputBoundary savePlanOutputBoundary = new SavePlanPresenter(savePlanViewModel,
+                dialogManagerModel);
+        final SavePlanInputBoundary savePlanInteractor = new SavePlanInteractor(savePlanOutputBoundary,
+                planDataAccessObject, subgoalDataAccessObject);
+        SavePlanController savePlanController = new SavePlanController(savePlanInteractor);
+
         generatePlanView.setGeneratePlanController(generatePlanController);
         generatePlanView.setSendMessageController(sendMessageController);
         generatePlanView.setShowPlanController(showPlanController);
+        showPlanView.setSavePlanController(savePlanController);
         return this;
     }
 

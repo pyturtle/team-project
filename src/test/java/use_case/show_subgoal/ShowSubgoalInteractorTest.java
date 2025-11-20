@@ -1,6 +1,6 @@
 //package use_case.show_subgoal;
 //
-//import entity.Subgoal;
+//import entity.subgoal.Subgoal;
 //import org.junit.jupiter.api.Test;
 //import java.time.LocalDate;
 //import java.util.HashMap;

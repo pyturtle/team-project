@@ -1,4 +1,4 @@
-package use_case.show_subgoal;
+package use_case.subgoal.show_subgoal;
 
 /**
  * Input data for the ShowSubgoal use case.
@@ -6,21 +6,21 @@ package use_case.show_subgoal;
  */
 public class ShowSubgoalInputData {
 
-    private final int subgoalId;
+    private final String subgoalId;
 
     /**
      * Constructs a new ShowSubgoalInputData.
      *
      * @param subgoalId the ID of the subgoal to load
      */
-    public ShowSubgoalInputData(int subgoalId) {
+    public ShowSubgoalInputData(String subgoalId) {
         this.subgoalId = subgoalId;
     }
 
     /**
      * @return the ID of the subgoal to load
      */
-    public int getSubgoalId() {
+    public String getSubgoalId() {
         return subgoalId;
     }
 }

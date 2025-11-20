@@ -1,11 +1,11 @@
-package use_case.show_subgoal;
+package use_case.subgoal.show_subgoal;
 
 /**
  * Input data for updating the priority flag of a subgoal.
  */
 public class SetPriorityInputData {
 
-    private final int subgoalId;
+    private final String subgoalId;
     private final boolean priority;
 
     /**
@@ -14,7 +14,7 @@ public class SetPriorityInputData {
      * @param subgoalId the ID of the subgoal whose priority should be updated
      * @param priority the new priority value
      */
-    public SetPriorityInputData(int subgoalId, boolean priority) {
+    public SetPriorityInputData(String subgoalId, boolean priority) {
         this.subgoalId = subgoalId;
         this.priority = priority;
     }
@@ -22,7 +22,7 @@ public class SetPriorityInputData {
     /**
      * @return the ID of the subgoal whose priority should be updated
      */
-    public int getSubgoalId() {
+    public String getSubgoalId() {
         return subgoalId;
     }
 

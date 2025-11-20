@@ -28,7 +28,7 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
     private final JButton qaButton = new JButton("Q/A");
 
     // We need to remember which subgoal is currently being displayed
-    private int currentSubgoalId = -1;
+    private String currentSubgoalId = "";
 
     /**
      * Constructs a SubgoalView.
@@ -87,14 +87,14 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
     private void setupListeners() {
         // Priority checkbox
         priorityCheckBox.addActionListener(e -> {
-            if (currentSubgoalId != -1) {
+            if (currentSubgoalId != "") {
                 controller.setPriority(currentSubgoalId, priorityCheckBox.isSelected());
             }
         });
 
         // Complete checkbox
         completeCheckBox.addActionListener(e -> {
-            if (currentSubgoalId != -1) {
+            if (currentSubgoalId != "") {
                 controller.setCompleted(currentSubgoalId, completeCheckBox.isSelected());
             }
         });
@@ -114,7 +114,7 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
      *
      * @param subgoalId the ID of the subgoal to display
      */
-    public void openForSubgoal(int subgoalId) {
+    public void openForSubgoal(String subgoalId) {
         this.currentSubgoalId = subgoalId;
         controller.execute(subgoalId);
         setLocationRelativeTo(getOwner());

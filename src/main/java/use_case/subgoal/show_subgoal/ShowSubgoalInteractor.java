@@ -1,6 +1,6 @@
-package use_case.show_subgoal;
+package use_case.subgoal.show_subgoal;
 
-import entity.Subgoal;
+import entity.subgoal.Subgoal;
 
 /**
  * Interactor for the ShowSubgoal use case.
@@ -25,7 +25,7 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
 
     @Override
     public void execute(ShowSubgoalInputData inputData) {
-        int id = inputData.getSubgoalId();
+        String id = inputData.getSubgoalId();
         Subgoal s = subgoalDAO.getSubgoalById(id);
 
         if (s == null) {
@@ -45,7 +45,7 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
 
     @Override
     public void setPriority(SetPriorityInputData inputData) {
-        int id = inputData.getSubgoalId();
+        String id = inputData.getSubgoalId();
         boolean priority = inputData.isPriority();
 
         subgoalDAO.updatePriority(id, priority);
@@ -68,7 +68,7 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
 
     @Override
     public void setCompleted(SetCompletedInputData inputData) {
-        int id = inputData.getSubgoalId();
+        String id = inputData.getSubgoalId();
         boolean completed = inputData.isCompleted();
 
         subgoalDAO.updateCompleted(id, completed);

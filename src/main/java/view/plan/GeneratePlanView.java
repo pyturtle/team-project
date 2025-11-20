@@ -1,4 +1,4 @@
-package view;
+package view.plan;
 
 import interface_adapter.message.SendMessageController;
 import interface_adapter.message.SendMessageState;

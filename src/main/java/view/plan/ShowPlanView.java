@@ -1,21 +1,30 @@
-package view;
+package view.plan;
 
-import entity.Subgoal;
+import interface_adapter.logged_in.LoggedInState;
+import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.plan.generate_plan.GeneratePlanController;
+import interface_adapter.plan.save_plan.SavePlanController;
 import interface_adapter.plan.show_plan.ShowPlanState;
 import interface_adapter.plan.show_plan.ShowPlanViewModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ShowPlanView extends JPanel implements PropertyChangeListener {
 
     private final String viewName = "show plan";
 
     private final ShowPlanViewModel showPlanViewModel;
+    private final LoggedInViewModel loggedInViewModel;
+
+    private SavePlanController savePlanController;
 
     private final JScrollPane subgoalsContainer = new JScrollPane(
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -25,15 +34,17 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
     private final JLabel planDescriptionLabel = new JLabel();
     private final JPanel subgoalsPanel = new JPanel();
 
-    public ShowPlanView(ShowPlanViewModel showPlanViewModel) {
+    private final JButton createPlanButton = new JButton("Create");
+
+    public ShowPlanView(ShowPlanViewModel showPlanViewModel, LoggedInViewModel loggedInViewModel) {
         this.showPlanViewModel = showPlanViewModel;
+        this.loggedInViewModel = loggedInViewModel;
         showPlanViewModel.addPropertyChangeListener(this);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15)); // outer padding
         setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // ---------- Title ----------
         JLabel title = new JLabel(ShowPlanViewModel.TITLE_LABEL);
         title.setFont(title.getFont().deriveFont(Font.BOLD, 18f));
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -41,7 +52,6 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
 
         add(Box.createVerticalStrut(15));
 
-        // ---------- Plan Info ----------
         JPanel planInfoPanel = new JPanel();
         planInfoPanel.setLayout(new BoxLayout(planInfoPanel, BoxLayout.Y_AXIS));
         planInfoPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -61,7 +71,6 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
         add(createDivider());
         add(Box.createVerticalStrut(10));
 
-        // ---------- Subgoals List ----------
         subgoalsPanel.setLayout(new BoxLayout(subgoalsPanel, BoxLayout.Y_AXIS));
         subgoalsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -70,6 +79,20 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
         subgoalsContainer.setBorder(null);
 
         add(subgoalsContainer);
+
+        createPlanButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                ShowPlanState currentState = showPlanViewModel.getState();
+                LoggedInState loggedInState = loggedInViewModel.getState();
+                savePlanController.execute(currentState.getPlanName(),
+                        currentState.getPlanDescription(),
+                        "john_doe@gmail.com",
+                        currentState.getSubgoalList());
+                createPlanButton.setEnabled(false);
+            }
+        });
+        add(createPlanButton);
     }
 
     @Override
@@ -79,21 +102,19 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
         planNameLabel.setText(newState.getPlanName());
         planDescriptionLabel.setText("<html>" + newState.getPlanDescription() + "</html>");
 
-        // Clear old subgoals before reloading
         subgoalsPanel.removeAll();
 
-        ArrayList<Subgoal> subgoals = newState.getSubgoalList();
+        ArrayList<HashMap<String, String>> subgoals = newState.getSubgoalList();
         for (int i = 0; i < subgoals.size(); i++) {
-            Subgoal subgoal = subgoals.get(i);
+            HashMap<String, String> subgoal = subgoals.get(i);
             JPanel subgoalPanel = createSubgoalPanel(
-                    subgoal.getName(),
-                    subgoal.getDescription(),
-                    subgoal.getDeadline()
+                    subgoal.get("name"),
+                    subgoal.get("description"),
+                    LocalDate.parse(subgoal.get("deadline"))
             );
 
             subgoalsPanel.add(subgoalPanel);
 
-            // Add divider between subgoals
             if (i < subgoals.size() - 1) {
                 subgoalsPanel.add(createDivider());
                 subgoalsPanel.add(Box.createVerticalStrut(10));
@@ -137,6 +158,10 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
         separator.setForeground(Color.GRAY);
         separator.setAlignmentX(Component.LEFT_ALIGNMENT);
         return separator;
+    }
+
+    public void setSavePlanController(SavePlanController savePlanController) {
+        this.savePlanController = savePlanController;
     }
 
     public String getViewName() {

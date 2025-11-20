@@ -1,4 +1,4 @@
-package entity;
+package entity.subgoal;
 
 import java.time.LocalDate;
 
@@ -14,7 +14,7 @@ public class Subgoal {
 
     private final String id;
     private final String planId;
-    private final String userEmail;
+    private final String username;
 
     private final String name;
     private final String description;
@@ -23,12 +23,13 @@ public class Subgoal {
     private final boolean isCompleted;
     private final boolean priority;
 
+
     /**
      * Constructs a new Subgoal entity.
      *
      * @param id the unique identifier of the subgoal
      * @param planId the identifier of the plan this subgoal belongs to
-     * @param userEmail the identifier of the user who owns this subgoal
+     * @param username the identifier of the user who owns this subgoal
      * @param name the name/title of the subgoal
      * @param description the description of what the subgoal requires
      * @param deadline the deadline by which the subgoal should be completed
@@ -40,7 +41,7 @@ public class Subgoal {
      */
     public Subgoal(String id,
                    String planId,
-                   String userEmail,
+                   String username,
                    String name,
                    String description,
                    LocalDate deadline,
@@ -59,7 +60,7 @@ public class Subgoal {
 
         this.id = id;
         this.planId = planId;
-        this.userEmail = userEmail;
+        this.username = username;
         this.name = name;
         this.description = description;
         this.deadline = deadline;
@@ -74,7 +75,7 @@ public class Subgoal {
     public String getPlanId() { return planId; }
 
     /** @return the ID of the user who owns this subgoal */
-    public String getUserEmail() { return userEmail; }
+    public String getUsername() { return username; }
 
     /** @return the name/title of the subgoal */
     public String getName() { return name; }
