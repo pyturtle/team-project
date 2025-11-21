@@ -16,6 +16,7 @@ public class Main {
                 .addLogoutUseCase()
                 .addShowPlansUseCase()
                 .addDeletePlanUseCase()
+                .addEditPlanUseCase()
                 .build();
 
         application.setSize(1000, 600);

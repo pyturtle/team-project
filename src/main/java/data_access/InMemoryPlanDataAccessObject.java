@@ -4,6 +4,7 @@ import entity.Plan;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import use_case.delete_plan.DeletePlanDataAccessInterface;
+import use_case.edit_plan.EditPlanDataAccessInterface;
 import use_case.show_plans.ShowPlansDataAccessInterface;
 
 import java.io.IOException;
@@ -19,7 +20,8 @@ import java.util.stream.Collectors;
  * In-memory implementation of the DAO for storing plan data.
  * Loads plans from a flat JSON array and filters by userId.
  */
-public class InMemoryPlanDataAccessObject implements ShowPlansDataAccessInterface, DeletePlanDataAccessInterface {
+public class InMemoryPlanDataAccessObject implements ShowPlansDataAccessInterface,
+        DeletePlanDataAccessInterface, EditPlanDataAccessInterface {
 
     private final List<Plan> allPlans = new ArrayList<>();
     private final Map<String, List<Plan>> cachedUserPlans = new HashMap<>();
@@ -27,6 +29,7 @@ public class InMemoryPlanDataAccessObject implements ShowPlansDataAccessInterfac
 
     /**
      * Constructs the data access object that loads plans from a JSON file.
+     *
      * @param plansDataFile path to the JSON file containing plans data, or null for demo data
      */
     public InMemoryPlanDataAccessObject(String plansDataFile) {
@@ -52,9 +55,12 @@ public class InMemoryPlanDataAccessObject implements ShowPlansDataAccessInterfac
      * Loads plans from a JSON file.
      * Expected format: Array of plan objects
      * [
-     *   {"planId": "...", "name": "...", "description": "...", "userId": "..."},
+     *   {"planId": "...", "name": "...", "description": "...", "userId": "...", "colour": "..."},
      *   ...
      * ]
+     *
+     * If "colour" is missing (older files), a default is used.
+     *
      * @param filePath path to the JSON file
      */
     private void loadPlansFromJson(String filePath) throws IOException {
@@ -70,7 +76,10 @@ public class InMemoryPlanDataAccessObject implements ShowPlansDataAccessInterfac
                 String description = planObj.getString("description");
                 String userId = planObj.getString("userId");
 
-                Plan plan = new Plan(planId, name, description, userId);
+                // Handle older JSON that might not have colour
+                String colour = planObj.optString("colour", "#FFFFFF");
+
+                Plan plan = new Plan(planId, name, description, userId, colour);
                 allPlans.add(plan);
             } catch (Exception e) {
                 System.err.println("Error parsing plan at index " + i + ": " + e.getMessage());
@@ -98,6 +107,7 @@ public class InMemoryPlanDataAccessObject implements ShowPlansDataAccessInterfac
                 planObj.put("name", plan.getName());
                 planObj.put("description", plan.getDescription());
                 planObj.put("userId", plan.getUserId());
+                planObj.put("colour", plan.getColour()); // persist colour as well
                 plansArray.put(planObj);
             }
 
@@ -114,22 +124,32 @@ public class InMemoryPlanDataAccessObject implements ShowPlansDataAccessInterfac
     /**
      * Initializes demo plans for a specific user.
      * Used when no JSON file is provided or file is empty.
+     *
      * @param userId the user ID (username)
      */
     private void initializeDemoPlansForUser(String userId) {
-        // Create 8 demo plans for this user
-        allPlans.add(new Plan("demo-001", "Learn Guitar", "Master guitar playing in 6 months", userId));
-        allPlans.add(new Plan("demo-002", "Prepare for Exam", "Study for final exams in Computer Science", userId));
-        allPlans.add(new Plan("demo-003", "Build Portfolio", "Create a professional portfolio website", userId));
-        allPlans.add(new Plan("demo-004", "Learn Spanish", "Become conversational in Spanish", userId));
-        allPlans.add(new Plan("demo-005", "Fitness Goal", "Run a half marathon by summer", userId));
-        allPlans.add(new Plan("demo-006", "Read 12 Books", "Read one book per month this year", userId));
-        allPlans.add(new Plan("demo-007", "Learn Cooking", "Master 20 new recipes", userId));
-        allPlans.add(new Plan("demo-008", "Side Project", "Build and launch a mobile app", userId));
+        // Create 8 demo plans for this user, each with a colour
+        allPlans.add(new Plan("demo-001", "Learn Guitar",
+                "Master guitar playing in 6 months", userId, "#FFCC00"));
+        allPlans.add(new Plan("demo-002", "Prepare for Exam",
+                "Study for final exams in Computer Science", userId, "#99CCFF"));
+        allPlans.add(new Plan("demo-003", "Build Portfolio",
+                "Create a professional portfolio website", userId, "#CCFF99"));
+        allPlans.add(new Plan("demo-004", "Learn Spanish",
+                "Become conversational in Spanish", userId, "#FF9999"));
+        allPlans.add(new Plan("demo-005", "Fitness Goal",
+                "Run a half marathon by summer", userId, "#FFCCFF"));
+        allPlans.add(new Plan("demo-006", "Read 12 Books",
+                "Read one book per month this year", userId, "#CCFFFF"));
+        allPlans.add(new Plan("demo-007", "Learn Cooking",
+                "Master 20 new recipes", userId, "#FFFF99"));
+        allPlans.add(new Plan("demo-008", "Side Project",
+                "Build and launch a mobile app", userId, "#D3D3D3"));
     }
 
     /**
      * Gets all plans for a specific user by filtering on userId.
+     *
      * @param userId the user ID (username) to filter by
      * @return list of plans belonging to this user
      */
@@ -182,17 +202,20 @@ public class InMemoryPlanDataAccessObject implements ShowPlansDataAccessInterfac
 
     /**
      * Adds a plan for a user.
+     *
      * @param userId the user ID (username)
-     * @param plan the plan to add
+     * @param plan   the plan to add
      */
     public void addPlan(String userId, Plan plan) {
         allPlans.add(plan);
         // Clear cache for this user so it gets rebuilt
         cachedUserPlans.remove(userId);
+        savePlansToJson();
     }
 
     /**
      * Removes a plan by planId.
+     *
      * @param planId the plan ID to remove
      * @return true if the plan was removed, false otherwise
      */
@@ -201,15 +224,18 @@ public class InMemoryPlanDataAccessObject implements ShowPlansDataAccessInterfac
         if (removed) {
             // Clear all caches since we don't know which user it belonged to
             cachedUserPlans.clear();
+            savePlansToJson();
         }
         return removed;
     }
 
     /**
      * Gets a plan by its ID.
+     *
      * @param planId the plan ID
      * @return the plan, or null if not found
      */
+    @Override
     public Plan getPlanById(String planId) {
         return allPlans.stream()
                 .filter(plan -> plan.getPlanId().equals(planId))
@@ -228,5 +254,17 @@ public class InMemoryPlanDataAccessObject implements ShowPlansDataAccessInterfac
         }
         return removed;
     }
-}
 
+    @Override
+    public void updatePlan(Plan updatedPlan) {
+        for (int i = 0; i < allPlans.size(); i++) {
+            if (allPlans.get(i).getPlanId().equals(updatedPlan.getPlanId())) {
+                allPlans.set(i, updatedPlan);
+                cachedUserPlans.clear();
+                savePlansToJson();
+                return;
+            }
+        }
+        throw new RuntimeException("Plan with id " + updatedPlan.getPlanId() + " not found");
+    }
+}

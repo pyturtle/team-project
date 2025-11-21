@@ -19,6 +19,14 @@ import interface_adapter.show_plans.ShowPlansViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+
+// NEW imports for edit plan
+import interface_adapter.edit_plan.EditPlanController;
+import interface_adapter.edit_plan.EditPlanPresenter;
+import use_case.edit_plan.EditPlanInputBoundary;
+import use_case.edit_plan.EditPlanInteractor;
+import use_case.edit_plan.EditPlanOutputBoundary;
+
 import use_case.delete_plan.DeletePlanInputBoundary;
 import use_case.delete_plan.DeletePlanInteractor;
 import use_case.delete_plan.DeletePlanOutputBoundary;
@@ -39,16 +47,13 @@ import view.*;
 import javax.swing.*;
 import java.awt.*;
 
-// Delete Plan functionality added
+// Delete Plan functionality + Edit Plan functionality added
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
     final UserFactory userFactory = new UserFactory();
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
-
-    // set which data access implementation to use, can be any
-    // of the classes from the data_access package
 
     // DAO version using local file storage
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
@@ -99,6 +104,7 @@ public class AppBuilder {
         loggedInViewModel = new LoggedInViewModel();
         return this;
     }
+
     public AppBuilder addCalendarView() {
         calendarViewModel = new CalendarViewModel();
         calendarView = new CalendarView(calendarViewModel, viewManagerModel);
@@ -107,8 +113,8 @@ public class AppBuilder {
     }
 
     public AppBuilder addSignupUseCase() {
-        final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel,
-                signupViewModel, loginViewModel);
+        final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(
+                viewManagerModel, signupViewModel, loginViewModel);
         final SignupInputBoundary userSignupInteractor = new SignupInteractor(
                 userDataAccessObject, signupOutputBoundary, userFactory);
 
@@ -118,8 +124,9 @@ public class AppBuilder {
     }
 
     public AppBuilder addLoginUseCase() {
-        final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel,
-                loggedInViewModel, loginViewModel, signupViewModel, calendarViewModel, showPlansViewModel);
+        final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(
+                viewManagerModel, loggedInViewModel, loginViewModel,
+                signupViewModel, calendarViewModel, showPlansViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(
                 userDataAccessObject, loginOutputBoundary);
 
@@ -150,13 +157,33 @@ public class AppBuilder {
      * @return this builder
      */
     public AppBuilder addDeletePlanUseCase() {
-        final DeletePlanOutputBoundary deletePlanOutputBoundary = new DeletePlanPresenter(showPlansViewModel);
+        final DeletePlanOutputBoundary deletePlanOutputBoundary =
+                new DeletePlanPresenter(showPlansViewModel);
 
         final DeletePlanInputBoundary deletePlanInteractor =
                 new DeletePlanInteractor(planDataAccessObject, deletePlanOutputBoundary);
 
-        final DeletePlanController deletePlanController = new DeletePlanController(deletePlanInteractor);
+        final DeletePlanController deletePlanController =
+                new DeletePlanController(deletePlanInteractor);
         showPlansView.setDeletePlanController(deletePlanController);
+        return this;
+    }
+
+    /**
+     * Adds the Edit Plan Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addEditPlanUseCase() {
+        final EditPlanOutputBoundary editPlanOutputBoundary =
+                new EditPlanPresenter(showPlansViewModel);
+
+        final EditPlanInputBoundary editPlanInteractor =
+                new EditPlanInteractor(planDataAccessObject, editPlanOutputBoundary);
+
+        final EditPlanController editPlanController =
+                new EditPlanController(editPlanInteractor);
+
+        showPlansView.setEditPlanController(editPlanController);
         return this;
     }
 
@@ -165,8 +192,8 @@ public class AppBuilder {
      * @return this builder
      */
     public AppBuilder addLogoutUseCase() {
-        final LogoutOutputBoundary logoutOutputBoundary = new LogoutPresenter(viewManagerModel,
-                loggedInViewModel, loginViewModel);
+        final LogoutOutputBoundary logoutOutputBoundary = new LogoutPresenter(
+                viewManagerModel, loggedInViewModel, loginViewModel);
 
         final LogoutInputBoundary logoutInteractor =
                 new LogoutInteractor(userDataAccessObject, logoutOutputBoundary);
@@ -188,6 +215,4 @@ public class AppBuilder {
 
         return application;
     }
-
-
 }
