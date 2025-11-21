@@ -12,13 +12,19 @@ public class Main {
                 .addGeneratePlanView()
                 .addShowPlanView()
                 .addSavePlanView()
+                .addLoggedInView() // Still needed for LoggedInViewModel (used by presenters)
+                .addCalendarView()
+                .addShowPlansView()
                 .addSignupUseCase()
                 .addLoginUseCase()
                 .addChangePasswordUseCase()
                 .addGeneratePlanUseCase()
+                .addLogoutUseCase()
+                .addShowPlansUseCase()
+                .addDeletePlanUseCase()
                 .build();
 
-        application.pack();
+        application.setSize(1000, 600);
         application.setLocationRelativeTo(null);
         application.setVisible(true);
     }

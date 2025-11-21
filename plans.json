@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Learn Guitar",
+    "description": "Master guitar playing in 6 months",
+    "planId": "plan-001",
+    "userId": "testuser"
+  },
+  {
+    "name": "Learn Spanish",
+    "description": "Become conversational in Spanish",
+    "planId": "plan-004",
+    "userId": "testuser"
+  },
+  {
+    "name": "Learn Cooking",
+    "description": "Master 20 new recipes",
+    "planId": "plan-007",
+    "userId": "testuser"
+  },
+  {
+    "name": "Side Project1",
+    "description": "Build and launch a mobile app",
+    "planId": "plan-008",
+    "userId": "testuser"
+  },
+  {
+    "name": "Side Project2",
+    "description": "Build and launch a mobile app",
+    "planId": "plan-009",
+    "userId": "testuser"
+  },
+  {
+    "name": "Side Project3",
+    "description": "Build and launch a mobile app",
+    "planId": "plan-010",
+    "userId": "testuser"
+  },
+  {
+    "name": "Side Project4",
+    "description": "Build and launch a mobile app",
+    "planId": "plan-011",
+    "userId": "testuser"
+  }
+]

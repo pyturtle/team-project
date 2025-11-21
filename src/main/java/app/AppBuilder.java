@@ -3,20 +3,26 @@ package app;
 import data_access.FilePlanDataAccessObject;
 import data_access.FileSubgoalDataAccessObject;
 import data_access.FileUserDataAccessObject;
+import data_access.InMemoryPlanDataAccessObject;
+import entity.UserFactory;
 import data_access.GeminiApiDataAccessObject;
 import entity.plan.PlanFactory;
 import entity.subgoal.SubgoalFactory;
 import entity.user.UserFactory;
 import interface_adapter.DialogManagerModel;
 import interface_adapter.ViewManagerModel;
-import interface_adapter.logged_in.ChangePasswordController;
-import interface_adapter.logged_in.ChangePasswordPresenter;
+import interface_adapter.calendar.CalendarViewModel;
+import interface_adapter.delete_plan.DeletePlanController;
+import interface_adapter.delete_plan.DeletePlanPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.logout.LogoutPresenter;
+import interface_adapter.show_plans.ShowPlansController;
+import interface_adapter.show_plans.ShowPlansPresenter;
+import interface_adapter.show_plans.ShowPlansViewModel;
 import interface_adapter.message.SendMessageController;
 import interface_adapter.message.SendMessagePresenter;
 import interface_adapter.message.SendMessageViewModel;
@@ -32,9 +38,9 @@ import interface_adapter.plan.show_plan.ShowPlanViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
-import use_case.change_password.ChangePasswordInputBoundary;
-import use_case.change_password.ChangePasswordInteractor;
-import use_case.change_password.ChangePasswordOutputBoundary;
+import use_case.delete_plan.DeletePlanInputBoundary;
+import use_case.delete_plan.DeletePlanInteractor;
+import use_case.delete_plan.DeletePlanOutputBoundary;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -53,6 +59,9 @@ import use_case.plan.save_plan.SavePlanOutputBoundary;
 import use_case.plan.show_plan.ShowPlanInputBoundary;
 import use_case.plan.show_plan.ShowPlanInteractor;
 import use_case.plan.show_plan.ShowPlanOutputBoundary;
+import use_case.show_plans.ShowPlansInputBoundary;
+import use_case.show_plans.ShowPlansInteractor;
+import use_case.show_plans.ShowPlansOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -60,11 +69,13 @@ import view.*;
 import view.plan.GeneratePlanView;
 import view.plan.SavePlanView;
 import view.plan.ShowPlanView;
+import view.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 
+// Delete Plan functionality added
 public class AppBuilder {
     final UserFactory userFactory = new UserFactory();
     final SubgoalFactory subgoalFactory = new SubgoalFactory();
@@ -72,6 +83,7 @@ public class AppBuilder {
 
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
+    final UserFactory userFactory = new UserFactory();
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
@@ -87,6 +99,14 @@ public class AppBuilder {
             subgoalFactory);
     final FilePlanDataAccessObject planDataAccessObject = new FilePlanDataAccessObject("plans.csv", planFactory);
     // DAO version using a shared external database
+
+    // Plan data access object - loads from JSON file
+    // To use JSON file: new InMemoryPlanDataAccessObject("plans.json")
+    // To use demo data: new InMemoryPlanDataAccessObject()
+    final InMemoryPlanDataAccessObject planDataAccessObject = new InMemoryPlanDataAccessObject("plans.json");
+
+    private ShowPlansView showPlansView;
+    private ShowPlansViewModel showPlansViewModel;
     // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
 
     final GeminiApiDataAccessObject generatePlanDataAccessObject = new GeminiApiDataAccessObject();
@@ -101,10 +121,12 @@ public class AppBuilder {
     private ShowPlanViewModel showPlanViewModel;
     private SavePlanViewModel savePlanViewModel;
     private LoggedInView loggedInView;
+    private CalendarViewModel calendarViewModel;
     private LoginView loginView;
     private GeneratePlanView generatePlanView;
     private ShowPlanView showPlanView;
     private SavePlanView savePlanView;
+    private CalendarView calendarView;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -117,6 +139,13 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addShowPlansView() {
+        showPlansViewModel = new ShowPlansViewModel();
+        showPlansView = new ShowPlansView(showPlansViewModel, viewManagerModel);
+        cardPanel.add(showPlansView, showPlansView.getViewName());
+        return this;
+    }
+
     public AppBuilder addLoginView() {
         loginViewModel = new LoginViewModel();
         loginView = new LoginView(loginViewModel);
@@ -125,9 +154,14 @@ public class AppBuilder {
     }
 
     public AppBuilder addLoggedInView() {
+        // LoggedInViewModel is still needed by presenters, but we don't need the view anymore
         loggedInViewModel = new LoggedInViewModel();
-        loggedInView = new LoggedInView(loggedInViewModel);
-        cardPanel.add(loggedInView, loggedInView.getViewName());
+        return this;
+    }
+    public AppBuilder addCalendarView() {
+        calendarViewModel = new CalendarViewModel();
+        calendarView = new CalendarView(calendarViewModel, viewManagerModel);
+        cardPanel.add(calendarView, calendarView.getViewName());
         return this;
     }
 
@@ -166,7 +200,7 @@ public class AppBuilder {
 
     public AppBuilder addLoginUseCase() {
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel,
-                loggedInViewModel, loginViewModel, signupViewModel);
+                loggedInViewModel, loginViewModel, signupViewModel, calendarViewModel, showPlansViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(
                 userDataAccessObject, loginOutputBoundary);
 
@@ -175,15 +209,35 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addChangePasswordUseCase() {
-        final ChangePasswordOutputBoundary changePasswordOutputBoundary = new ChangePasswordPresenter(viewManagerModel,
-                loggedInViewModel);
+    /**
+     * Adds the Show Plans Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addShowPlansUseCase() {
+        final ShowPlansOutputBoundary showPlansOutputBoundary = new ShowPlansPresenter(
+                viewManagerModel, showPlansViewModel, loggedInViewModel);
 
-        final ChangePasswordInputBoundary changePasswordInteractor =
-                new ChangePasswordInteractor(userDataAccessObject, changePasswordOutputBoundary, userFactory);
+        final ShowPlansInputBoundary showPlansInteractor =
+                new ShowPlansInteractor(planDataAccessObject, showPlansOutputBoundary);
 
-        ChangePasswordController changePasswordController = new ChangePasswordController(changePasswordInteractor);
-        loggedInView.setChangePasswordController(changePasswordController);
+        final ShowPlansController showPlansController = new ShowPlansController(showPlansInteractor);
+        showPlansView.setShowPlansController(showPlansController);
+        calendarView.setShowPlansController(showPlansController);
+        return this;
+    }
+
+    /**
+     * Adds the Delete Plan Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addDeletePlanUseCase() {
+        final DeletePlanOutputBoundary deletePlanOutputBoundary = new DeletePlanPresenter(showPlansViewModel);
+
+        final DeletePlanInputBoundary deletePlanInteractor =
+                new DeletePlanInteractor(planDataAccessObject, deletePlanOutputBoundary);
+
+        final DeletePlanController deletePlanController = new DeletePlanController(deletePlanInteractor);
+        showPlansView.setDeletePlanController(deletePlanController);
         return this;
     }
 
@@ -227,13 +281,15 @@ public class AppBuilder {
                 new LogoutInteractor(userDataAccessObject, logoutOutputBoundary);
 
         final LogoutController logoutController = new LogoutController(logoutInteractor);
-        loggedInView.setLogoutController(logoutController);
+        calendarView.setLogoutController(logoutController);
+        showPlansView.setLogoutController(logoutController);
         return this;
     }
 
     public JFrame build() {
         final JFrame application = new JFrame("Generate Plan Example");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
         application.add(cardPanel);
 
         viewManagerModel.setState(generatePlanView.getViewName());
