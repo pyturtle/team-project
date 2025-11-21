@@ -6,6 +6,7 @@ import interface_adapter.logout.LogoutController;
 import interface_adapter.show_plans.ShowPlansController;
 import interface_adapter.show_plans.ShowPlansState;
 import interface_adapter.show_plans.ShowPlansViewModel;
+import interface_adapter.edit_plan.EditPlanController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,6 +30,7 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     private ShowPlansController showPlansController;
     private DeletePlanController deletePlanController;
     private LogoutController logoutController;
+    private EditPlanController editPlanController;
 
     // View navigation buttons
     private JButton calendarButton;
@@ -206,9 +208,52 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
         final JButton subgoalsButton = new JButton(ShowPlansViewModel.SUBGOALS_BUTTON_LABEL);
         final JButton deleteButton = new JButton(ShowPlansViewModel.DELETE_BUTTON_LABEL);
+        final JButton editButton = new JButton("Edit");
 
         // Subgoals button not implemented yet
         subgoalsButton.setEnabled(false);
+
+        editButton.addActionListener(e -> {
+            if (editPlanController == null) return;
+
+            JTextField nameField = new JTextField(plan.getName(), 20);
+            JTextField descField = new JTextField(plan.getDescription(), 20);
+            JTextField colourField = new JTextField(plan.getColour(), 10);
+
+            JPanel form = new JPanel(new GridLayout(0, 2, 5, 5));
+            form.add(new JLabel("Title:"));
+            form.add(nameField);
+            form.add(new JLabel("Description:"));
+            form.add(descField);
+            form.add(new JLabel("Colour:"));
+            form.add(colourField);
+
+            int result = JOptionPane.showConfirmDialog(
+                    this,
+                    form,
+                    "Edit Plan",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE
+            );
+
+            if (result == JOptionPane.OK_OPTION) {
+                String newName = nameField.getText().trim();
+                String newDesc = descField.getText().trim();
+                String newColour = colourField.getText().trim();
+
+                if (!newName.isEmpty() && !newDesc.isEmpty() && !newColour.isEmpty()) {
+                    editPlanController.execute(plan.getPlanId(), newName, newDesc, newColour);
+                } else {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "All fields must be non-empty.",
+                            "Edit Plan Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+        });
+
 
         // Enable delete button and add action listener
         deleteButton.addActionListener(e -> {
@@ -241,7 +286,9 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         });
 
         buttonsPanel.add(subgoalsButton);
+        buttonsPanel.add(editButton);
         buttonsPanel.add(deleteButton);
+
 
         panel.add(buttonsPanel, BorderLayout.SOUTH);
 
@@ -262,6 +309,10 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
     public void setShowPlansController(ShowPlansController controller) {
         this.showPlansController = controller;
+    }
+
+    public void setEditPlanController(EditPlanController controller) {
+        this.editPlanController = controller;
     }
 
     public void setDeletePlanController(DeletePlanController controller) {

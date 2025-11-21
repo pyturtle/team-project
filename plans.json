@@ -1,44 +1,23 @@
 [
   {
-    "name": "Learn Guitar",
-    "description": "Master guitar playing in 6 months",
-    "planId": "plan-001",
+    "colour": "#FFCC44",
+    "name": "lol",
+    "description": "ok",
+    "planId": "test-plan-001",
     "userId": "testuser"
   },
   {
-    "name": "Learn Spanish",
-    "description": "Become conversational in Spanish",
-    "planId": "plan-004",
+    "colour": "#99CCFF",
+    "name": "Second Plan",
+    "description": "testing edited",
+    "planId": "test-plan-002",
     "userId": "testuser"
   },
   {
-    "name": "Learn Cooking",
-    "description": "Master 20 new recipes",
-    "planId": "plan-007",
-    "userId": "testuser"
-  },
-  {
-    "name": "Side Project1",
-    "description": "Build and launch a mobile app",
-    "planId": "plan-008",
-    "userId": "testuser"
-  },
-  {
-    "name": "Side Project2",
-    "description": "Build and launch a mobile app",
-    "planId": "plan-009",
-    "userId": "testuser"
-  },
-  {
-    "name": "Side Project3",
-    "description": "Build and launch a mobile app",
-    "planId": "plan-010",
-    "userId": "testuser"
-  },
-  {
-    "name": "Side Project4",
-    "description": "Build and launch a mobile app",
-    "planId": "plan-011",
-    "userId": "testuser"
+    "colour": "#CCFF99",
+    "name": "Different User Plan",
+    "description": "This plan belongs to another user and should NOT show for testuser.",
+    "planId": "test-plan-003",
+    "userId": "someone_else"
   }
 ]
