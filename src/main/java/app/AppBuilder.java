@@ -1,6 +1,7 @@
 package app;
 
 import data_access.FileUserDataAccessObject;
+import data_access.PreferenceRepository;
 import entity.UserFactory;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.ChangePasswordController;
@@ -23,6 +24,7 @@ import use_case.login.LoginOutputBoundary;
 import use_case.logout.LogoutInputBoundary;
 import use_case.logout.LogoutInteractor;
 import use_case.logout.LogoutOutputBoundary;
+import use_case.remember_me.RememberMe;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -68,9 +70,15 @@ public class AppBuilder {
         return this;
     }
 
+    // In AppBuilder.java, update the addLoginView method:
     public AppBuilder addLoginView() {
         loginViewModel = new LoginViewModel();
-        loginView = new LoginView(loginViewModel);
+
+        // Create RememberMe use case
+        PreferenceRepository preferenceRepository = new PreferenceRepository();
+        RememberMe rememberMeUseCase = new RememberMe(preferenceRepository);
+
+        loginView = new LoginView(loginViewModel, rememberMeUseCase);
         cardPanel.add(loginView, loginView.getViewName());
         return this;
     }
