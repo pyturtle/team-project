@@ -1,7 +1,7 @@
 package data_access;
 
-import entity.User;
-import entity.UserFactory;
+import entity.user.User;
+import entity.user.UserFactory;
 import okhttp3.*;
 import org.json.JSONException;
 import org.json.JSONObject;

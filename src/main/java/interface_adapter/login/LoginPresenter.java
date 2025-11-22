@@ -1,11 +1,19 @@
 package interface_adapter.login;
 
 import interface_adapter.ViewManagerModel;
+import interface_adapter.calendar.CalendarState;
+import interface_adapter.calendar.CalendarViewModel;
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.plan.generate_plan.GeneratePlanState;
+import interface_adapter.plan.show_plan.ShowPlanState;
+import interface_adapter.plan.show_plan.ShowPlanViewModel;
+import interface_adapter.plan.show_plans.ShowPlansState;
+import interface_adapter.plan.show_plans.ShowPlansViewModel;
 import interface_adapter.signup.SignupViewModel;
 import use_case.login.LoginOutputBoundary;
 import use_case.login.LoginOutputData;
+import view.plan.ShowPlanView;
 
 /**
  * The Presenter for the Login Use Case.
@@ -16,15 +24,24 @@ public class LoginPresenter implements LoginOutputBoundary {
     private final LoggedInViewModel loggedInViewModel;
     private final ViewManagerModel viewManagerModel;
     private final SignupViewModel signupViewModel;
+    private final CalendarViewModel calendarViewModel;
+    private final ShowPlansViewModel showPlansViewModel;
+    private final ShowPlanViewModel showPlanViewModel;
 
     public LoginPresenter(ViewManagerModel viewManagerModel,
                           LoggedInViewModel loggedInViewModel,
                           LoginViewModel loginViewModel,
-                          SignupViewModel signupViewModel) {
+                          SignupViewModel signupViewModel,
+                          interface_adapter.calendar.CalendarViewModel calendarViewModel,
+                          ShowPlansViewModel showPlansViewModel,
+                          ShowPlanViewModel showPlanViewModel) {
         this.viewManagerModel = viewManagerModel;
         this.loggedInViewModel = loggedInViewModel;
         this.loginViewModel = loginViewModel;
         this.signupViewModel = signupViewModel;
+        this.calendarViewModel = calendarViewModel;
+        this.showPlansViewModel = showPlansViewModel;
+        this.showPlanViewModel = showPlanViewModel;
     }
 
     @Override
@@ -34,11 +51,23 @@ public class LoginPresenter implements LoginOutputBoundary {
         loggedInState.setUsername(response.getUsername());
         this.loggedInViewModel.firePropertyChange();
 
+        // Set username in CalendarState and ShowPlansState
+        final CalendarState calendarState = calendarViewModel.getCalendarState();
+        calendarState.setUsername(response.getUsername());
+        calendarViewModel.firePropertyChanged();
+
+        final ShowPlansState showPlansState = showPlansViewModel.getState();
+        showPlansState.setUsername(response.getUsername());
+        showPlansViewModel.firePropertyChange();
+
+        final ShowPlanState showPlanState = showPlanViewModel.getState();
+        showPlanState.setUsername(response.getUsername());
+
         // and clear everything from the LoginViewModel's state
         loginViewModel.setState(new LoginState());
 
-        // switch to the logged in view
-        this.viewManagerModel.setState(loggedInViewModel.getViewName());
+        // switch to the calendar view
+        this.viewManagerModel.setState("main page");
         this.viewManagerModel.firePropertyChange();
     }
 
