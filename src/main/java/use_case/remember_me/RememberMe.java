@@ -25,7 +25,6 @@ public class RememberMe {
         String username = prefs.loadUsername();
         String password = prefs.loadPassword();
 
-        // Return null if credentials are empty
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
             return null;
         }

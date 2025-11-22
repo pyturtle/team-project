@@ -59,7 +59,6 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
         signUp = new JButton("sign up");
         buttons.add(signUp);
 
-        // Load saved credentials if Remember Me was enabled
         loadSavedCredentials();
 
         logIn.addActionListener(
@@ -68,7 +67,6 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
                         if (evt.getSource().equals(logIn)) {
                             final LoginState currentState = loginViewModel.getState();
 
-                            // Save credentials if Remember Me is checked
                             rememberMeUseCase.saveCredentials(
                                     currentState.getUsername(),
                                     currentState.getPassword(),
