@@ -65,18 +65,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
                 new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         if (evt.getSource().equals(logIn)) {
-                            final LoginState currentState = loginViewModel.getState();
-
-                            rememberMeUseCase.saveCredentials(
-                                    currentState.getUsername(),
-                                    currentState.getPassword(),
-                                    rememberMeCheckbox.isSelected()
-                            );
-
-                            loginController.execute(
-                                    currentState.getUsername(),
-                                    currentState.getPassword()
-                            );
+                            performLogin();
                         }
                     }
                 }
@@ -85,7 +74,9 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
         signUp.addActionListener(
                 new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
-                        loginController.switchToSignupView();
+                        if (loginController != null) {
+                            loginController.switchToSignupView();
+                        }
                     }
                 }
         );
@@ -145,6 +136,13 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
         this.add(passwordErrorField);
         this.add(checkboxes);
         this.add(buttons);
+
+        //We have to wait a bit for the auto login to work
+        SwingUtilities.invokeLater(() -> {
+            Timer timer = new Timer(1000, e -> attemptAutoLogin());
+            timer.setRepeats(false);
+            timer.start();
+        });
     }
 
     private void loadSavedCredentials() {
@@ -154,12 +152,40 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
             passwordInputField.setText(savedUser.getPassword());
             rememberMeCheckbox.setSelected(true);
 
-            // Update the view model state
             LoginState currentState = loginViewModel.getState();
             currentState.setUsername(savedUser.getUsername());
             currentState.setPassword(savedUser.getPassword());
+            currentState.setRememberMe(true);
             loginViewModel.setState(currentState);
         }
+    }
+
+    private void attemptAutoLogin() {
+        if (loginController != null && rememberMeCheckbox.isSelected()) {
+            final LoginState currentState = loginViewModel.getState();
+            if (!currentState.getUsername().isEmpty() && !currentState.getPassword().isEmpty()) {
+                System.out.println("Performing automatic login for: " + currentState.getUsername());
+                loginController.execute(
+                        currentState.getUsername(),
+                        currentState.getPassword()
+                );
+            }
+        }
+    }
+
+    private void performLogin() {
+        final LoginState currentState = loginViewModel.getState();
+
+        rememberMeUseCase.saveCredentials(
+                currentState.getUsername(),
+                currentState.getPassword(),
+                rememberMeCheckbox.isSelected()
+        );
+
+        loginController.execute(
+                currentState.getUsername(),
+                currentState.getPassword()
+        );
     }
 
     /**
@@ -174,6 +200,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
     public void propertyChange(PropertyChangeEvent evt) {
         final LoginState state = (LoginState) evt.getNewValue();
         setFields(state);
+
         if (state.getLoginError() != null) {
             usernameErrorField.setText(state.getLoginError());
             usernameErrorField.setForeground(Color.RED);
@@ -185,6 +212,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
     private void setFields(LoginState state) {
         usernameInputField.setText(state.getUsername());
         passwordInputField.setText(state.getPassword());
+        rememberMeCheckbox.setSelected(state.isRememberMe());
     }
 
     public String getViewName() {
