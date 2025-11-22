@@ -28,7 +28,7 @@
 //            // Make new immutable Subgoal
 //            data.compute(id, (k, old) -> new Subgoal(old.getId(),
 //                    old.getPlanId(),
-//                    old.getUserId(),
+//                    old.getusername(),
 //                    old.getName(),
 //                    old.getDescription(),
 //                    old.getDeadline(),

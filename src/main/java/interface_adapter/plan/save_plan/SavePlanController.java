@@ -2,8 +2,7 @@ package interface_adapter.plan.save_plan;
 
 import use_case.plan.save_plan.SavePlanInputBoundary;
 import use_case.plan.save_plan.SavePlanInputData;
-import use_case.plan.save_plan.SavePlanInteractor;
-import use_case.plan.save_subgoal.SaveSubgoalInputData;
+import use_case.subgoal.save_subgoal.SaveSubgoalInputData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

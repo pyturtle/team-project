@@ -8,7 +8,7 @@ public class Plan {
     private final String username;
 
     /**
-     * Creates a new plan with an id, given name, description, and an associated userid.
+     * Creates a new plan with an id, given name, description, and an associated username.
      * @param name the plan's name
      * @param description the description of the plan.
      * @throws IllegalArgumentException if the name or description are empty

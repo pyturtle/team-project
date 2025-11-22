@@ -9,12 +9,14 @@ public class ShowPlanOutputData {
     private String planName;
     private String planDescription;
     private ArrayList<HashMap<String, String>> subgoalList;
+    private boolean isCreated;
 
     public ShowPlanOutputData(String planName, String planDescription,
-                              ArrayList<HashMap<String, String>> subgoalList) {
+                              ArrayList<HashMap<String, String>> subgoalList, boolean isCreated) {
         this.planName = planName;
         this.planDescription = planDescription;
         this.subgoalList = subgoalList;
+        this.isCreated = isCreated;
     }
 
     public String getPlanName() {
@@ -27,5 +29,9 @@ public class ShowPlanOutputData {
 
     public ArrayList<HashMap<String, String>> getSubgoalList() {
         return subgoalList;
+    }
+
+    public boolean isCreated() {
+        return isCreated;
     }
 }

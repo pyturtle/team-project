@@ -1,11 +1,18 @@
 package data_access;
 
+import entity.plan.Plan;
 import entity.subgoal.Subgoal;
+import entity.subgoal.SubgoalBuilder;
 import entity.subgoal.SubgoalFactory;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,94 +25,88 @@ import java.util.Map;
  * is implemented by the team.
  */
 public class FileSubgoalDataAccessObject implements SubgoalDataAccessInterface {
-
-    private static final String HEADER = "id;planId;username;name;description;deadline;isCompleted;priority";
-
-    private final File csvFile;
-    private final Map<String, Integer> headers = new LinkedHashMap<>();
-    private final Map<String, Subgoal> subgoals = new HashMap<>();
+    private final String subgoalsFilePath;
+    private final SubgoalBuilder subgoalBuilder;
+    private final HashMap<String, Subgoal> subgoals = new HashMap();
 
     /**
      * Constructs an empty SubgoalDataAccessObject.
      */
-    public FileSubgoalDataAccessObject(String csvPath, SubgoalFactory subgoalFactory) {
-        csvFile = new File(csvPath);
-        headers.put("id", 0);
-        headers.put("planId", 1);
-        headers.put("username", 2);
-        headers.put("name", 3);
-        headers.put("description", 4);
-        headers.put("deadline", 5);
-        headers.put("isCompleted", 6);
-        headers.put("priority", 7);
-
-        if (csvFile.length() == 0) {
-            save();
-        }
-        else {
-
-            try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
-                final String header = reader.readLine();
-
-                if (!header.equals(HEADER)) {
-                    throw new RuntimeException(String.format("header should be%n: %s%n but was:%n%s", HEADER, header));
-                }
-
-                String row;
-                while ((row = reader.readLine()) != null) {
-                    final String[] col = row.split(";");
-                    final String id = String.valueOf(col[headers.get("id")]);
-                    final String planId = String.valueOf(col[headers.get("planId")]);
-                    final String username = String.valueOf(col[headers.get("username")]);
-                    final String name = String.valueOf(col[headers.get("name")]);
-                    final String description = String.valueOf(col[headers.get("description")]);
-                    final LocalDate deadline = LocalDate.parse(String.valueOf(col[headers.get("deadline")]));
-                    final boolean isCompleted = Boolean.valueOf(String.valueOf(col[headers.get("isCompleted")]));
-                    final boolean priority = Boolean.valueOf(String.valueOf(col[headers.get("priority")]));
-                    final Subgoal subgoal = subgoalFactory.create(id,
-                            planId,
-                            username,
-                            name,
-                            description,
-                            deadline,
-                            isCompleted,
-                            priority);
-                    subgoals.put(id, subgoal);
-                }
+    public FileSubgoalDataAccessObject(String subgoalsFilePath, SubgoalBuilder subgoalBuilder) {
+        this.subgoalsFilePath = subgoalsFilePath;
+        this.subgoalBuilder = subgoalBuilder;
+        if (subgoalsFilePath != null) {
+            try {
+                loadSubgoalsFromJson(subgoalsFilePath);
+            } catch (Exception e) {
+                System.err.println("Could not load subgoals from file: " + e.getMessage());
+                System.err.println("Will use demo data when needed.");
             }
-            catch (IOException ex) {
-                throw new RuntimeException(ex);
+        }
+    }
+
+    private void loadSubgoalsFromJson(String filePath) throws IOException {
+        String jsonContent = new String(Files.readAllBytes(Paths.get(filePath)));
+        JSONArray subgoalsArray = new JSONArray(jsonContent);
+
+        for (int i = 0; i < subgoalsArray.length(); i++) {
+            try {
+                JSONObject subgoalObj = subgoalsArray.getJSONObject(i);
+
+                String subgoalId = subgoalObj.getString("id");
+                String planId = subgoalObj.getString("plan_id");
+                String username = subgoalObj.getString("username");
+                String name = subgoalObj.getString("name");
+                String description = subgoalObj.getString("description");
+                LocalDate date = LocalDate.parse(subgoalObj.getString("deadline"));
+                boolean isPriority = subgoalObj.getBoolean("priority");
+                boolean isCompleted = subgoalObj.getBoolean("completed");
+                Subgoal subgoal = subgoalBuilder
+                        .setId(subgoalId)
+                        .setPlanId(planId)
+                        .setUsername(username)
+                        .setName(name)
+                        .setDescription(description)
+                        .setDeadline(date)
+                        .setPriority(isPriority)
+                        .setIsCompleted(isCompleted)
+                        .build();
+                subgoals.put(subgoalId, subgoal);
+            } catch (Exception e) {
+                System.err.println("Error parsing subgoal at index " + i + ": " + e.getMessage());
+                // Skip this plan and continue with the next one
             }
         }
     }
 
     @Override
     public void save() {
-        final BufferedWriter writer;
-        try {
-            writer = new BufferedWriter(new FileWriter(csvFile));
-            writer.write(String.join(";", headers.keySet()));
-            writer.newLine();
+        if (subgoalsFilePath == null) {
+            // No file path configured, can't save
+            return;
+        }
 
+        try {
+            JSONArray subgoalsArray = new JSONArray();
             for (Subgoal subgoal : subgoals.values()) {
-                final String line = String.format("%s;%s;%s;%s;%s;%s;%s;%s",
-                        subgoal.getId(),
-                        subgoal.getPlanId(),
-                        subgoal.getUsername(),
-                        subgoal.getName(),
-                        subgoal.getDescription(),
-                        subgoal.getDeadline(),
-                        subgoal.isCompleted(),
-                        subgoal.isPriority());
-                writer.write(line);
-                writer.newLine();
+                JSONObject subgoalObj = new JSONObject();
+                subgoalObj.put("id", subgoal.getId());
+                subgoalObj.put("plan_id", subgoal.getPlanId());
+                subgoalObj.put("username", subgoal.getUsername());
+                subgoalObj.put("name", subgoal.getName());
+                subgoalObj.put("description", subgoal.getDescription());
+                subgoalObj.put("deadline", subgoal.getDeadline());
+                subgoalObj.put("priority", subgoal.isPriority());
+                subgoalObj.put("completed", subgoal.isCompleted());
+                subgoalsArray.put(subgoalObj);
             }
 
-            writer.close();
-
-        }
-        catch (IOException ex) {
-            throw new RuntimeException(ex);
+            // Write to file with proper formatting
+            String jsonContent = subgoalsArray.toString(2); // 2 spaces indentation
+            Files.write(Paths.get(subgoalsFilePath), jsonContent.getBytes());
+            System.out.println("Subgoals saved to file: " + subgoalsFilePath);
+        } catch (IOException e) {
+            System.err.println("Error saving subgoals to file: " + e.getMessage());
         }
     }
     /**

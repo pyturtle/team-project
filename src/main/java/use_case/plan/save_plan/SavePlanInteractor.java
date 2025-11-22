@@ -4,19 +4,18 @@ import entity.plan.Plan;
 import entity.plan.PlanBuilder;
 import entity.subgoal.Subgoal;
 import entity.subgoal.SubgoalBuilder;
-import use_case.plan.PlanDataAccessInterface;
-import use_case.plan.save_subgoal.SaveSubgoalInputData;
+import use_case.subgoal.save_subgoal.SaveSubgoalInputData;
 import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
 
 public class SavePlanInteractor implements SavePlanInputBoundary{
     private final SavePlanOutputBoundary savePlanPresenter;
-    private final PlanDataAccessInterface planDataAccess;
+    private final SavePlanDataAccessInterface planDataAccess;
     private final SubgoalDataAccessInterface subgoalDataAccess;
     private final SubgoalBuilder subgoalBuilder = new SubgoalBuilder();
     private final PlanBuilder planBuilder = new PlanBuilder();
 
     public SavePlanInteractor(SavePlanOutputBoundary savePlanPresenter,
-                              PlanDataAccessInterface planDataAccess,
+                              SavePlanDataAccessInterface planDataAccess,
                               SubgoalDataAccessInterface subgoalDataAccess) {
         this.savePlanPresenter = savePlanPresenter;
         this.planDataAccess = planDataAccess;
@@ -33,12 +32,13 @@ public class SavePlanInteractor implements SavePlanInputBoundary{
                     .setDescription(savePlanInputData.getDescription())
                     .setUsername(savePlanInputData.getUsername())
                     .build();
-            planDataAccess.save(newPlan);
+            planDataAccess.savePlan(newPlan);
             for (SaveSubgoalInputData subgoalInputData : savePlanInputData.getSubgoals()) {
                 Subgoal subgoal = subgoalBuilder
                         .generateId()
                         .setPlanId(newPlan.getId())
                         .setName(subgoalInputData.getName())
+                        .setUsername(savePlanInputData.getUsername())
                         .setDescription(subgoalInputData.getDescription())
                         .setDeadline(subgoalInputData.getDeadline())
                         .build();

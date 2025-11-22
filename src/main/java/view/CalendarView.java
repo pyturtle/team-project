@@ -3,25 +3,19 @@ package view;
 import interface_adapter.calendar.CalendarViewModel;
 import interface_adapter.calendar.CalendarState;
 import interface_adapter.logout.LogoutController;
-import interface_adapter.show_plans.ShowPlansController;
+import interface_adapter.plan.show_plans.ShowPlansController;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 
 public class CalendarView extends JPanel implements ActionListener, PropertyChangeListener {
     // Views, go on the top right
-    private JButton calendarButton;
-    private JButton myPlansButton;
-    private JButton createPlanButton;
-    private JButton logoutButton;
 
     // Month changing, ie. left/right buttons, and show current month.
     private JButton prevMonthButton;
@@ -59,27 +53,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
 
         setLayout(new BorderLayout());
 
-        //View buttons to change view.
-        JPanel topPanel = new JPanel(new BorderLayout());
-
-        // Navigation buttons on the left
-        JPanel navButtons = new JPanel();
-        calendarButton = new JButton("Calendar");
-        myPlansButton = new JButton("My Plans");
-        createPlanButton = new JButton("Create Plan");
-        navButtons.add(calendarButton);
-        navButtons.add(myPlansButton);
-        navButtons.add(createPlanButton);
-        topPanel.add(navButtons, BorderLayout.WEST);
-
-        // Logout button on the right
-        JPanel logoutPanel = new JPanel();
-        logoutButton = new JButton("Logout");
-        logoutPanel.add(logoutButton);
-        topPanel.add(logoutPanel, BorderLayout.EAST);
-
-        add(topPanel, BorderLayout.NORTH);
-
         //Changing months
         JPanel monthPanel = new JPanel(new BorderLayout());
         prevMonthButton = new JButton("<");
@@ -109,12 +82,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         goalPanel.add(new JScrollPane(goalList), BorderLayout.CENTER);
         goalPanel.add(goalControlPanel, BorderLayout.SOUTH);
         add(goalPanel, BorderLayout.SOUTH);
-
-        // Action perofmred buttons
-        calendarButton.addActionListener(this);
-        myPlansButton.addActionListener(this);
-        createPlanButton.addActionListener(this);
-        logoutButton.addActionListener(this);
         prevMonthButton.addActionListener(this);
         nextMonthButton.addActionListener(this);
         addGoalButton.addActionListener(this);
@@ -173,32 +140,9 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         CalendarState state = viewModel.getCalendarState(); // get current calendar state
         LocalDate selectedDate = state.getSelectedDate();
 
-        // View buttons on top right
-        if (src == calendarButton) {
-            viewManagerModel.setState("CalendarView");
-            viewManagerModel.firePropertyChange();
-        } else if (src == myPlansButton) {
-            // Load plans for current user before switching view
-            if (showPlansController != null) {
-                final CalendarState calendarState = viewModel.getCalendarState();
-                final String currentUsername = calendarState.getUsername();
-                if (currentUsername != null && !currentUsername.isEmpty()) {
-                    showPlansController.execute(currentUsername, 0, 6);
-                }
-            }
-            viewManagerModel.setState("ShowPlansView");
-            viewManagerModel.firePropertyChange();
-        } else if (src == createPlanButton) {
-            viewManagerModel.setState("CreatePlanView");
-            viewManagerModel.firePropertyChange();
-        } else if (src == logoutButton) {
-            if (logoutController != null) {
-                logoutController.execute();
-            }
-        }
 
         // changing months
-        else if (src == prevMonthButton) {
+        if (src == prevMonthButton) {
             displayedMonth = displayedMonth.minusMonths(1);
             updateCalendar(); // redraw calendars
         } else if (src == nextMonthButton) {

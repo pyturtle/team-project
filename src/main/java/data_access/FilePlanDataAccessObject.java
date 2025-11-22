@@ -1,96 +1,239 @@
 package data_access;
 
 import entity.plan.Plan;
-import entity.plan.PlanFactory;
-import entity.user.User;
-import use_case.plan.PlanDataAccessInterface;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import use_case.plan.delete_plan.DeletePlanDataAccessInterface;
+import use_case.plan.save_plan.SavePlanDataAccessInterface;
+import use_case.plan.show_plan.ShowPlanDataAccessInterface;
+import use_case.plan.show_plans.ShowPlansDataAccessInterface;
 
-import java.io.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public class FilePlanDataAccessObject implements PlanDataAccessInterface {
+/**
+ * In-memory implementation of the DAO for storing plan data.
+ * Loads plans from a flat JSON array and filters by username.
+ */
+public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
+        DeletePlanDataAccessInterface, SavePlanDataAccessInterface, ShowPlanDataAccessInterface {
 
-    private static final String HEADER = "id;name;description;username";
-    private final File csvFile;
-    private final Map<String, Integer> headers = new LinkedHashMap<>();
-    private final Map<String, Plan> plans = new HashMap<>();
+    private final List<Plan> allPlans = new ArrayList<>();
+    private final Map<String, List<Plan>> cachedUserPlans = new HashMap<>();
+    private final String plansFilePath;
 
-    public FilePlanDataAccessObject(String csvPath, PlanFactory planFactory) {
-        this.csvFile = new File(csvPath);
-        headers.put("id", 0);
-        headers.put("name", 1);
-        headers.put("description", 2);
-        headers.put("username", 3);
-        if (csvFile.length() == 0) {
-            save();
-        }
-        else {
-
-            try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
-                final String header = reader.readLine();
-
-                if (!header.equals(HEADER)) {
-                    throw new RuntimeException(String.format("header should be%n: %s%n but was:%n%s", HEADER, header));
-                }
-
-                String row;
-                while ((row = reader.readLine()) != null) {
-                    final String[] col = row.split(";");
-                    final String id = String.valueOf(col[headers.get("id")]);
-                    final String name = String.valueOf(col[headers.get("name")]);
-                    final String description = String.valueOf(col[headers.get("description")]);
-                    final String username = String.valueOf(col[headers.get("username")]);
-                    final Plan plan = planFactory.create(id, name, description, username);
-                    plans.put(id, plan);
-                }
-            }
-            catch (IOException ex) {
-                throw new RuntimeException(ex);
+    /**
+     * Constructs the data access object that loads plans from a JSON file.
+     * @param plansDataFile path to the JSON file containing plans data, or null for demo data
+     */
+    public FilePlanDataAccessObject(String plansDataFile) {
+        this.plansFilePath = plansDataFile;
+        if (plansDataFile != null) {
+            try {
+                loadPlansFromJson(plansDataFile);
+            } catch (Exception e) {
+                System.err.println("Could not load plans from file: " + e.getMessage());
+                System.err.println("Will use demo data when needed.");
             }
         }
     }
 
-    @Override
-    public void save() {
-        final BufferedWriter writer;
+    /**
+     * Constructs the data access object with demo plans.
+     */
+    public FilePlanDataAccessObject() {
+        this(null);
+    }
+
+    /**
+     * Loads plans from a JSON file.
+     * Expected format: Array of plan objects
+     * [
+     *   {"planId": "...", "name": "...", "description": "...", "username": "..."},
+     *   ...
+     * ]
+     * @param filePath path to the JSON file
+     */
+    private void loadPlansFromJson(String filePath) throws IOException {
+        String jsonContent = new String(Files.readAllBytes(Paths.get(filePath)));
+        JSONArray plansArray = new JSONArray(jsonContent);
+
+        for (int i = 0; i < plansArray.length(); i++) {
+            try {
+                JSONObject planObj = plansArray.getJSONObject(i);
+
+                String planId = planObj.getString("id");
+                String name = planObj.getString("name");
+                String description = planObj.getString("description");
+                String username = planObj.getString("username");
+
+                Plan plan = new Plan(planId, name, description, username);
+                allPlans.add(plan);
+            } catch (Exception e) {
+                System.err.println("Error parsing plan at index " + i + ": " + e.getMessage());
+                // Skip this plan and continue with the next one
+            }
+        }
+    }
+
+    /**
+     * Saves all plans to the JSON file.
+     * This persists changes to disk.
+     */
+    private void savePlansToJson() {
+        if (plansFilePath == null) {
+            // No file path configured, can't save
+            return;
+        }
+
         try {
-            writer = new BufferedWriter(new FileWriter(csvFile));
-            writer.write(String.join(";", headers.keySet()));
-            writer.newLine();
-
-            for (Plan plan : plans.values()) {
-                final String line = String.format("%s;%s;%s;%s",
-                        plan.getId(),
-                        plan.getName(),
-                        plan.getDescription(),
-                        plan.getUsername());
-                writer.write(line);
-                writer.newLine();
+            JSONArray plansArray = new JSONArray();
+            for (Plan plan : allPlans) {
+                JSONObject planObj = new JSONObject();
+                planObj.put("id", plan.getId());
+                planObj.put("name", plan.getName());
+                planObj.put("description", plan.getDescription());
+                planObj.put("username", plan.getUsername());
+                plansArray.put(planObj);
             }
 
-            writer.close();
+            // Write to file with proper formatting
+            String jsonContent = plansArray.toString(2); // 2 spaces indentation
+            Files.write(Paths.get(plansFilePath), jsonContent.getBytes());
 
+            System.out.println("Plans saved to file: " + plansFilePath);
+        } catch (IOException e) {
+            System.err.println("Error saving plans to file: " + e.getMessage());
         }
-        catch (IOException ex) {
-            throw new RuntimeException(ex);
+    }
+
+    /**
+     * Initializes demo plans for a specific user.
+     * Used when no JSON file is provided or file is empty.
+     * @param username the user ID (username)
+     */
+    private void initializeDemoPlansForUser(String username) {
+        // Create 8 demo plans for this user
+        allPlans.add(new Plan("demo-001", "Learn Guitar", "Master guitar playing in 6 months", username));
+        allPlans.add(new Plan("demo-002", "Prepare for Exam", "Study for final exams in Computer Science", username));
+        allPlans.add(new Plan("demo-003", "Build Portfolio", "Create a professional portfolio website", username));
+        allPlans.add(new Plan("demo-004", "Learn Spanish", "Become conversational in Spanish", username));
+        allPlans.add(new Plan("demo-005", "Fitness Goal", "Run a half marathon by summer", username));
+        allPlans.add(new Plan("demo-006", "Read 12 Books", "Read one book per month this year", username));
+        allPlans.add(new Plan("demo-007", "Learn Cooking", "Master 20 new recipes", username));
+        allPlans.add(new Plan("demo-008", "Side Project", "Build and launch a mobile app", username));
+    }
+
+    /**
+     * Gets all plans for a specific user by filtering on username.
+     * @param username the user ID (username) to filter by
+     * @return list of plans belonging to this user
+     */
+    private List<Plan> getPlansForUser(String username) {
+        // Check cache first
+        if (cachedUserPlans.containsKey(username)) {
+            return cachedUserPlans.get(username);
         }
+
+        // Filter allPlans by username
+        List<Plan> userPlans = allPlans.stream()
+                .filter(plan -> plan.getUsername().equals(username))
+                .collect(Collectors.toList());
+
+        // If no plans found and no plans loaded at all, initialize demo data
+        /*if (userPlans.isEmpty() && allPlans.isEmpty()) {
+            initializeDemoPlansForUser(username);
+            userPlans = allPlans.stream()
+                    .filter(plan -> plan.getUsername().equals(username))
+                    .collect(Collectors.toList());
+        }*/
+
+        // Cache the result
+        cachedUserPlans.put(username, userPlans);
+        return userPlans;
     }
 
     @Override
-    public void save(Plan plan) {
-        plans.put(plan.getId(), plan);
-        this.save();
+    public List<Plan> getPlansByUsername(String username) {
+        return getPlansForUser(username);
     }
 
     @Override
-    public String getPlanNameById(String planId) {
-        return plans.get(planId).getName();
+    public List<Plan> getPlansByUsername(String username, int page, int pageSize) {
+        final List<Plan> userPlans = getPlansForUser(username);
+        final int start = page * pageSize;
+        final int end = Math.min(start + pageSize, userPlans.size());
+
+        if (start >= userPlans.size()) {
+            return new ArrayList<>();
+        }
+
+        return userPlans.subList(start, end);
     }
 
     @Override
-    public String getPlanDescriptionById(String planId) {
-        return plans.get(planId).getDescription();
+    public int getPlansCount(String username) {
+        return getPlansForUser(username).size();
+    }
+
+
+    /**
+     * Removes a plan by planId.
+     * @param planId the plan ID to remove
+     * @return true if the plan was removed, false otherwise
+     */
+    public boolean removePlan(String planId) {
+        boolean removed = allPlans.removeIf(plan -> plan.getId().equals(planId));
+        if (removed) {
+            // Clear all caches since we don't know which user it belonged to
+            cachedUserPlans.clear();
+        }
+        return removed;
+    }
+
+    /**
+     * Gets a plan by its ID.
+     * @param planId the plan ID
+     * @return the plan, or null if not found
+     */
+    public Plan getPlanById(String planId) {
+        return allPlans.stream()
+                .filter(plan -> plan.getId().equals(planId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public boolean deletePlan(String planId) {
+        boolean removed = allPlans.removeIf(plan -> plan.getId().equals(planId));
+        if (removed) {
+            // Clear all caches since we don't know which user it belonged to
+            cachedUserPlans.clear();
+            // Save changes to the JSON file
+            savePlansToJson();
+        }
+        return removed;
+    }
+
+    @Override
+    public void savePlan(Plan plan) {
+        allPlans.add(plan);
+        cachedUserPlans.remove(plan.getUsername());
+        savePlansToJson();
+    }
+
+    @Override
+    public boolean planExists(String planName) {
+        return allPlans.stream()
+                .filter(plan -> plan.getName().equals(planName))
+                .findFirst()
+                .orElse(null) != null;
     }
 }
+

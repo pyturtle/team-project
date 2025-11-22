@@ -1,7 +1,6 @@
 package use_case.plan.save_plan;
 
-import entity.plan.Plan;
-import use_case.plan.save_subgoal.SaveSubgoalInputData;
+import use_case.subgoal.save_subgoal.SaveSubgoalInputData;
 
 import java.util.ArrayList;
 

@@ -21,9 +21,6 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
 
     private final String viewName = "show plan";
 
-    private final ShowPlanViewModel showPlanViewModel;
-    private final LoggedInViewModel loggedInViewModel;
-
     private SavePlanController savePlanController;
 
     private final JScrollPane subgoalsContainer = new JScrollPane(
@@ -34,11 +31,9 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
     private final JLabel planDescriptionLabel = new JLabel();
     private final JPanel subgoalsPanel = new JPanel();
 
-    private final JButton createPlanButton = new JButton("Create");
+    private final JButton createPlanButton = new JButton(ShowPlanViewModel.CREATE_BUTTON_LABEL);
 
-    public ShowPlanView(ShowPlanViewModel showPlanViewModel, LoggedInViewModel loggedInViewModel) {
-        this.showPlanViewModel = showPlanViewModel;
-        this.loggedInViewModel = loggedInViewModel;
+    public ShowPlanView(ShowPlanViewModel showPlanViewModel) {
         showPlanViewModel.addPropertyChangeListener(this);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -74,6 +69,9 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
         subgoalsPanel.setLayout(new BoxLayout(subgoalsPanel, BoxLayout.Y_AXIS));
         subgoalsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        // *** KEY FIX: add right padding so content doesn't sit under the scrollbar ***
+        subgoalsPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+
         subgoalsContainer.setViewportView(subgoalsPanel);
         subgoalsContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         subgoalsContainer.setBorder(null);
@@ -84,10 +82,9 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
             @Override
             public void actionPerformed(ActionEvent evt) {
                 ShowPlanState currentState = showPlanViewModel.getState();
-                LoggedInState loggedInState = loggedInViewModel.getState();
                 savePlanController.execute(currentState.getPlanName(),
                         currentState.getPlanDescription(),
-                        "john_doe@gmail.com",
+                        currentState.getUsername(),
                         currentState.getSubgoalList());
                 createPlanButton.setEnabled(false);
             }
@@ -98,7 +95,7 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         ShowPlanState newState = (ShowPlanState) evt.getNewValue();
-
+        createPlanButton.setEnabled(!newState.isPlanExists());
         planNameLabel.setText(newState.getPlanName());
         planDescriptionLabel.setText("<html>" + newState.getPlanDescription() + "</html>");
 
@@ -139,6 +136,8 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
         JLabel descLabel = new JLabel("<html>" + description + "</html>");
         descLabel.setFont(descLabel.getFont().deriveFont(13f));
         descLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // Optional extra safety: padding inside the label itself
+        descLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
 
         JLabel deadlineLabel = new JLabel("Due: " + deadline);
         deadlineLabel.setAlignmentX(Component.LEFT_ALIGNMENT);

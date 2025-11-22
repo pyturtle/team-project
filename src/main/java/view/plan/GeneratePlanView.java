@@ -20,6 +20,7 @@ import java.beans.PropertyChangeListener;
 
 public class GeneratePlanView extends JPanel implements ActionListener, PropertyChangeListener {
     private final String viewName = "generate plan";
+    private final GeneratePlanViewModel generatePlanViewModel;
     private final SendMessageViewModel sendMessageViewModel;
     private GeneratePlanController generatePlanController;
     private SendMessageController sendMessageController;
@@ -34,6 +35,7 @@ public class GeneratePlanView extends JPanel implements ActionListener, Property
 
     public GeneratePlanView(GeneratePlanViewModel generatePlanViewModel, SendMessageViewModel sendMessageViewModel) {
         this.sendMessageViewModel = sendMessageViewModel;
+        this.generatePlanViewModel = generatePlanViewModel;
         generatePlanViewModel.addPropertyChangeListener(this);
         sendMessageViewModel.addPropertyChangeListener(this);
 
@@ -84,6 +86,7 @@ public class GeneratePlanView extends JPanel implements ActionListener, Property
                     public void actionPerformed(ActionEvent evt) {
                         final SendMessageState sendMessageState = sendMessageViewModel.getState();
                         sendMessageController.execute(sendMessageState.getUserMessage());
+                        userMessageInputField.setText("");
                     }
                 });
 
@@ -130,11 +133,11 @@ public class GeneratePlanView extends JPanel implements ActionListener, Property
             String userMessage = ((SendMessageState) newState).getUserMessage();
 
             sendButton.setEnabled(false);
-            sendButton.setText("Loading...");
+            sendButton.setText(GeneratePlanViewModel.LOADING_LABEL);
 
             JPanel textBox = createTextBox(userMessage);
-            JPanel bubble = createMessageBox(textBox, true);            // true = user
-            JPanel row = wrapInRow(bubble, true);                       // right side
+            JPanel bubble = createMessageBox(textBox, true);
+            JPanel row = wrapInRow(bubble, true);
 
             messagesPanel.add(row);
             messagesPanel.revalidate();
@@ -146,7 +149,7 @@ public class GeneratePlanView extends JPanel implements ActionListener, Property
 
         if (newState instanceof GeneratePlanState) {
             sendButton.setEnabled(true);
-            sendButton.setText("Send");
+            sendButton.setText(GeneratePlanViewModel.SEND_BUTTON_LABEL);
             GeneratePlanState newGeneratePlanState = (GeneratePlanState) newState;
             boolean success = newGeneratePlanState.isSuccess();
             String responseMessage = newGeneratePlanState.getResponseMessage();
@@ -165,8 +168,8 @@ public class GeneratePlanView extends JPanel implements ActionListener, Property
                 content.add(createTryAgainButton(userMessage));
             }
 
-            JPanel bubble = createMessageBox(content, false);           // false = response
-            JPanel row = wrapInRow(bubble, false);                      // left side
+            JPanel bubble = createMessageBox(content, false);
+            JPanel row = wrapInRow(bubble, false);
 
             messagesPanel.add(row);
             messagesPanel.revalidate();
@@ -263,7 +266,7 @@ public class GeneratePlanView extends JPanel implements ActionListener, Property
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setOpaque(false);
-        JButton showPlanButton = new JButton("Show Plan");
+        JButton showPlanButton = new JButton(GeneratePlanViewModel.SHOW_PLAN_BUTTON_LABEL);
         showPlanButton.setFont(showPlanButton.getFont().deriveFont(13f));
         showPlanButton.addActionListener(new ActionListener() {
             @Override
@@ -279,9 +282,17 @@ public class GeneratePlanView extends JPanel implements ActionListener, Property
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setOpaque(false);
-        JButton button = new JButton("Try Again");
+        JButton button = new JButton(GeneratePlanViewModel.TRY_AGAIN_BUTTON_LABEL);
         button.setFont(button.getFont().deriveFont(13f));
-        button.addActionListener(evt -> generatePlanController.execute(userMessage));
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                button.setEnabled(false);
+                sendButton.setEnabled(false);
+                sendButton.setText(GeneratePlanViewModel.LOADING_LABEL);
+                startGeneratePlanInBackground(userMessage);
+            }
+        });
         panel.add(button);
         return panel;
     }

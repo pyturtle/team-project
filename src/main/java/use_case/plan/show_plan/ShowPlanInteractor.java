@@ -10,9 +10,12 @@ import java.util.HashMap;
 
 public class ShowPlanInteractor implements ShowPlanInputBoundary {
     ShowPlanOutputBoundary showPlanPresenter;
+    ShowPlanDataAccessInterface showPlanDataAccess;
 
-    public ShowPlanInteractor(ShowPlanOutputBoundary showPlanPresenter) {
+    public ShowPlanInteractor(ShowPlanOutputBoundary showPlanPresenter,
+                              ShowPlanDataAccessInterface showPlanDataAccess) {
         this.showPlanPresenter = showPlanPresenter;
+        this.showPlanDataAccess = showPlanDataAccess;
     }
 
     @Override
@@ -29,8 +32,9 @@ public class ShowPlanInteractor implements ShowPlanInputBoundary {
             subgoal.put("deadline", subgoals.getJSONObject(i).getString("deadline"));
             subgoalsList.add(subgoal);
         }
+        boolean planExists = showPlanDataAccess.planExists(planName);
         final ShowPlanOutputData showPlanOutputData =
-                new ShowPlanOutputData(planName, planDescription, subgoalsList);
+                new ShowPlanOutputData(planName, planDescription, subgoalsList, planExists);
         showPlanPresenter.prepareView(showPlanOutputData);
     }
 }
