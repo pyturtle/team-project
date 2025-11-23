@@ -11,14 +11,20 @@ public class CalendarState {
     private Map<LocalDate, List<String>> goalsByDate = new HashMap<>();
     private String errorMessage;
     private String username;
+    private boolean filterActive = false;
+    private List<String> filteredGoals = new ArrayList<>(); // Store as Strings for display
+    private List<entity.Subgoal> filteredSubgoals = new ArrayList<>();
+    private String currentFilter = "";
 
     public String getUsername() {
         return username;
     }
 
+
     public void setUsername(String username) {
         this.username = username;
     }
+
 
     public LocalDate getSelectedDate() {
         return selectedDate;
@@ -26,6 +32,7 @@ public class CalendarState {
     public void setSelectedDate(LocalDate selectedDate) {
         this.selectedDate = selectedDate;
     }
+
 
     public List<String> getGoalsForDate(LocalDate date) {
         return goalsByDate.computeIfAbsent(date, k -> new ArrayList<>());
@@ -44,5 +51,58 @@ public class CalendarState {
     }
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+    public void setFilteredSubgoals(List<entity.Subgoal> filteredSubgoals) {
+        this.filteredSubgoals = new ArrayList<>(filteredSubgoals);
+        this.filteredGoals = convertSubgoalsToStrings(filteredSubgoals);
+        this.filterActive = true;
+    }
+
+    public void clearFilter() {
+        this.filterActive = false;
+        this.filteredSubgoals.clear();
+        this.filteredGoals.clear();
+        this.currentFilter = "";
+    }
+
+    public boolean isFilterActive() {
+        return filterActive;
+    }
+
+    public void setFilterActive(boolean filterActive) {
+        this.filterActive = filterActive;
+    }
+
+    public List<String> getFilteredGoals() {
+        return new ArrayList<>(filteredGoals);
+    }
+
+    public List<entity.Subgoal> getFilteredSubgoals() {
+        return new ArrayList<>(filteredSubgoals);
+    }
+
+    public String getCurrentFilter() {
+        return currentFilter;
+    }
+
+    public void setCurrentFilter(String currentFilter) {
+        this.currentFilter = currentFilter;
+    }
+
+    private List<String> convertSubgoalsToStrings(List<entity.Subgoal> subgoals) {
+        List<String> goalStrings = new ArrayList<>();
+        for (entity.Subgoal subgoal : subgoals) {
+            goalStrings.add(subgoalToString(subgoal));
+        }
+        return goalStrings;
+    }
+
+    private String subgoalToString(entity.Subgoal subgoal) {
+        // Convert Subgoal entity to display string
+        // Adjust this based on your Subgoal class structure
+        return String.format("%s (Plan: %d, Priority: %s)",
+                subgoal.getName(),
+                subgoal.getPlanId(),
+                subgoal.isPriority() ? "High" : "Normal");
     }
 }
