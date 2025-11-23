@@ -2,7 +2,6 @@ package view;
 
 import interface_adapter.calendar.CalendarViewModel;
 import interface_adapter.calendar.CalendarState;
-import interface_adapter.filter_subgoals.FilterSubgoalsController;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.show_plans.ShowPlansController;
 
@@ -39,7 +38,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     private JTextField goalInput;
     private JButton addGoalButton;
     private JButton removeGoalButton;
-    private JButton filterButton;
 
     // Calendar state when we are in teh calendar view
     private CalendarViewModel viewModel;
@@ -53,7 +51,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
 
     // Show Plans controller for loading plans when switching views
     private ShowPlansController showPlansController;
-    private FilterSubgoalsController filterSubgoalsController;
 
     public CalendarView(CalendarViewModel viewModel, interface_adapter.ViewManagerModel viewManagerModel) {
         this.viewModel = viewModel;
@@ -104,17 +101,14 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         goalInput = new JTextField(15);
         addGoalButton = new JButton("Add Subgoal");
         removeGoalButton = new JButton("Remove Subgoal");
-        filterButton = new JButton("Filter Subgoals");
         JPanel goalControlPanel = new JPanel();
         goalControlPanel.add(goalInput);
         goalControlPanel.add(addGoalButton);
         goalControlPanel.add(removeGoalButton);
-        goalControlPanel.add(filterButton);
         JPanel goalPanel = new JPanel(new BorderLayout());
         goalPanel.add(new JScrollPane(goalList), BorderLayout.CENTER);
         goalPanel.add(goalControlPanel, BorderLayout.SOUTH);
         add(goalPanel, BorderLayout.SOUTH);
-
 
         // Action perofmred buttons
         calendarButton.addActionListener(this);
@@ -124,7 +118,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         prevMonthButton.addActionListener(this);
         nextMonthButton.addActionListener(this);
         addGoalButton.addActionListener(this);
-        filterButton.addActionListener(this);
         removeGoalButton.addActionListener(this);
 
         //defined below: this is to make the correct grid for calendar.
@@ -202,11 +195,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
             if (logoutController != null) {
                 logoutController.execute();
             }
-        } else if (src == filterButton) {
-            showFilterDialog();
-
-            System.out.println("Filter button clicked!");
-            // You'll implement the actual filter dialog later
         }
 
         // changing months
@@ -254,18 +242,9 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
 
         // update goals
         goalListModel.clear();
-        if (state.isFilterActive()) {
-            // Display filtered subgoals
-            List<String> filteredGoals = state.getFilteredGoals();
-            for (String goal : filteredGoals) {
-                goalListModel.addElement(goal);
-            }
-        } else {
-            // Display all goals for selected date
-            List<String> goals = state.getGoalsForDate(state.getSelectedDate());
-            for (String goal : goals) {
-                goalListModel.addElement(goal);
-            }
+        List<String> goals = state.getGoalsForDate(state.getSelectedDate());
+        for (String goal : goals) {
+            goalListModel.addElement(goal);
         }
         updateCalendar();
 
@@ -287,60 +266,5 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
 
     public void setShowPlansController(ShowPlansController showPlansController) {
         this.showPlansController = showPlansController;
-    }
-
-    private void showFilterDialog() {
-        String[] options = {"By Plan ID", "Priority Only", "Clear Filter", "Cancel"};
-        int choice = JOptionPane.showOptionDialog(this,
-                "Filter subgoals:",
-                "Filter Subgoals",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                options,
-                options[0]);
-
-        switch (choice) {
-            case 0: // By Plan ID
-                filterByPlanId();
-                break;
-            case 1: // Priority Only
-                filterByPriority();
-                break;
-            case 2: // Clear Filter
-                clearFilter();
-                break;
-        }
-    }
-
-    private void filterByPlanId() {
-        String planIdStr = JOptionPane.showInputDialog(this, "Enter Plan ID to filter:");
-        if (planIdStr != null && !planIdStr.trim().isEmpty()) {
-            try {
-                Integer planId = Integer.parseInt(planIdStr.trim());
-                if (filterSubgoalsController != null) {
-                    filterSubgoalsController.execute(planId, false);
-                }
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Please enter a valid Plan ID number");
-            }
-        }
-    }
-
-    private void filterByPriority() {
-        if (filterSubgoalsController != null) {
-            filterSubgoalsController.execute(null, true);
-        }
-    }
-
-    private void clearFilter() {
-        CalendarState state = viewModel.getCalendarState();
-        state.clearFilter();
-        viewModel.firePropertyChanged();
-    }
-
-    // Add setter for the controller
-    public void setFilterSubgoalsController(FilterSubgoalsController controller) {
-        this.filterSubgoalsController = controller;
     }
 }

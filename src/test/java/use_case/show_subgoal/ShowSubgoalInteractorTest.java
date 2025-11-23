@@ -1,6 +1,6 @@
 //package use_case.show_subgoal;
 //
-//import entity.Subgoal;
+//import entity.subgoal.Subgoal;
 //import org.junit.jupiter.api.Test;
 //import java.time.LocalDate;
 //import java.util.HashMap;
@@ -28,7 +28,7 @@
 //            // Make new immutable Subgoal
 //            data.compute(id, (k, old) -> new Subgoal(old.getId(),
 //                    old.getPlanId(),
-//                    old.getUserId(),
+//                    old.getusername(),
 //                    old.getName(),
 //                    old.getDescription(),
 //                    old.getDeadline(),
