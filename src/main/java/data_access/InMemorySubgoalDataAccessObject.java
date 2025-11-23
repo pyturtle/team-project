@@ -1,6 +1,6 @@
 package data_access;
 
-import entity.Subgoal;
+import entity.subgoal.Subgoal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,40 +11,39 @@ public class InMemorySubgoalDataAccessObject implements SubgoalDataAccessInterfa
     private final List<Subgoal> subgoals = new ArrayList<>();
 
     @Override
-    public List<Subgoal> getSubgoalsByPlan(int planId, int userId) {
+    public List<Subgoal> getSubgoalsByPlan(String planId, String userId) {
         return subgoals.stream()
-                .filter(s -> s.getPlanId() == planId && s.getUserId() == userId)
+                .filter(s -> s.getPlanId().equals(planId) && s.getUsername().equals(userId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Subgoal> getPrioritySubgoals(int userId) {
+    public List<Subgoal> getPrioritySubgoals(String userId) {
         return subgoals.stream()
-                .filter(s -> s.getUserId() == userId && s.isPriority())
+                .filter(s -> s.getUsername().equals(userId) && s.isPriority())
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Subgoal> getAllSubgoalsForUser(int userId) {
+    public List<Subgoal> getAllSubgoalsForUser(String userId) {
         return subgoals.stream()
-                .filter(s -> s.getUserId() == userId)
+                .filter(s -> s.getUsername().equals(userId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Subgoal getSubgoalById(int subgoalId) {
+    public Subgoal getSubgoalById(String subgoalId) {
         return subgoals.stream()
-                .filter(s -> s.getId() == subgoalId)
+                .filter(s -> s.getId().equals(subgoalId))
                 .findFirst()
                 .orElse(null);
     }
 
     @Override
     public void saveUpdatedSubgoal(Subgoal subgoal) {
-        subgoals.removeIf(s -> s.getId() == subgoal.getId());
+        subgoals.removeIf(s -> s.getId().equals(subgoal.getId()));
         subgoals.add(subgoal);
     }
-
     // Helper for testing
     public void add(Subgoal s) {
         subgoals.add(s);

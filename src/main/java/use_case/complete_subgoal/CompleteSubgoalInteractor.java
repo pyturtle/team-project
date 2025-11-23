@@ -1,7 +1,7 @@
 package use_case.complete_subgoal;
 
 import data_access.SubgoalDataAccessInterface;
-import entity.Subgoal;
+import entity.subgoal.Subgoal;
 
 public class CompleteSubgoalInteractor implements CompleteSubgoalInputBoundary {
 
@@ -17,8 +17,8 @@ public class CompleteSubgoalInteractor implements CompleteSubgoalInputBoundary {
     @Override
     public void complete(CompleteSubgoalInputData inputData) {
 
-        // 1. Retrieve the existing subgoal
-        Subgoal s = subgoalDAO.getSubgoalById(inputData.getSubgoalId());
+        // 1. Retrieve the existing subgoal - FIXED: Use String parameter
+        Subgoal s = subgoalDAO.getSubgoalById(String.valueOf(inputData.getSubgoalId()));
 
         if (s == null) {
             presenter.presentFailure(
@@ -30,7 +30,7 @@ public class CompleteSubgoalInteractor implements CompleteSubgoalInputBoundary {
         Subgoal updated = new Subgoal(
                 s.getId(),
                 s.getPlanId(),
-                s.getUserId(),
+                s.getUsername(),  // FIXED: Use getUsername() not getUserId()
                 s.getName(),
                 s.getDescription(),
                 s.getDeadline(),
@@ -41,7 +41,7 @@ public class CompleteSubgoalInteractor implements CompleteSubgoalInputBoundary {
         // 3. Save the updated subgoal into DAO
         subgoalDAO.saveUpdatedSubgoal(updated);
 
-        // 4. Return successful output
+        // 4. Return successful output - FIXED: Pass String ID
         presenter.present(new CompleteSubgoalOutputData(updated.getId()));
     }
 }

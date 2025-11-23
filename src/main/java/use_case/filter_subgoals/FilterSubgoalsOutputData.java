@@ -1,6 +1,6 @@
 package use_case.filter_subgoals;
 
-import entity.Subgoal;
+import entity.subgoal.Subgoal;
 import java.util.List;
 
 public class FilterSubgoalsOutputData {

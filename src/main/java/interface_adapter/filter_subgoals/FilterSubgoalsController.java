@@ -10,9 +10,9 @@ public class FilterSubgoalsController {
         this.filterSubgoalsInteractor = filterSubgoalsInteractor;
     }
 
-    public void execute(Integer planId, Boolean priorityOnly) {
-        // For now, we'll use a default user ID - you might want to get this from the current user
-        int currentUserId = getCurrentUserId();
+    public void execute(String planId, Boolean priorityOnly) {
+        // Get current user ID as String
+        String currentUserId = getCurrentUserId();
 
         FilterSubgoalsInputData inputData = new FilterSubgoalsInputData(
                 currentUserId, planId, priorityOnly
@@ -25,9 +25,9 @@ public class FilterSubgoalsController {
         // Otherwise, we'll handle keyword filtering in the view for now
     }
 
-    private int getCurrentUserId() {
+    private String getCurrentUserId() {
         // You'll need to implement this based on how you handle current user
         // For now, return a default or get from your user system
-        return 99; // Using the test user ID from your example
+        return "99"; // Using the test user ID from your example as String
     }
 }

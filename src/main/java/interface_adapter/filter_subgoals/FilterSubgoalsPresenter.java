@@ -14,11 +14,8 @@ public class FilterSubgoalsPresenter implements FilterSubgoalsOutputBoundary {
     @Override
     public void present(FilterSubgoalsOutputData outputData) {
         var state = calendarViewModel.getCalendarState();
-
-        // This should now work since we fixed CalendarState
         state.setFilteredSubgoals(outputData.getFilteredSubgoals());
         state.setFilterActive(true);
-
         calendarViewModel.firePropertyChanged();
     }
 }

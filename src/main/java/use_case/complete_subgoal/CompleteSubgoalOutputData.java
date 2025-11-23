@@ -1,13 +1,13 @@
 package use_case.complete_subgoal;
 
 public class CompleteSubgoalOutputData {
-    private final int subgoalId;
+    private final String subgoalId;
 
-    public CompleteSubgoalOutputData(int subgoalId) {
+    public CompleteSubgoalOutputData(String subgoalId) {
         this.subgoalId = subgoalId;
     }
 
-    public int getSubgoalId() {
+    public String getSubgoalId() {
         return subgoalId;
     }
 }

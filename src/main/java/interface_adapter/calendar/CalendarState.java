@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import entity.subgoal.Subgoal;
+
+
 
 public class CalendarState {
     private LocalDate selectedDate = LocalDate.now();
@@ -13,7 +16,7 @@ public class CalendarState {
     private String username;
     private boolean filterActive = false;
     private List<String> filteredGoals = new ArrayList<>(); // Store as Strings for display
-    private List<entity.Subgoal> filteredSubgoals = new ArrayList<>();
+    private List<entity.subgoal.Subgoal> filteredSubgoals = new ArrayList<>();
     private String currentFilter = "";
 
     public String getUsername() {
@@ -52,7 +55,7 @@ public class CalendarState {
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
-    public void setFilteredSubgoals(List<entity.Subgoal> filteredSubgoals) {
+    public void setFilteredSubgoals(List<entity.subgoal.Subgoal> filteredSubgoals) {
         this.filteredSubgoals = new ArrayList<>(filteredSubgoals);
         this.filteredGoals = convertSubgoalsToStrings(filteredSubgoals);
         this.filterActive = true;
@@ -77,7 +80,7 @@ public class CalendarState {
         return new ArrayList<>(filteredGoals);
     }
 
-    public List<entity.Subgoal> getFilteredSubgoals() {
+    public List<entity.subgoal.Subgoal> getFilteredSubgoals() {
         return new ArrayList<>(filteredSubgoals);
     }
 
@@ -89,15 +92,15 @@ public class CalendarState {
         this.currentFilter = currentFilter;
     }
 
-    private List<String> convertSubgoalsToStrings(List<entity.Subgoal> subgoals) {
+    private List<String> convertSubgoalsToStrings(List<entity.subgoal.Subgoal> subgoals) {
         List<String> goalStrings = new ArrayList<>();
-        for (entity.Subgoal subgoal : subgoals) {
+        for (entity.subgoal.Subgoal subgoal : subgoals) {
             goalStrings.add(subgoalToString(subgoal));
         }
         return goalStrings;
     }
 
-    private String subgoalToString(entity.Subgoal subgoal) {
+    private String subgoalToString(entity.subgoal.Subgoal subgoal) {
         // Convert Subgoal entity to display string
         // Adjust this based on your Subgoal class structure
         return String.format("%s (Plan: %d, Priority: %s)",

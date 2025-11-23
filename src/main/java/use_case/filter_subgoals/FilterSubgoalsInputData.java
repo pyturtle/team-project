@@ -1,18 +1,17 @@
 package use_case.filter_subgoals;
 
 public class FilterSubgoalsInputData {
-    private final Integer planId;
+    private final String planId;
     private final boolean priorityOnly;
-    private final int userId;
+    private final String userId;
 
-    public FilterSubgoalsInputData(int userId, Integer planId, boolean priorityOnly) {
+    public FilterSubgoalsInputData(String userId, String planId, boolean priorityOnly) {
         this.userId = userId;
         this.planId = planId;
         this.priorityOnly = priorityOnly;
-
     }
 
-    public Integer getPlanId() { return planId; }
+    public String getPlanId() { return planId; }
     public boolean isPriorityOnly() { return priorityOnly; }
-    public int getUserId() { return userId; }
+    public String getUserId() { return userId; }
 }

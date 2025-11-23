@@ -72,6 +72,10 @@ import view.plan.ShowPlansView;
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
+import interface_adapter.filter_subgoals.FilterSubgoalsController;
+import interface_adapter.filter_subgoals.FilterSubgoalsPresenter;
+import use_case.filter_subgoals.FilterSubgoalsInputBoundary;
+import use_case.filter_subgoals.FilterSubgoalsInteractor;
 
 // Delete Plan functionality added
 public class AppBuilder {
@@ -242,6 +246,23 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addFilterSubgoalsUseCase() {
+        // Add these imports at the top of AppBuilder if not already there:
+        // import interface_adapter.filter_subgoals.FilterSubgoalsController;
+        // import interface_adapter.filter_subgoals.FilterSubgoalsPresenter;
+        // import use_case.filter_subgoals.FilterSubgoalsInputBoundary;
+        // import use_case.filter_subgoals.FilterSubgoalsInteractor;
+
+        final FilterSubgoalsPresenter filterSubgoalsPresenter = new FilterSubgoalsPresenter(calendarViewModel);
+        final FilterSubgoalsInputBoundary filterSubgoalsInteractor =
+                new FilterSubgoalsInteractor(subgoalDataAccessObject, filterSubgoalsPresenter);
+        final FilterSubgoalsController filterSubgoalsController =
+                new FilterSubgoalsController(filterSubgoalsInteractor);
+
+        calendarView.setFilterSubgoalsController(filterSubgoalsController);
+        return this;
+    }
+
     /**
      * Adds the Delete Plan Use Case to the application.
      * @return this builder
@@ -318,6 +339,8 @@ public class AppBuilder {
 
         return application;
     }
+
+
 
 
 }

@@ -20,6 +20,7 @@ public class Main {
                 .addLoginUseCase()
                 .addGeneratePlanUseCase()
                 .addLogoutUseCase()
+                .addFilterSubgoalsUseCase()
                 .addShowPlansUseCase()
                 .addDeletePlanUseCase()
                 .build();

@@ -17,6 +17,27 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+
+import entity.plan.Plan;
+import entity.subgoal.Subgoal;
+import entity.subgoal.SubgoalBuilder;
+import entity.subgoal.SubgoalFactory;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;  // ADD THIS IMPORT
+import java.util.Map;
+
+
+
 /**
  * A simple in-memory implementation of SubgoalDataAccessInterface.
  * <p>
@@ -24,7 +45,7 @@ import java.util.Map;
  * It can be used as a placeholder until a file- or DB-backed DAO
  * is implemented by the team.
  */
-public class FileSubgoalDataAccessObject implements SubgoalDataAccessInterface {
+public class FileSubgoalDataAccessObject implements data_access.SubgoalDataAccessInterface, SubgoalDataAccessInterface {
     private final String subgoalsFilePath;
     private final SubgoalBuilder subgoalBuilder;
     private final HashMap<String, Subgoal> subgoals = new HashMap();
@@ -145,6 +166,44 @@ public class FileSubgoalDataAccessObject implements SubgoalDataAccessInterface {
         subgoals.put(id, updated);
         this.save();
     }
+    @Override
+    public List<Subgoal> getSubgoalsByPlan(String planId, String userId) {
+        List<Subgoal> result = new ArrayList<>();
+        for (Subgoal subgoal : subgoals.values()) {
+            if (subgoal.getPlanId().equals(planId) && subgoal.getUsername().equals(userId)) {
+                result.add(subgoal);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<Subgoal> getPrioritySubgoals(String userId) {
+        List<Subgoal> result = new ArrayList<>();
+        for (Subgoal subgoal : subgoals.values()) {
+            if (subgoal.getUsername().equals(userId) && subgoal.isPriority()) {
+                result.add(subgoal);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<Subgoal> getAllSubgoalsForUser(String userId) {
+        List<Subgoal> result = new ArrayList<>();
+        for (Subgoal subgoal : subgoals.values()) {
+            if (subgoal.getUsername().equals(userId)) {
+                result.add(subgoal);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public void saveUpdatedSubgoal(Subgoal subgoal) {
+        subgoals.put(subgoal.getId(), subgoal);
+        this.save();
+    }
 
     @Override
     public void updateCompleted(String id, boolean completed) {
@@ -168,4 +227,6 @@ public class FileSubgoalDataAccessObject implements SubgoalDataAccessInterface {
         this.save();
     }
 
+
 }
+

@@ -1,7 +1,7 @@
 package use_case.filter_subgoals;
 
 import data_access.SubgoalDataAccessInterface;
-import entity.Subgoal;
+import entity.subgoal.Subgoal;
 import java.util.List;
 
 public class FilterSubgoalsInteractor implements FilterSubgoalsInputBoundary {
