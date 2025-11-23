@@ -35,6 +35,9 @@ import interface_adapter.plan.show_plans.ShowPlansViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.show_subgoal.ShowSubgoalController;
+import interface_adapter.show_subgoal.ShowSubgoalPresenter;
+import interface_adapter.show_subgoal.ShowSubgoalViewModel;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -63,11 +66,15 @@ import use_case.remember_me.RememberMe;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import use_case.subgoal.show_subgoal.ShowSubgoalInputBoundary;
+import use_case.subgoal.show_subgoal.ShowSubgoalInteractor;
+import use_case.subgoal.show_subgoal.ShowSubgoalOutputBoundary;
 import view.*;
 import view.plan.GeneratePlanView;
 import view.plan.SavePlanView;
 import view.plan.ShowPlanView;
 import view.plan.ShowPlansView;
+import view.SubgoalView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -122,11 +129,14 @@ public class AppBuilder {
     private ShowPlanViewModel showPlanViewModel;
     private SavePlanViewModel savePlanViewModel;
     private CalendarViewModel calendarViewModel;
+    private ShowSubgoalViewModel showSubgoalViewModel;
     private LoginView loginView;
     private GeneratePlanView generatePlanView;
     private ShowPlanView showPlanView;
     private SavePlanView savePlanView;
     private CalendarView calendarView;
+    private SubgoalView showSubgoalView;
+    private SubgoalView subgoalView;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -201,6 +211,11 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addShowSubgoalView() {
+        showSubgoalViewModel = new ShowSubgoalViewModel();
+        return this;
+    }
+
     public AppBuilder addSignupUseCase() {
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel,
                 signupViewModel, loginViewModel);
@@ -241,6 +256,28 @@ public class AppBuilder {
         mainPageView.setShowPlansController(showPlansController);
         return this;
     }
+
+    public AppBuilder addShowSubgoalUseCase() {
+
+        // Presenter
+        final ShowSubgoalOutputBoundary showSubgoalOutputBoundary =
+                new ShowSubgoalPresenter(showSubgoalViewModel, dialogManagerModel);
+
+        // Interactor
+        final ShowSubgoalInputBoundary showSubgoalInteractor =
+                new ShowSubgoalInteractor(subgoalDataAccessObject, showSubgoalOutputBoundary);
+
+        // Controller
+        final ShowSubgoalController showSubgoalController =
+                new ShowSubgoalController(showSubgoalInteractor);
+
+        // Build the Subgoal popup dialog (owner = main app frame)
+        subgoalView = new SubgoalView(null, showSubgoalViewModel, showSubgoalController);
+
+
+        return this;
+    }
+
 
     /**
      * Adds the Delete Plan Use Case to the application.
