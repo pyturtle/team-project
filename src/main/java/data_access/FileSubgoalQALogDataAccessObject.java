@@ -3,6 +3,7 @@ package data_access;
 import entity.SubgoalQuestionAnswer;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import use_case.subgoal.subgoal_qa.SubgoalQuestionDataAccessInterface;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,7 +22,7 @@ import java.util.*;
  *   ...
  * }
  */
-public class FileSubgoalQALogDataAccessObject {
+public class FileSubgoalQALogDataAccessObject implements SubgoalQuestionDataAccessInterface {
 
     private final String filePath;
     private final Map<String, List<SubgoalQuestionAnswer>> historyBySubgoal = new HashMap<>();
@@ -35,6 +36,22 @@ public class FileSubgoalQALogDataAccessObject {
         }
     }
 
+    // ===== Interface methods required by Interactor =====
+
+    @Override
+    public List<SubgoalQuestionAnswer> getQuestionsForSubgoal(String subgoalId) {
+        return getHistory(subgoalId);
+    }
+
+    @Override
+    public SubgoalQuestionAnswer saveQuestion(String subgoalId, String question, String answer) {
+        append(subgoalId, question, answer);
+        List<SubgoalQuestionAnswer> list = getHistory(subgoalId);
+        return list.get(list.size() - 1);
+    }
+
+    // ===== Your existing functionality =====
+
     public List<SubgoalQuestionAnswer> getHistory(String subgoalId) {
         return historyBySubgoal.getOrDefault(subgoalId, new ArrayList<>());
     }
@@ -44,7 +61,7 @@ public class FileSubgoalQALogDataAccessObject {
                 historyBySubgoal.computeIfAbsent(subgoalId, k -> new ArrayList<>());
 
         int nextId = list.size() + 1;
-        int subgoalIntId = subgoalId.hashCode(); // see note above
+        int subgoalIntId = subgoalId.hashCode(); // stable int per subgoal
 
         list.add(new SubgoalQuestionAnswer(nextId, subgoalIntId, question, answer));
         save();
