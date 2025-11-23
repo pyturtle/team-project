@@ -12,6 +12,8 @@ public class Main {
                 .addGeneratePlanView()
                 .addShowPlanView()
                 .addSavePlanView()
+                .addShowSubgoalView()
+                .addSubgoalQAView()
                 .addLoggedInView() // Still needed for LoggedInViewModel (used by presenters)
                 .addCalendarView()
                 .addShowPlansView()
@@ -21,7 +23,9 @@ public class Main {
                 .addGeneratePlanUseCase()
                 .addLogoutUseCase()
                 .addShowPlansUseCase()
+                .addShowSubgoalUseCase()
                 .addDeletePlanUseCase()
+                .addSubgoalQAUseCase()
                 .build();
 
         application.setSize(1000, 600);
