@@ -1,0 +1,22 @@
+[
+  {
+    "id": "subgoal-001",
+    "plan_id": "plan-001",
+    "username": "rapunzelsa",
+    "name": "Practice scales",
+    "description": "Practice 30 min/day",
+    "deadline": "2025-12-31",
+    "priority": true,
+    "completed": false
+  },
+  {
+    "id": "subgoal-002",
+    "plan_id": "plan-002",
+    "username": "rapunzelsa",
+    "name": "Create homepage",
+    "description": "Set up homepage layout",
+    "deadline": "2025-11-30",
+    "priority": false,
+    "completed": false
+  }
+]

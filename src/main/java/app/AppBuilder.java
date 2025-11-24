@@ -29,6 +29,7 @@ import interface_adapter.plan.save_plan.SavePlanViewModel;
 import interface_adapter.plan.show_plan.ShowPlanController;
 import interface_adapter.plan.show_plan.ShowPlanPresenter;
 import interface_adapter.plan.show_plan.ShowPlanViewModel;
+
 import interface_adapter.plan.show_plans.ShowPlansController;
 import interface_adapter.plan.show_plans.ShowPlansPresenter;
 import interface_adapter.plan.show_plans.ShowPlansViewModel;
@@ -66,14 +67,14 @@ import use_case.signup.SignupOutputBoundary;
 import view.*;
 import view.plan.GeneratePlanView;
 import view.plan.SavePlanView;
-import view.plan.ShowPlanView;
 import view.plan.ShowPlansView;
+import view.plan.ShowPlanView;
+
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 
-// Delete Plan functionality added
 public class AppBuilder {
     final UserFactory userFactory = new UserFactory();
     final SubgoalFactory subgoalFactory = new SubgoalFactory();
@@ -91,24 +92,17 @@ public class AppBuilder {
     private final HashMap<String, JPanel> partialViews = new HashMap<>();
     private final PartialViewModel partialViewModel = new PartialViewModel();
     PartialViewManager partialViewManager = new PartialViewManager(partialViews, partialViewModel);
-    // set which data access implementation to use, can be any
-    // of the classes from the data_access package
 
-    // DAO version using local file storage
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
     final FileSubgoalDataAccessObject subgoalDataAccessObject = new FileSubgoalDataAccessObject(
             "subgoals.json",
             new SubgoalBuilder());
-    // DAO version using a shared external database
-
-    // Plan data access object - loads from JSON file
-    // To use JSON file: new InMemoryPlanDataAccessObject("plans.json")
-    // To use demo data: new InMemoryPlanDataAccessObject()
     final FilePlanDataAccessObject planDataAccessObject = new FilePlanDataAccessObject("plans.json");
 
     private ShowPlansView showPlansView;
     private ShowPlansViewModel showPlansViewModel;
-    // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
+    private ShowPlanView showPlanView;
+    private ShowPlanViewModel showPlanViewModel;
 
     final GeminiApiDataAccessObject generatePlanDataAccessObject = new GeminiApiDataAccessObject();
 
@@ -119,12 +113,10 @@ public class AppBuilder {
     private LoggedInViewModel loggedInViewModel;
     private GeneratePlanViewModel generatePlanViewModel;
     private SendMessageViewModel sendMessageViewModel;
-    private ShowPlanViewModel showPlanViewModel;
     private SavePlanViewModel savePlanViewModel;
     private CalendarViewModel calendarViewModel;
     private LoginView loginView;
     private GeneratePlanView generatePlanView;
-    private ShowPlanView showPlanView;
     private SavePlanView savePlanView;
     private CalendarView calendarView;
 
@@ -132,8 +124,21 @@ public class AppBuilder {
         cardPanel.setLayout(cardLayout);
     }
 
-    public AppBuilder addMainView()
-    {
+    public AppBuilder addShowPlanView() {
+        showPlanViewModel = new ShowPlanViewModel();
+        showPlanView = new ShowPlanView(showPlanViewModel);
+        dialogViews.put(showPlanView.getViewName(), showPlanView);
+        return this;
+    }
+
+    public AppBuilder addShowPlansView() {
+        showPlansViewModel = new ShowPlansViewModel();
+        showPlansView = new ShowPlansView(showPlansViewModel, savePlanViewModel, viewManagerModel);
+        partialViews.put(showPlansView.getViewName(), showPlansView);
+        return this;
+    }
+
+    public AppBuilder addMainView() {
         mainPageView = new MainPageView(viewManagerModel,
                 partialViewModel,
                 showPlansViewModel,
@@ -149,29 +154,20 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addShowPlansView() {
-        showPlansViewModel = new ShowPlansViewModel();
-        showPlansView = new ShowPlansView(showPlansViewModel, savePlanViewModel, viewManagerModel);
-        partialViews.put(showPlansView.getViewName(), showPlansView);
-        return this;
-    }
-
     public AppBuilder addLoginView() {
         loginViewModel = new LoginViewModel();
-
         PreferenceRepository preferenceRepository = new PreferenceRepository();
         RememberMe rememberMeUseCase = new RememberMe(preferenceRepository);
-
         loginView = new LoginView(loginViewModel, rememberMeUseCase);
         cardPanel.add(loginView, loginView.getViewName());
         return this;
     }
 
     public AppBuilder addLoggedInView() {
-        // LoggedInViewModel is still needed by presenters, but we don't need the view anymore
         loggedInViewModel = new LoggedInViewModel();
         return this;
     }
+
     public AppBuilder addCalendarView() {
         calendarViewModel = new CalendarViewModel();
         calendarView = new CalendarView(calendarViewModel, viewManagerModel);
@@ -187,13 +183,6 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addShowPlanView() {
-        showPlanViewModel = new ShowPlanViewModel();
-        showPlanView = new ShowPlanView(showPlanViewModel);
-        dialogViews.put(showPlanView.getViewName(), showPlanView);
-        return this;
-    }
-
     public AppBuilder addSavePlanView() {
         savePlanViewModel = new SavePlanViewModel();
         savePlanView = new SavePlanView(savePlanViewModel);
@@ -206,7 +195,6 @@ public class AppBuilder {
                 signupViewModel, loginViewModel);
         final SignupInputBoundary userSignupInteractor = new SignupInteractor(
                 userDataAccessObject, signupOutputBoundary, userFactory);
-
         SignupController controller = new SignupController(userSignupInteractor);
         signupView.setSignupController(controller);
         return this;
@@ -218,40 +206,33 @@ public class AppBuilder {
                 showPlanViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(
                 userDataAccessObject, loginOutputBoundary);
-
         LoginController loginController = new LoginController(loginInteractor);
         loginView.setLoginController(loginController);
         return this;
     }
 
-    /**
-     * Adds the Show Plans Use Case to the application.
-     * @return this builder
-     */
     public AppBuilder addShowPlansUseCase() {
         final ShowPlansOutputBoundary showPlansOutputBoundary = new ShowPlansPresenter(
                 viewManagerModel, showPlansViewModel, loggedInViewModel);
-
         final ShowPlansInputBoundary showPlansInteractor =
                 new ShowPlansInteractor(planDataAccessObject, showPlansOutputBoundary);
-
         final ShowPlansController showPlansController = new ShowPlansController(showPlansInteractor);
+        final ShowPlanOutputBoundary showPlanOutputBoundary = new ShowPlanPresenter(showPlanViewModel,
+                dialogManagerModel);
+        final ShowPlanInputBoundary showPlanInteractor = new ShowPlanInteractor(showPlanOutputBoundary,
+                planDataAccessObject);
+        ShowPlanController showPlanController = new ShowPlanController(showPlanInteractor);
+        showPlansController.setShowPlanController(showPlanController);
+        showPlansView.setShowPlanController(showPlanController);
         showPlansView.setShowPlansController(showPlansController);
-        calendarView.setShowPlansController(showPlansController);
-        mainPageView.setShowPlansController(showPlansController);
         return this;
     }
 
-    /**
-     * Adds the Delete Plan Use Case to the application.
-     * @return this builder
-     */
+
     public AppBuilder addDeletePlanUseCase() {
         final DeletePlanOutputBoundary deletePlanOutputBoundary = new DeletePlanPresenter(showPlansViewModel);
-
         final DeletePlanInputBoundary deletePlanInteractor =
                 new DeletePlanInteractor(planDataAccessObject, deletePlanOutputBoundary);
-
         final DeletePlanController deletePlanController = new DeletePlanController(deletePlanInteractor);
         showPlansView.setDeletePlanController(deletePlanController);
         return this;
@@ -262,41 +243,26 @@ public class AppBuilder {
         final GeneratePlanInputBoundary generatePlanInteractor = new GeneratePlanInteractor(
                 generatePlanDataAccessObject, generatePlanOutputBoundary);
         GeneratePlanController generatePlanController = new GeneratePlanController(generatePlanInteractor);
-
         final SendMessageOutputBoundary sendMessageOutputBoundary = new SendMessagePresenter(sendMessageViewModel);
         final SendMessageInputBoundary sendMessageInteractor = new SendMessageInteractor(sendMessageOutputBoundary);
         SendMessageController sendMessageController = new SendMessageController(sendMessageInteractor);
-
-        final ShowPlanOutputBoundary showPlanOutputBoundary = new ShowPlanPresenter(showPlanViewModel,
-                dialogManagerModel);
-        final ShowPlanInputBoundary showPlanInteractor = new ShowPlanInteractor(showPlanOutputBoundary,
-                planDataAccessObject);
-        ShowPlanController showPlanController = new ShowPlanController(showPlanInteractor);
-
         final SavePlanOutputBoundary savePlanOutputBoundary = new SavePlanPresenter(savePlanViewModel,
                 dialogManagerModel);
         final SavePlanInputBoundary savePlanInteractor = new SavePlanInteractor(savePlanOutputBoundary,
                 planDataAccessObject, subgoalDataAccessObject);
         SavePlanController savePlanController = new SavePlanController(savePlanInteractor);
-
         generatePlanView.setGeneratePlanController(generatePlanController);
         generatePlanView.setSendMessageController(sendMessageController);
-        generatePlanView.setShowPlanController(showPlanController);
+        generatePlanView.setShowPlanController(new ShowPlanController(new ShowPlanInteractor(new ShowPlanPresenter(showPlanViewModel, dialogManagerModel), planDataAccessObject)));
         showPlanView.setSavePlanController(savePlanController);
         return this;
     }
 
-    /**
-     * Adds the Logout Use Case to the application.
-     * @return this builder
-     */
     public AppBuilder addLogoutUseCase() {
         final LogoutOutputBoundary logoutOutputBoundary = new LogoutPresenter(viewManagerModel,
                 loggedInViewModel, loginViewModel);
-
         final LogoutInputBoundary logoutInteractor =
                 new LogoutInteractor(userDataAccessObject, logoutOutputBoundary);
-
         final LogoutController logoutController = new LogoutController(logoutInteractor);
         calendarView.setLogoutController(logoutController);
         showPlansView.setLogoutController(logoutController);
@@ -307,17 +273,11 @@ public class AppBuilder {
     public JFrame build() {
         final JFrame application = new JFrame("Group Project");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
         application.add(cardPanel);
-
         partialViewModel.setState("CalendarView");
         partialViewModel.firePropertyChange();
-
         viewManagerModel.setState(signupView.getViewName());
         viewManagerModel.firePropertyChange();
-
         return application;
     }
-
-
 }

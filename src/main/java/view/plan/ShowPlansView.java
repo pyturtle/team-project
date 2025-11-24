@@ -6,14 +6,14 @@ import interface_adapter.plan.delete_plan.DeletePlanController;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.plan.save_plan.SavePlanState;
 import interface_adapter.plan.save_plan.SavePlanViewModel;
+import interface_adapter.plan.show_plan.ShowPlanController;
 import interface_adapter.plan.show_plans.ShowPlansController;
 import interface_adapter.plan.show_plans.ShowPlansState;
 import interface_adapter.plan.show_plans.ShowPlansViewModel;
+import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -36,6 +36,7 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     private ShowPlansController showPlansController;
     private DeletePlanController deletePlanController;
     private LogoutController logoutController;
+    private ShowPlanController showPlanController;
 
 
     private final JPanel plansGridPanel;
@@ -168,8 +169,18 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         final JButton subgoalsButton = new JButton(ShowPlansViewModel.SUBGOALS_BUTTON_LABEL);
         final JButton deleteButton = new JButton(ShowPlansViewModel.DELETE_BUTTON_LABEL);
 
-        // Subgoals button not implemented yet
-        subgoalsButton.setEnabled(false);
+        // ALEXTQWANG SHOWSUBGOALS BUTTON I THINK
+        // this is disableed but will be enabeld when i set it
+        subgoalsButton.setEnabled(showPlanController != null);
+
+
+        subgoalsButton.addActionListener(e -> {
+            if (showPlanController != null) {
+                JSONObject planJson = plan.toJson(); // Plan must have toJson() method
+                showPlanController.execute(planJson);
+            }
+        });
+
 
         // Enable delete button and add action listener
         deleteButton.addActionListener(e -> {
@@ -229,7 +240,10 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
     public void setShowPlansController(ShowPlansController controller) {
         this.showPlansController = controller;
+        String username = "rapunzelsa";
+        loadPlans(username, 0);
     }
+
 
     public void setDeletePlanController(DeletePlanController controller) {
         this.deletePlanController = controller;
@@ -238,4 +252,9 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     public void setLogoutController(LogoutController controller) {
         this.logoutController = controller;
     }
+    public void setShowPlanController(ShowPlanController controller) {
+        this.showPlanController = controller;
+        updateView();
+    }
+
 }

@@ -5,6 +5,7 @@ import interface_adapter.calendar.CalendarState;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.plan.show_plans.ShowPlansController;
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -62,7 +63,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         monthPanel.add(prevMonthButton, BorderLayout.WEST);
         monthPanel.add(monthLabel, BorderLayout.CENTER);
         monthPanel.add(nextMonthButton, BorderLayout.EAST);
-        add(monthPanel, BorderLayout.CENTER);
+        add(monthPanel, BorderLayout.NORTH);
 
         //Create the calendar grid. 0 rows to create as many as we need
         calendarGrid = new JPanel(new GridLayout(0, 7));
@@ -208,7 +209,8 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     }
 
 
-    public void setShowPlansController(ShowPlansController showPlansController) {
-        this.showPlansController = showPlansController;
+    public void setShowPlansController(ShowPlansController controller) {
+        this.showPlansController = controller;
     }
+
 }

@@ -104,9 +104,11 @@ public class MainPageView extends JPanel implements ActionListener, PropertyChan
 
     }
 
-    public void setShowPlansController(ShowPlansController showPlansController) {
-        this.showPlansController = showPlansController;
+    public void setShowPlansController(ShowPlansController controller) {
+        this.showPlansController = controller;
+        myPlansButton.setEnabled(controller != null);
     }
+
 
     public void setLogoutController(LogoutController logoutController) {
         this.logoutController = logoutController;

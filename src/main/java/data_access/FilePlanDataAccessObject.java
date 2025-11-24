@@ -1,6 +1,7 @@
 package data_access;
 
 import entity.plan.Plan;
+import entity.subgoal.Subgoal;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import use_case.plan.delete_plan.DeletePlanDataAccessInterface;
@@ -17,10 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * In-memory implementation of the DAO for storing plan data.
- * Loads plans from a flat JSON array and filters by username.
- */
 public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
         DeletePlanDataAccessInterface, SavePlanDataAccessInterface, ShowPlanDataAccessInterface {
 
@@ -28,10 +25,6 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
     private final Map<String, List<Plan>> cachedUserPlans = new HashMap<>();
     private final String plansFilePath;
 
-    /**
-     * Constructs the data access object that loads plans from a JSON file.
-     * @param plansDataFile path to the JSON file containing plans data, or null for demo data
-     */
     public FilePlanDataAccessObject(String plansDataFile) {
         this.plansFilePath = plansDataFile;
         if (plansDataFile != null) {
@@ -44,22 +37,10 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
         }
     }
 
-    /**
-     * Constructs the data access object with demo plans.
-     */
     public FilePlanDataAccessObject() {
         this(null);
     }
 
-    /**
-     * Loads plans from a JSON file.
-     * Expected format: Array of plan objects
-     * [
-     *   {"planId": "...", "name": "...", "description": "...", "username": "..."},
-     *   ...
-     * ]
-     * @param filePath path to the JSON file
-     */
     private void loadPlansFromJson(String filePath) throws IOException {
         String jsonContent = new String(Files.readAllBytes(Paths.get(filePath)));
         JSONArray plansArray = new JSONArray(jsonContent);
@@ -73,22 +54,16 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
                 String description = planObj.getString("description");
                 String username = planObj.getString("username");
 
-                Plan plan = new Plan(planId, name, description, username);
+                Plan plan = new Plan(planId, name, description, username, new ArrayList<Subgoal>());
                 allPlans.add(plan);
             } catch (Exception e) {
                 System.err.println("Error parsing plan at index " + i + ": " + e.getMessage());
-                // Skip this plan and continue with the next one
             }
         }
     }
 
-    /**
-     * Saves all plans to the JSON file.
-     * This persists changes to disk.
-     */
     private void savePlansToJson() {
         if (plansFilePath == null) {
-            // No file path configured, can't save
             return;
         }
 
@@ -103,8 +78,7 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
                 plansArray.put(planObj);
             }
 
-            // Write to file with proper formatting
-            String jsonContent = plansArray.toString(2); // 2 spaces indentation
+            String jsonContent = plansArray.toString(2);
             Files.write(Paths.get(plansFilePath), jsonContent.getBytes());
 
             System.out.println("Plans saved to file: " + plansFilePath);
@@ -113,48 +87,26 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
         }
     }
 
-    /**
-     * Initializes demo plans for a specific user.
-     * Used when no JSON file is provided or file is empty.
-     * @param username the user ID (username)
-     */
-    private void initializeDemoPlansForUser(String username) {
-        // Create 8 demo plans for this user
-        allPlans.add(new Plan("demo-001", "Learn Guitar", "Master guitar playing in 6 months", username));
-        allPlans.add(new Plan("demo-002", "Prepare for Exam", "Study for final exams in Computer Science", username));
-        allPlans.add(new Plan("demo-003", "Build Portfolio", "Create a professional portfolio website", username));
-        allPlans.add(new Plan("demo-004", "Learn Spanish", "Become conversational in Spanish", username));
-        allPlans.add(new Plan("demo-005", "Fitness Goal", "Run a half marathon by summer", username));
-        allPlans.add(new Plan("demo-006", "Read 12 Books", "Read one book per month this year", username));
-        allPlans.add(new Plan("demo-007", "Learn Cooking", "Master 20 new recipes", username));
-        allPlans.add(new Plan("demo-008", "Side Project", "Build and launch a mobile app", username));
+    public void initializeDemoPlansForUser(String username) {
+        allPlans.add(new Plan("demo-001", "Learn Guitar", "Master guitar playing in 6 months", username, new ArrayList<>()));
+        allPlans.add(new Plan("demo-002", "Prepare for Exam", "Study for final exams in Computer Science", username, new ArrayList<>()));
+        allPlans.add(new Plan("demo-003", "Build Portfolio", "Create a professional portfolio website", username, new ArrayList<>()));
+        allPlans.add(new Plan("demo-004", "Learn Spanish", "Become conversational in Spanish", username, new ArrayList<>()));
+        allPlans.add(new Plan("demo-005", "Fitness Goal", "Run a half marathon by summer", username, new ArrayList<>()));
+        allPlans.add(new Plan("demo-006", "Read 12 Books", "Read one book per month this year", username, new ArrayList<>()));
+        allPlans.add(new Plan("demo-007", "Learn Cooking", "Master 20 new recipes", username, new ArrayList<>()));
+        allPlans.add(new Plan("demo-008", "Side Project", "Build and launch a mobile app", username, new ArrayList<>()));
     }
 
-    /**
-     * Gets all plans for a specific user by filtering on username.
-     * @param username the user ID (username) to filter by
-     * @return list of plans belonging to this user
-     */
     private List<Plan> getPlansForUser(String username) {
-        // Check cache first
         if (cachedUserPlans.containsKey(username)) {
             return cachedUserPlans.get(username);
         }
 
-        // Filter allPlans by username
         List<Plan> userPlans = allPlans.stream()
                 .filter(plan -> plan.getUsername().equals(username))
                 .collect(Collectors.toList());
 
-        // If no plans found and no plans loaded at all, initialize demo data
-        /*if (userPlans.isEmpty() && allPlans.isEmpty()) {
-            initializeDemoPlansForUser(username);
-            userPlans = allPlans.stream()
-                    .filter(plan -> plan.getUsername().equals(username))
-                    .collect(Collectors.toList());
-        }*/
-
-        // Cache the result
         cachedUserPlans.put(username, userPlans);
         return userPlans;
     }
@@ -182,26 +134,14 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
         return getPlansForUser(username).size();
     }
 
-
-    /**
-     * Removes a plan by planId.
-     * @param planId the plan ID to remove
-     * @return true if the plan was removed, false otherwise
-     */
     public boolean removePlan(String planId) {
         boolean removed = allPlans.removeIf(plan -> plan.getId().equals(planId));
         if (removed) {
-            // Clear all caches since we don't know which user it belonged to
             cachedUserPlans.clear();
         }
         return removed;
     }
 
-    /**
-     * Gets a plan by its ID.
-     * @param planId the plan ID
-     * @return the plan, or null if not found
-     */
     public Plan getPlanById(String planId) {
         return allPlans.stream()
                 .filter(plan -> plan.getId().equals(planId))
@@ -213,9 +153,7 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
     public boolean deletePlan(String planId) {
         boolean removed = allPlans.removeIf(plan -> plan.getId().equals(planId));
         if (removed) {
-            // Clear all caches since we don't know which user it belonged to
             cachedUserPlans.clear();
-            // Save changes to the JSON file
             savePlansToJson();
         }
         return removed;
@@ -236,4 +174,3 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
                 .orElse(null) != null;
     }
 }
-

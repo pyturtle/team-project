@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A simple in-memory implementation of SubgoalDataAccessInterface.
@@ -28,6 +30,7 @@ public class FileSubgoalDataAccessObject implements SubgoalDataAccessInterface {
     private final String subgoalsFilePath;
     private final SubgoalBuilder subgoalBuilder;
     private final HashMap<String, Subgoal> subgoals = new HashMap();
+
 
     /**
      * Constructs an empty SubgoalDataAccessObject.
@@ -166,6 +169,12 @@ public class FileSubgoalDataAccessObject implements SubgoalDataAccessInterface {
 
         subgoals.put(id, updated);
         this.save();
+    }
+    // FOR SUBGOALS ALEXTQWANG
+    public List<Subgoal> getSubgoalsByPlanId(String planId) {
+        return subgoals.values().stream()
+                .filter(s -> s.getPlanId().equals(planId))
+                .collect(Collectors.toList());
     }
 
 }
