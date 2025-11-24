@@ -14,14 +14,25 @@ public class ShowPlanPresenter implements ShowPlanOutputBoundary {
     }
 
     @Override
-    public void prepareView(ShowPlanOutputData showPlanOutputData) {
+    public void prepareSuccessView(ShowPlanOutputData showPlanOutputData) {
         final ShowPlanState showPlanState = showPlanViewModel.getState();
         showPlanState.setPlanName(showPlanOutputData.getPlanName());
         showPlanState.setPlanDescription(showPlanOutputData.getPlanDescription());
         showPlanState.setSubgoalList(showPlanOutputData.getSubgoalList());
         showPlanState.setPlanExists(showPlanOutputData.isCreated());
+        showPlanState.setSuccess(true);
         showPlanViewModel.firePropertyChange();
         dialogManagerModel.setState(showPlanViewModel.getViewName());
         dialogManagerModel.firePropertyChange();
     }
+
+    @Override
+    public void prepareFailureView() {
+        final ShowPlanState showPlanState = showPlanViewModel.getState();
+        showPlanState.setSuccess(false);
+        showPlanViewModel.firePropertyChange();
+        dialogManagerModel.setState(showPlanViewModel.getViewName());
+        dialogManagerModel.firePropertyChange();
+    }
+
 }
