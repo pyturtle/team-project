@@ -1,0 +1,82 @@
+[
+  {
+    "name": "Research Guitar Types and Styles",
+    "description": "Explore different types of guitars (acoustic, electric, classical) and playing styles to decide which best suits your interests.",
+    "id": "54291ccd-0893-4933-aa7a-4296e6a00621",
+    "completed": false,
+    "deadline": "2026-01-10",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Find Learning Resources",
+    "description": "Identify and choose your primary learning resources, such as online tutorials, beginner books, or a local guitar instructor.",
+    "id": "f23bd1e5-41bb-48e6-9807-d878d5c1312d",
+    "completed": false,
+    "deadline": "2026-01-31",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Learn Your First Simple Song",
+    "description": "Apply your learned chords and strumming patterns to play a complete, simple song from start to finish.",
+    "id": "7bc9ac9f-695d-49b2-9c5f-54cdf5dbab9d",
+    "completed": false,
+    "deadline": "2026-04-11",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Establish a Consistent Practice Routine",
+    "description": "Set up a regular schedule for guitar practice to ensure continuous improvement and make playing a habit.",
+    "id": "5f1cab01-2b87-4bdd-b913-31ea846e5211",
+    "completed": false,
+    "deadline": "2026-04-25",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Acquire a Guitar and Essential Gear",
+    "description": "Purchase or borrow a guitar along with necessary accessories such as picks, a tuner, a strap, and an amplifier (if electric).",
+    "id": "5e663df0-6735-4179-b8d3-f4b5a6063216",
+    "completed": false,
+    "deadline": "2026-01-24",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Learn Basic Guitar Fundamentals",
+    "description": "Understand how to properly hold the guitar, fret notes, and perform basic strumming techniques.",
+    "id": "a9fc606a-b9ad-44b5-b2b1-ab92bc4da308",
+    "completed": false,
+    "deadline": "2026-02-14",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Practice Regular Strumming and Fingerpicking Patterns",
+    "description": "Develop rhythm and dexterity by practicing various strumming patterns and simple fingerpicking exercises.",
+    "id": "fb46ea83-b544-44e5-bc30-52cebecf2eb5",
+    "completed": false,
+    "deadline": "2026-03-28",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Master Basic Chords and Scales",
+    "description": "Learn and practice common open chords (e.g., G, C, D, E, A, Em, Am) and a simple major or minor scale.",
+    "id": "43f48f85-81c4-4f09-9219-f92f8bf4d99f",
+    "completed": false,
+    "deadline": "2026-03-07",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  }
+]
