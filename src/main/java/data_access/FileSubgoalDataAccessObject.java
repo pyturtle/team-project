@@ -45,7 +45,7 @@ import java.util.Map;
  * It can be used as a placeholder until a file- or DB-backed DAO
  * is implemented by the team.
  */
-public class FileSubgoalDataAccessObject implements data_access.SubgoalDataAccessInterface, SubgoalDataAccessInterface {
+public class FileSubgoalDataAccessObject implements SubgoalDataAccessInterface {
     private final String subgoalsFilePath;
     private final SubgoalBuilder subgoalBuilder;
     private final HashMap<String, Subgoal> subgoals = new HashMap();
@@ -227,6 +227,15 @@ public class FileSubgoalDataAccessObject implements data_access.SubgoalDataAcces
         this.save();
     }
 
+    @Override
+    public java.util.List<Subgoal> getSubgoalsByUsername(String username) {
+        java.util.List<Subgoal> result = new ArrayList<>();
+        for (Subgoal subgoal : subgoals.values()) {
+            if (subgoal.getUsername().equals(username)) {
+                result.add(subgoal);
+            }
+        }
+        return result;
+    }
 
 }
-

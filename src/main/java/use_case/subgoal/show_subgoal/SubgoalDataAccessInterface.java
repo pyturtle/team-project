@@ -12,7 +12,6 @@ public interface SubgoalDataAccessInterface {
 
     void save();
     void save(Subgoal subgoal);
-
     /**
      * Returns the Subgoal with the given ID, or {@code null} if no such subgoal exists.
      *
@@ -55,6 +54,14 @@ public interface SubgoalDataAccessInterface {
      * @return list of priority subgoals for the user
      */
     List<Subgoal> getPrioritySubgoals(String userId);
+
+    /**
+     * Returns all subgoals for a given username.
+     *
+     * @param username the username to get subgoals for
+     * @return a list of all subgoals for the user
+     */
+    java.util.List<Subgoal> getSubgoalsByUsername(String username);
 
     /**
      * Returns all subgoals for a specific user.
