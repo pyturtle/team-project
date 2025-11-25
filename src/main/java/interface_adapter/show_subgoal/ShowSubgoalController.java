@@ -1,5 +1,4 @@
 package interface_adapter.show_subgoal;
-;
 import use_case.subgoal.show_subgoal.SetCompletedInputData;
 import use_case.subgoal.show_subgoal.SetPriorityInputData;
 import use_case.subgoal.show_subgoal.ShowSubgoalInputBoundary;
