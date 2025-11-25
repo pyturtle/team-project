@@ -16,6 +16,7 @@ public class Main {
                 .addSubgoalQAView()
                 .addLoggedInView() // Still needed for LoggedInViewModel (used by presenters)
                 .addCalendarView()
+                .addSubgoalView()
                 .addShowPlansView()
                 .addMainView()
                 .addSignupUseCase()

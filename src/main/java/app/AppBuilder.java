@@ -35,6 +35,9 @@ import interface_adapter.plan.show_plan.ShowPlanViewModel;
 import interface_adapter.plan.show_plans.ShowPlansController;
 import interface_adapter.plan.show_plans.ShowPlansPresenter;
 import interface_adapter.plan.show_plans.ShowPlansViewModel;
+import interface_adapter.show_subgoal.ShowSubgoalController;
+import interface_adapter.show_subgoal.ShowSubgoalPresenter;
+import interface_adapter.show_subgoal.ShowSubgoalViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -200,8 +203,35 @@ public class AppBuilder {
     }
     public AppBuilder addCalendarView() {
         calendarViewModel = new CalendarViewModel();
-        calendarView = new CalendarView(calendarViewModel, viewManagerModel);
+        calendarView = new CalendarView(calendarViewModel, viewManagerModel, subgoalDataAccessObject);
         partialViews.put(calendarView.getViewName(), calendarView);
+        return this;
+    }
+
+    public AppBuilder addSubgoalView() {
+        // Create the ShowSubgoal use case components
+        showSubgoalViewModel = new ShowSubgoalViewModel();
+        ShowSubgoalOutputBoundary showSubgoalPresenter = new ShowSubgoalPresenter(showSubgoalViewModel);
+        ShowSubgoalInputBoundary showSubgoalInteractor = new ShowSubgoalInteractor(
+                subgoalDataAccessObject,
+                showSubgoalPresenter);
+        ShowSubgoalController showSubgoalController = new ShowSubgoalController(showSubgoalInteractor);
+
+        // Create the SubgoalView dialog (needs a parent frame, we'll use null for now)
+        // The dialog will be modal and will work with any parent
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(cardPanel);
+        if (parentFrame == null) {
+            // If no parent frame yet, create a temporary reference
+            // This will be resolved when the view is actually shown
+            parentFrame = new JFrame();
+        }
+        subgoalView = new SubgoalView(parentFrame, showSubgoalViewModel, showSubgoalController);
+
+        // Connect the SubgoalView to the CalendarView if it exists
+        if (calendarView != null) {
+            calendarView.setSubgoalView(subgoalView);
+        }
+
         return this;
     }
 

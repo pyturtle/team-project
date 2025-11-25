@@ -1,9 +1,11 @@
 package view;
 
+import entity.subgoal.Subgoal;
 import interface_adapter.calendar.CalendarViewModel;
 import interface_adapter.calendar.CalendarState;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.plan.show_plans.ShowPlansController;
+import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,6 +35,16 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     private JButton addGoalButton;
     private JButton removeGoalButton;
 
+    // Pagination for upcoming subgoals
+    private int subgoalPageOffset = 0;
+    private static final int SUBGOALS_PER_PAGE = 6;
+    private JButton prevSubgoalsButton;
+    private JButton nextSubgoalsButton;
+    private JButton openSubgoalButton;
+
+    // Map to track subgoal IDs for the displayed items
+    private final Map<String, String> displayTextToSubgoalId = new HashMap<>();
+
     // Calendar state when we are in teh calendar view
     private CalendarViewModel viewModel;
     private LocalDate displayedMonth;
@@ -46,9 +58,17 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     // Show Plans controller for loading plans when switching views
     private ShowPlansController showPlansController;
 
-    public CalendarView(CalendarViewModel viewModel, interface_adapter.ViewManagerModel viewManagerModel) {
+    // Subgoal data access for fetching actual subgoals
+    private SubgoalDataAccessInterface subgoalDataAccess;
+
+    // SubgoalView for opening individual subgoals
+    private SubgoalView subgoalView;
+
+    public CalendarView(CalendarViewModel viewModel, interface_adapter.ViewManagerModel viewManagerModel,
+                        SubgoalDataAccessInterface subgoalDataAccess) {
         this.viewModel = viewModel;
         this.viewManagerModel = viewManagerModel;
+        this.subgoalDataAccess = subgoalDataAccess;
         this.displayedMonth = LocalDate.now().withDayOfMonth(1); // starting with current month, should prob be nov
 
         setLayout(new BorderLayout());
@@ -62,7 +82,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         monthPanel.add(prevMonthButton, BorderLayout.WEST);
         monthPanel.add(monthLabel, BorderLayout.CENTER);
         monthPanel.add(nextMonthButton, BorderLayout.EAST);
-        add(monthPanel, BorderLayout.CENTER);
+        add(monthPanel, BorderLayout.NORTH);
 
         //Create the calendar grid. 0 rows to create as many as we need
         calendarGrid = new JPanel(new GridLayout(0, 7));
@@ -74,11 +94,32 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         goalInput = new JTextField(15);
         addGoalButton = new JButton("Add Subgoal");
         removeGoalButton = new JButton("Remove Subgoal");
+
+        // Navigation buttons for upcoming subgoals
+        prevSubgoalsButton = new JButton("<");
+        nextSubgoalsButton = new JButton(">");
+
+        // Button to open selected subgoal
+        openSubgoalButton = new JButton("Open Selected Subgoal");
+
         JPanel goalControlPanel = new JPanel();
         goalControlPanel.add(goalInput);
         goalControlPanel.add(addGoalButton);
         goalControlPanel.add(removeGoalButton);
+        goalControlPanel.add(openSubgoalButton);
+
+        // Panel for subgoal navigation
+        JPanel subgoalNavPanel = new JPanel(new BorderLayout());
+        JLabel upcomingLabel = new JLabel("Upcoming Subgoals", SwingConstants.CENTER);
+        upcomingLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+        JPanel navButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        navButtonPanel.add(prevSubgoalsButton);
+        navButtonPanel.add(nextSubgoalsButton);
+        subgoalNavPanel.add(upcomingLabel, BorderLayout.WEST);
+        subgoalNavPanel.add(navButtonPanel, BorderLayout.EAST);
+
         JPanel goalPanel = new JPanel(new BorderLayout());
+        goalPanel.add(subgoalNavPanel, BorderLayout.NORTH);
         goalPanel.add(new JScrollPane(goalList), BorderLayout.CENTER);
         goalPanel.add(goalControlPanel, BorderLayout.SOUTH);
         add(goalPanel, BorderLayout.SOUTH);
@@ -86,9 +127,20 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         nextMonthButton.addActionListener(this);
         addGoalButton.addActionListener(this);
         removeGoalButton.addActionListener(this);
+        prevSubgoalsButton.addActionListener(this);
+        nextSubgoalsButton.addActionListener(this);
+        openSubgoalButton.addActionListener(this);
+
+        // Register this view as a property change listener
+        viewModel.addPropertyChangeListener(this);
 
         //defined below: this is to make the correct grid for calendar.
         updateCalendar();
+
+        // Initial load of upcoming subgoals if username is already set
+        if (viewModel.getCalendarState().getUsername() != null) {
+            updateUpcomingSubgoals();
+        }
     }
     private void updateCalendar() {
         calendarGrid.removeAll(); //first start by removing everything so we can rewrite calendar.
@@ -161,8 +213,52 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         } else if (src == removeGoalButton) {
             String selectedGoal = goalList.getSelectedValue();
             if (selectedGoal != null) {
-                state.removeGoal(selectedDate, selectedGoal); // remove a goal/finish
-                viewModel.firePropertyChanged(); // refresh goals
+                // Extract date and goal text from the selected item
+                String goalText = selectedGoal;
+                if (selectedGoal.contains(" - ")) {
+                    String[] parts = selectedGoal.split(" - ", 2);
+                    if (parts.length == 2) {
+                        goalText = parts[1];
+                        try {
+                            LocalDate goalDate = LocalDate.parse(parts[0]);
+                            state.removeGoal(goalDate, goalText); // remove a goal/finish
+                            viewModel.firePropertyChanged(); // refresh goals
+                        } catch (Exception ex) {
+                            // If parsing fails, try to remove from selected date
+                            state.removeGoal(selectedDate, selectedGoal);
+                            viewModel.firePropertyChanged();
+                        }
+                    }
+                } else {
+                    state.removeGoal(selectedDate, goalText);
+                    viewModel.firePropertyChanged();
+                }
+            }
+        } else if (src == prevSubgoalsButton) {
+            if (subgoalPageOffset > 0) {
+                subgoalPageOffset -= SUBGOALS_PER_PAGE;
+                updateUpcomingSubgoals();
+            }
+        } else if (src == nextSubgoalsButton) {
+            subgoalPageOffset += SUBGOALS_PER_PAGE;
+            updateUpcomingSubgoals();
+        } else if (src == openSubgoalButton) {
+            String selectedValue = goalList.getSelectedValue();
+            if (selectedValue != null && subgoalView != null) {
+                String subgoalId = displayTextToSubgoalId.get(selectedValue);
+                if (subgoalId != null) {
+                    subgoalView.openForSubgoal(subgoalId);
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                        "Could not find subgoal ID for the selected item.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } else if (selectedValue == null) {
+                JOptionPane.showMessageDialog(this,
+                    "Please select a subgoal first.",
+                    "No Selection",
+                    JOptionPane.INFORMATION_MESSAGE);
             }
         }
 
@@ -184,12 +280,8 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     public void propertyChange(PropertyChangeEvent evt) {
         CalendarState state = viewModel.getCalendarState();
 
-        // update goals
-        goalListModel.clear();
-        List<String> goals = state.getGoalsForDate(state.getSelectedDate());
-        for (String goal : goals) {
-            goalListModel.addElement(goal);
-        }
+        // update upcoming subgoals
+        updateUpcomingSubgoals();
         updateCalendar();
 
         // error popups
@@ -198,6 +290,62 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
             state.setErrorMessage("");
         }
 
+    }
+
+    private void updateUpcomingSubgoals() {
+        CalendarState state = viewModel.getCalendarState();
+        goalListModel.clear();
+        displayTextToSubgoalId.clear();
+
+        if (subgoalDataAccess == null) {
+            System.out.println("CalendarView: subgoalDataAccess is null");
+            return;
+        }
+
+        if (state.getUsername() == null) {
+            System.out.println("CalendarView: username is null, cannot load subgoals");
+            return;
+        }
+
+        System.out.println("CalendarView: Loading subgoals for user: " + state.getUsername());
+
+        // Get all subgoals for the current user
+        List<Subgoal> allSubgoals = subgoalDataAccess.getSubgoalsByUsername(state.getUsername());
+        System.out.println("CalendarView: Found " + allSubgoals.size() + " total subgoals for user");
+
+        // Filter to upcoming subgoals (not completed and deadline is today or in the future)
+        LocalDate today = LocalDate.now();
+        List<Subgoal> upcomingSubgoals = new ArrayList<>();
+        for (Subgoal subgoal : allSubgoals) {
+            if (!subgoal.isCompleted() && !subgoal.getDeadline().isBefore(today)) {
+                upcomingSubgoals.add(subgoal);
+            }
+        }
+
+        System.out.println("CalendarView: Found " + upcomingSubgoals.size() + " upcoming subgoals");
+
+        // Sort by deadline
+        upcomingSubgoals.sort(Comparator.comparing(Subgoal::getDeadline));
+
+        // Calculate the range to display
+        int startIdx = subgoalPageOffset;
+        int endIdx = Math.min(startIdx + SUBGOALS_PER_PAGE, upcomingSubgoals.size());
+
+        System.out.println("CalendarView: Displaying subgoals from index " + startIdx + " to " + endIdx);
+
+        // Display the subgoals for current page
+        for (int i = startIdx; i < endIdx; i++) {
+            Subgoal subgoal = upcomingSubgoals.get(i);
+            String priorityFlag = subgoal.isPriority() ? " [PRIORITY]" : "";
+            String displayText = subgoal.getDeadline() + " - " + subgoal.getName() + priorityFlag;
+            goalListModel.addElement(displayText);
+            displayTextToSubgoalId.put(displayText, subgoal.getId());
+            System.out.println("CalendarView: Added subgoal: " + displayText);
+        }
+
+        // Enable/disable navigation buttons
+        prevSubgoalsButton.setEnabled(subgoalPageOffset > 0);
+        nextSubgoalsButton.setEnabled(endIdx < upcomingSubgoals.size());
     }
     public String getViewName() {
         return "CalendarView";
@@ -210,5 +358,9 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
 
     public void setShowPlansController(ShowPlansController showPlansController) {
         this.showPlansController = showPlansController;
+    }
+
+    public void setSubgoalView(SubgoalView subgoalView) {
+        this.subgoalView = subgoalView;
     }
 }
