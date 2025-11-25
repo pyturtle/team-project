@@ -177,4 +177,15 @@ public class FileSubgoalDataAccessObject implements SubgoalDataAccessInterface {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public java.util.List<Subgoal> getSubgoalsByUsername(String username) {
+        java.util.List<Subgoal> result = new ArrayList<>();
+        for (Subgoal subgoal : subgoals.values()) {
+            if (subgoal.getUsername().equals(username)) {
+                result.add(subgoal);
+            }
+        }
+        return result;
+    }
+
 }

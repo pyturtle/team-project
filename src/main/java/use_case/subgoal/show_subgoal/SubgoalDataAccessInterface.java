@@ -34,4 +34,12 @@ public interface SubgoalDataAccessInterface {
      * @param completed the new completed value
      */
     void updateCompleted(String id, boolean completed);
+
+    /**
+     * Returns all subgoals for a given username.
+     *
+     * @param username the username to get subgoals for
+     * @return a list of all subgoals for the user
+     */
+    java.util.List<Subgoal> getSubgoalsByUsername(String username);
 }

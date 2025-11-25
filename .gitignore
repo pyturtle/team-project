@@ -37,3 +37,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Local data files
+/users.csv
+/subgoals.json
+/plans.json

@@ -14,6 +14,7 @@ public class Main {
                 .addSavePlanView()
                 .addLoggedInView() // Still needed for LoggedInViewModel (used by presenters)
                 .addCalendarView()
+                .addSubgoalView()
                 .addShowPlansView()
                 .addMainView()
                 .addSignupUseCase()
