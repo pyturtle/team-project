@@ -1,104 +1,144 @@
 package view;
 
 import interface_adapter.show_subgoal.ShowSubgoalController;
+import interface_adapter.show_subgoal.ShowSubgoalState;
 import interface_adapter.show_subgoal.ShowSubgoalViewModel;
-import interface_adapter.subgoal_qa.SubgoalQAController;
 
 import javax.swing.*;
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
- * Popup dialog that shows a single subgoal's details and provides a Q/A button.
+ * Popup view that shows a single subgoal's details:
+ * name, description, priority checkbox, and a Q/A button.
+ *
+ * This dialog listens to the ShowSubgoalViewModel for state changes
+ * and updates its components accordingly.
  */
-public class SubgoalView extends JDialog {
+public class SubgoalView extends JDialog implements PropertyChangeListener {
 
     private final ShowSubgoalViewModel viewModel;
-    private ShowSubgoalController showSubgoalController;
+    private final ShowSubgoalController controller;
 
-    // Q/A controller (set from AppBuilder)
-    private SubgoalQAController subgoalQAController;
-
-    // Used as key for Q/A history (we use subgoal name as id)
-    private String currentSubgoalId;
-
-    // UI components
     private final JLabel nameLabel = new JLabel();
-    private final JTextArea descriptionArea = new JTextArea();
+    private final JTextArea descriptionArea = new JTextArea(5, 30);
     private final JCheckBox priorityCheckBox = new JCheckBox("Priority");
-    private final JCheckBox completedCheckBox = new JCheckBox("Completed");
-    private final JButton qaButton = new JButton("Q / A");
+    private final JCheckBox completeCheckBox = new JCheckBox("Complete");
+    private final JButton qaButton = new JButton("Q/A");
 
+    // We need to remember which subgoal is currently being displayed
+    private String currentSubgoalId = "";
+
+    /**
+     * Constructs a SubgoalView.
+     *
+     * @param owner     the parent frame of this dialog
+     * @param viewModel the view model providing subgoal state
+     * @param controller the controller to invoke the ShowSubgoal use case
+     */
     public SubgoalView(JFrame owner,
                        ShowSubgoalViewModel viewModel,
                        ShowSubgoalController controller) {
-
-        super(owner, "Subgoal Details", true);
-
+        super(owner, "Subgoal", true); // modal dialog
         this.viewModel = viewModel;
-        this.showSubgoalController = controller;
+        this.controller = controller;
 
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setSize(400, 500);
-        setLocationRelativeTo(owner);
+        this.viewModel.addPropertyChangeListener(this);
 
-        initUI();
-
-        // Listen for ShowSubgoalViewModel updates – just refresh on any change
-        viewModel.addPropertyChangeListener(evt -> updateView());
-    }
-
-    private void initUI() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        // Title
-        nameLabel.setFont(nameLabel.getFont().deriveFont(Font.BOLD, 18f));
-        panel.add(nameLabel);
-
-        // Description
-        descriptionArea.setEditable(false);
-        descriptionArea.setLineWrap(true);
-        descriptionArea.setWrapStyleWord(true);
-        JScrollPane scroll = new JScrollPane(descriptionArea);
-        panel.add(scroll);
-
-        // Priority + Completed checkboxes
-        panel.add(priorityCheckBox);
-        panel.add(completedCheckBox);
-
-        // Q/A BUTTON LISTENER
-        qaButton.addActionListener(e -> {
-            // use the current subgoal "id" (we're using the name as key)
-            if (subgoalQAController != null && currentSubgoalId != null) {
-                subgoalQAController.loadHistory(currentSubgoalId);
-            }
-        });
-        panel.add(qaButton);
-
-        this.add(panel, BorderLayout.CENTER);
-    }
-
-    // Allow AppBuilder to swap controller if needed
-    public void setShowSubgoalController(ShowSubgoalController controller) {
-        this.showSubgoalController = controller;
-    }
-
-    // Called by AppBuilder: subgoalView.setSubgoalQAController(...)
-    public void setSubgoalQAController(SubgoalQAController controller) {
-        this.subgoalQAController = controller;
+        setupUI();
+        setupListeners();
     }
 
     /**
-     * Update UI from the ViewModel state.
+     * Sets up the Swing components and layout.
      */
-    private void updateView() {
-        var state = viewModel.getState();
+    private void setupUI() {
+        descriptionArea.setLineWrap(true);
+        descriptionArea.setWrapStyleWord(true);
+        descriptionArea.setEditable(false);
+
+        JPanel content = new JPanel(new BorderLayout(10, 10));
+        content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Top: subgoal name
+        nameLabel.setFont(nameLabel.getFont().deriveFont(Font.BOLD, 16f));
+        content.add(nameLabel, BorderLayout.NORTH);
+
+        // Center: description
+        JScrollPane scroll = new JScrollPane(descriptionArea);
+        content.add(scroll, BorderLayout.CENTER);
+
+        // Bottom: priority + Q/A button
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        bottomPanel.add(priorityCheckBox);
+        bottomPanel.add(completeCheckBox);
+        bottomPanel.add(qaButton);
+        content.add(bottomPanel, BorderLayout.SOUTH);
+
+        setContentPane(content);
+        pack();
+        setLocationRelativeTo(getOwner());
+    }
+
+    /**
+     * Sets up listeners for UI interactions.
+     */
+    private void setupListeners() {
+        // Priority checkbox
+        priorityCheckBox.addActionListener(e -> {
+            if (currentSubgoalId != "") {
+                controller.setPriority(currentSubgoalId, priorityCheckBox.isSelected());
+            }
+        });
+
+        // Complete checkbox
+        completeCheckBox.addActionListener(e -> {
+            if (currentSubgoalId != "") {
+                controller.setCompleted(currentSubgoalId, completeCheckBox.isSelected());
+            }
+        });
+
+        // Q/A button (placeholder for now)
+        qaButton.addActionListener(e ->
+                JOptionPane.showMessageDialog(this,
+                        "Q/A chat not implemented yet.",
+                        "Q/A",
+                        JOptionPane.INFORMATION_MESSAGE));
+    }
+
+
+    /**
+     * Opens the dialog for a specific subgoal.
+     * This triggers the ShowSubgoal use case and then shows the popup.
+     *
+     * @param subgoalId the ID of the subgoal to display
+     */
+    public void openForSubgoal(String subgoalId) {
+        this.currentSubgoalId = subgoalId;
+        controller.execute(subgoalId);
+        setLocationRelativeTo(getOwner());
+        setVisible(true);
+    }
+
+    /**
+     * Called when the ViewModel's state changes.
+     * Updates the UI components.
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        ShowSubgoalState state = viewModel.getState();
+
         nameLabel.setText(state.getName());
         descriptionArea.setText(state.getDescription());
         priorityCheckBox.setSelected(state.isPriority());
-        completedCheckBox.setSelected(state.isCompleted());
+        completeCheckBox.setSelected(state.isCompleted());
 
-        // store id for Q/A popup (using name as key in history file)
-        currentSubgoalId = state.getName();
+        if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    state.getErrorMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
