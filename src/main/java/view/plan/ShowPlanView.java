@@ -95,31 +95,36 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         ShowPlanState newState = (ShowPlanState) evt.getNewValue();
-        createPlanButton.setEnabled(!newState.isPlanExists());
-        planNameLabel.setText(newState.getPlanName());
-        planDescriptionLabel.setText("<html>" + newState.getPlanDescription() + "</html>");
+        if (newState.isSuccess()) {
+            createPlanButton.setEnabled(!newState.isPlanExists());
+            planNameLabel.setText(newState.getPlanName());
+            planDescriptionLabel.setText("<html>" + newState.getPlanDescription() + "</html>");
 
-        subgoalsPanel.removeAll();
+            subgoalsPanel.removeAll();
 
-        ArrayList<HashMap<String, String>> subgoals = newState.getSubgoalList();
-        for (int i = 0; i < subgoals.size(); i++) {
-            HashMap<String, String> subgoal = subgoals.get(i);
-            JPanel subgoalPanel = createSubgoalPanel(
-                    subgoal.get("name"),
-                    subgoal.get("description"),
-                    LocalDate.parse(subgoal.get("deadline"))
-            );
+            ArrayList<HashMap<String, String>> subgoals = newState.getSubgoalList();
+            for (int i = 0; i < subgoals.size(); i++) {
+                HashMap<String, String> subgoal = subgoals.get(i);
+                JPanel subgoalPanel = createSubgoalPanel(
+                        subgoal.get("name"),
+                        subgoal.get("description"),
+                        LocalDate.parse(subgoal.get("deadline"))
+                );
 
-            subgoalsPanel.add(subgoalPanel);
+                subgoalsPanel.add(subgoalPanel);
 
-            if (i < subgoals.size() - 1) {
-                subgoalsPanel.add(createDivider());
-                subgoalsPanel.add(Box.createVerticalStrut(10));
+                if (i < subgoals.size() - 1) {
+                    subgoalsPanel.add(createDivider());
+                    subgoalsPanel.add(Box.createVerticalStrut(10));
+                }
             }
-        }
 
-        subgoalsPanel.revalidate();
-        subgoalsPanel.repaint();
+            subgoalsPanel.revalidate();
+            subgoalsPanel.repaint();
+        }
+        else {
+            planNameLabel.setText("Data is damaged!");
+        }
     }
 
     private JPanel createSubgoalPanel(String name, String description, LocalDate deadline) {

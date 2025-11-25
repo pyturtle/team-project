@@ -44,6 +44,10 @@ public class FileSubgoalDataAccessObject implements SubgoalDataAccessInterface {
             }
         }
     }
+    public FileSubgoalDataAccessObject() {
+        this.subgoalsFilePath = null;
+        this.subgoalBuilder = null;
+    }
 
     private void loadSubgoalsFromJson(String filePath) throws IOException {
         String jsonContent = new String(Files.readAllBytes(Paths.get(filePath)));
