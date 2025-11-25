@@ -1,5 +1,6 @@
 package interface_adapter.show_subgoal;
 
+import interface_adapter.DialogManagerModel;
 import use_case.subgoal.show_subgoal.ShowSubgoalOutputBoundary;
 import use_case.subgoal.show_subgoal.ShowSubgoalOutputData;
 
@@ -10,9 +11,18 @@ import use_case.subgoal.show_subgoal.ShowSubgoalOutputData;
 public class ShowSubgoalPresenter implements ShowSubgoalOutputBoundary {
 
     private final ShowSubgoalViewModel viewModel;
+    private final DialogManagerModel dialogManagerModel;
 
-    public ShowSubgoalPresenter(ShowSubgoalViewModel viewModel) {
+    /**
+     * Constructs a ShowSubgoalPresenter.
+     *
+     * @param viewModel the view model to update with subgoal data
+     * @param dialogManagerModel the dialog manager model used to trigger popups
+     */
+    public ShowSubgoalPresenter(ShowSubgoalViewModel viewModel,
+                                DialogManagerModel dialogManagerModel) {
         this.viewModel = viewModel;
+        this.dialogManagerModel = dialogManagerModel;
     }
 
     @Override
@@ -25,14 +35,22 @@ public class ShowSubgoalPresenter implements ShowSubgoalOutputBoundary {
         state.setErrorMessage("");
 
         viewModel.setState(state);
-        viewModel.firePropertyChange();  // note: no "d"
+        viewModel.firePropertyChange();  // update Swing bindings
+
+        // Tell the DialogManager to open the 'subgoal' dialog
+        dialogManagerModel.setState(viewModel.getViewName());
+        dialogManagerModel.firePropertyChange();
     }
 
     @Override
     public void presentError(String message) {
         ShowSubgoalState state = viewModel.getState();
         state.setErrorMessage(message);
+
         viewModel.setState(state);
         viewModel.firePropertyChange();
+
+        dialogManagerModel.setState(viewModel.getViewName());
+        dialogManagerModel.firePropertyChange();
     }
 }

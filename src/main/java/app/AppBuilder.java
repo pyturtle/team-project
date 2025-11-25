@@ -1,6 +1,9 @@
 package app;
 
 import data_access.*;
+import data_access.FileSubgoalQALogDataAccessObject;
+import data_access.GeminiSubgoalQAAdapter;
+import data_access.GeminiSubgoalQADataAccessObject;
 import entity.user.UserFactory;
 import entity.plan.PlanFactory;
 import entity.subgoal.SubgoalBuilder;
@@ -38,6 +41,12 @@ import interface_adapter.show_subgoal.ShowSubgoalViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.show_subgoal.ShowSubgoalController;
+import interface_adapter.show_subgoal.ShowSubgoalPresenter;
+import interface_adapter.show_subgoal.ShowSubgoalViewModel;
+import interface_adapter.subgoal_qa.SubgoalQAViewModel;
+import interface_adapter.subgoal_qa.SubgoalQAPresenter;
+import interface_adapter.subgoal_qa.SubgoalQAController;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -69,11 +78,19 @@ import use_case.signup.SignupOutputBoundary;
 import use_case.subgoal.show_subgoal.ShowSubgoalInputBoundary;
 import use_case.subgoal.show_subgoal.ShowSubgoalInteractor;
 import use_case.subgoal.show_subgoal.ShowSubgoalOutputBoundary;
+import use_case.subgoal.subgoal_qa.SubgoalQAInputBoundary;
+import use_case.subgoal.subgoal_qa.SubgoalQAInteractor;
+import use_case.subgoal.subgoal_qa.SubgoalQAOutputBoundary;
+import use_case.subgoal.subgoal_qa.SubgoalQuestionDataAccessInterface;
+import use_case.subgoal.subgoal_qa.GeminiQADataAccessInterface;
+
 import view.*;
 import view.plan.GeneratePlanView;
 import view.plan.SavePlanView;
 import view.plan.ShowPlanView;
 import view.plan.ShowPlansView;
+import view.SubgoalView;
+import view.subgoal_qa.SubgoalQAView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -134,7 +151,11 @@ public class AppBuilder {
     private ShowPlanView showPlanView;
     private SavePlanView savePlanView;
     private CalendarView calendarView;
+    private SendMessageController sendMessageController;
+    private SubgoalView showSubgoalView;
     private SubgoalView subgoalView;
+    private SubgoalQAViewModel subgoalQAViewModel;
+    private SubgoalQAView subgoalQAView;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -236,6 +257,22 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addShowSubgoalView() {
+        showSubgoalViewModel = new ShowSubgoalViewModel();
+        return this;
+    }
+
+    public AppBuilder addSubgoalQAView() {
+        // Use the fields, not new locals
+        subgoalQAViewModel = new SubgoalQAViewModel();
+        subgoalQAView = new SubgoalQAView(subgoalQAViewModel, sendMessageViewModel);
+
+        // Register the Q/A dialog panel in DialogManager
+        dialogViews.put(subgoalQAViewModel.getViewName(), subgoalQAView);
+
+        return this;
+    }
+
     public AppBuilder addSignupUseCase() {
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel,
                 signupViewModel, loginViewModel);
@@ -277,6 +314,27 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addShowSubgoalUseCase() {
+
+        // Presenter
+        final ShowSubgoalOutputBoundary showSubgoalOutputBoundary =
+                new ShowSubgoalPresenter(showSubgoalViewModel, dialogManagerModel);
+
+        // Interactor
+        final ShowSubgoalInputBoundary showSubgoalInteractor =
+                new ShowSubgoalInteractor(subgoalDataAccessObject, showSubgoalOutputBoundary);
+
+        // Controller
+        final ShowSubgoalController showSubgoalController =
+                new ShowSubgoalController(showSubgoalInteractor);
+
+        // Build the Subgoal popup dialog (owner = main app frame)
+        subgoalView = new SubgoalView(null, showSubgoalViewModel, showSubgoalController);
+
+
+        return this;
+    }
+
     /**
      * Adds the Delete Plan Use Case to the application.
      * @return this builder
@@ -300,7 +358,7 @@ public class AppBuilder {
 
         final SendMessageOutputBoundary sendMessageOutputBoundary = new SendMessagePresenter(sendMessageViewModel);
         final SendMessageInputBoundary sendMessageInteractor = new SendMessageInteractor(sendMessageOutputBoundary);
-        SendMessageController sendMessageController = new SendMessageController(sendMessageInteractor);
+        sendMessageController = new SendMessageController(sendMessageInteractor);
 
         final ShowPlanOutputBoundary showPlanOutputBoundary = new ShowPlanPresenter(showPlanViewModel,
                 dialogManagerModel);
@@ -320,6 +378,42 @@ public class AppBuilder {
         showPlanView.setSavePlanController(savePlanController);
         return this;
     }
+
+    public AppBuilder addSubgoalQAUseCase() {
+
+        // Presenter
+        final SubgoalQAOutputBoundary subgoalQAOutputBoundary =
+                new SubgoalQAPresenter(subgoalQAViewModel, dialogManagerModel);
+
+        // History DAO
+        final SubgoalQuestionDataAccessInterface historyDAO =
+                new FileSubgoalQALogDataAccessObject("subgoal_qna.json");
+
+        // Gemini DAO (raw)
+        final GeminiSubgoalQADataAccessObject rawGeminiDAO =
+                new GeminiSubgoalQADataAccessObject();
+
+        // Gemini adapter (interactor expects getAnswerForQuestion)
+        final GeminiQADataAccessInterface geminiDAO =
+                new GeminiSubgoalQAAdapter(rawGeminiDAO);
+
+        // Interactor
+        final SubgoalQAInputBoundary subgoalQAInteractor =
+                new SubgoalQAInteractor(historyDAO, geminiDAO, subgoalQAOutputBoundary);
+
+        // Controller
+        final SubgoalQAController subgoalQAController =
+                new SubgoalQAController(subgoalQAInteractor);
+
+        // Inject controllers into Q/A View
+        subgoalQAView.setSendMessageController(sendMessageController);
+
+        // Inject Q/A controller into SubgoalView (so Q/A button opens chat)
+        subgoalView.setSubgoalQAController(subgoalQAController);
+
+        return this;
+    }
+
 
     /**
      * Adds the Logout Use Case to the application.
