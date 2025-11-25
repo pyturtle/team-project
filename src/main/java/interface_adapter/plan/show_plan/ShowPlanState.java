@@ -12,7 +12,6 @@ public class ShowPlanState {
     private ArrayList<HashMap<String, String>> subgoalList;
     private String username;
     private boolean planExists;
-    private boolean isSuccess;
 
     public String getPlanName() {
         return planName;
@@ -52,13 +51,5 @@ public class ShowPlanState {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public boolean isSuccess() {
-        return isSuccess;
-    }
-
-    public void setSuccess(boolean success) {
-        isSuccess = success;
     }
 }
