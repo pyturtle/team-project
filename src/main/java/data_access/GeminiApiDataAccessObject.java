@@ -5,10 +5,12 @@ import org.json.JSONObject;
 import use_case.plan.generate_plan.GeneratePlanDataAccessInterface;
 import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
+import use_case.subgoal.qna.SubgoalQnaGeminiDataAccessInterface;
 
 import java.time.LocalDate;
 
-public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterface {
+public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterface,
+        SubgoalQnaGeminiDataAccessInterface {
     private final String apiKey = "AIzaSyCub87wCtvtm4OBN-BHmFPSoBCaaE4hKT0";
     private final Client client;
 
@@ -56,6 +58,26 @@ public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterfac
         catch (Exception e) {
             return prepareResponse(new JSONObject(), "Something went wrong. Please, try again.",
                     false);
+        }
+    }
+
+    @Override
+    public String getAnswerForQuestion(String userMessage) {
+        try {
+            GenerateContentResponse response = client.models.generateContent(
+                    "gemini-2.5-flash",
+                    "You are a helpful assistant helping a user with a subgoal in their plan. " +
+                            "Answer the following question clearly and concisely:\n\n" + userMessage,
+                    null
+            );
+            String text = response.text();
+            if (text == null || text.trim().isEmpty()) {
+                return "Sorry, I couldn't get a response from Gemini.";
+            }
+            return text.trim();
+        }
+        catch (Exception e) {
+            return "Sorry, I couldn't get an answer from Gemini right now.";
         }
     }
 

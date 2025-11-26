@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import interface_adapter.subgoal_qna.SubgoalQnaController;
 
 /**
  * Popup view that shows a single subgoal's details:
@@ -20,6 +21,8 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
 
     private final ShowSubgoalViewModel viewModel;
     private final ShowSubgoalController controller;
+    private SubgoalQnaController qnaController;   // controller for Q/A dialog
+
 
     private final JLabel nameLabel = new JLabel();
     private final JTextArea descriptionArea = new JTextArea(5, 30);
@@ -40,7 +43,7 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
     public SubgoalView(JFrame owner,
                        ShowSubgoalViewModel viewModel,
                        ShowSubgoalController controller) {
-        super(owner, "Subgoal", true); // modal dialog
+        super(owner, "Subgoal", false); // modal dialog
         this.viewModel = viewModel;
         this.controller = controller;
 
@@ -48,6 +51,10 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
 
         setupUI();
         setupListeners();
+    }
+
+    public void setQnaController(SubgoalQnaController qnaController) {
+        this.qnaController = qnaController;
     }
 
     /**
@@ -99,14 +106,20 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
             }
         });
 
-        // Q/A button (placeholder for now)
-        qaButton.addActionListener(e ->
+        // Q/A button – open the Q/A dialog for this subgoal
+        qaButton.addActionListener(e -> {
+            // assume SubgoalView already tracks the currently opened subgoal id
+            // (e.g. a field currentSubgoalId set in propertyChange / update method)
+            if (qnaController != null && currentSubgoalId != null && !currentSubgoalId.isEmpty()) {
+                qnaController.open(currentSubgoalId);
+            } else {
                 JOptionPane.showMessageDialog(this,
-                        "Q/A chat not implemented yet.",
+                        "Q/A chat is not available for this subgoal.",
                         "Q/A",
-                        JOptionPane.INFORMATION_MESSAGE));
+                        JOptionPane.WARNING_MESSAGE);
+            }
+        });
     }
-
 
     /**
      * Opens the dialog for a specific subgoal.
