@@ -76,6 +76,7 @@ import use_case.subgoal.qna.SubgoalQnaDataAccessInterface;
 import use_case.subgoal.qna.SubgoalQnaInputBoundary;
 import use_case.subgoal.qna.SubgoalQnaInteractor;
 import use_case.subgoal.qna.SubgoalQnaOutputBoundary;
+import use_case.subgoal.qna.SubgoalQnaGeminiDataAccessInterface;
 import view.*;
 import view.plan.GeneratePlanView;
 import view.plan.SavePlanView;
@@ -219,8 +220,11 @@ public class AppBuilder {
                 new InMemorySubgoalQnaDataAccessObject();
         SubgoalQnaOutputBoundary subgoalQnaPresenter =
                 new SubgoalQnaPresenter(subgoalQnaViewModel, dialogManagerModel);
+        SubgoalQnaGeminiDataAccessInterface qnaGeminiGateway = generatePlanDataAccessObject;
         SubgoalQnaInputBoundary subgoalQnaInteractor =
-                new SubgoalQnaInteractor(subgoalQnaDataAccessObject, subgoalQnaPresenter);
+                new SubgoalQnaInteractor(subgoalQnaDataAccessObject,
+                        qnaGeminiGateway,
+                        subgoalQnaPresenter);
         SubgoalQnaController subgoalQnaController =
                 new SubgoalQnaController(subgoalQnaInteractor);
         SubgoalQnaView subgoalQnaView =

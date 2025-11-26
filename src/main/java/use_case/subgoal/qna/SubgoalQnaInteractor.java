@@ -11,11 +11,14 @@ import java.util.List;
 public class SubgoalQnaInteractor implements SubgoalQnaInputBoundary {
 
     private final SubgoalQnaDataAccessInterface qnaDAO;
+    private final SubgoalQnaGeminiDataAccessInterface geminiGateway;
     private final SubgoalQnaOutputBoundary presenter;
 
     public SubgoalQnaInteractor(SubgoalQnaDataAccessInterface qnaDAO,
+                                SubgoalQnaGeminiDataAccessInterface geminiGateway,
                                 SubgoalQnaOutputBoundary presenter) {
         this.qnaDAO = qnaDAO;
+        this.geminiGateway = geminiGateway;
         this.presenter = presenter;
     }
 
@@ -37,8 +40,11 @@ public class SubgoalQnaInteractor implements SubgoalQnaInputBoundary {
             return;
         }
 
-        // TODO: later we replace this with a real Gemini call.
-        String answer = "This is a placeholder answer. Integrate Gemini here.";
+        // Ask Gemini for the answer
+        String answer = geminiGateway.getAnswerForQuestion(question);
+        if (answer == null || answer.trim().isEmpty()) {
+            answer = "Sorry, I couldn't get an answer from Gemini.";
+        }
 
         qnaDAO.appendEntry(subgoalId, question, answer);
         List<SubgoalQuestionAnswer> history = qnaDAO.getHistory(subgoalId);
