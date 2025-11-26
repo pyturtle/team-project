@@ -10,8 +10,8 @@ package entity;
  */
 public class SubgoalQuestionAnswer {
 
-    private final int id;
-    private final int subgoalId;
+    private final String id;
+    private final String subgoalId;
 
     private final String questionMessage;
     private final String responseMessage;
@@ -26,8 +26,7 @@ public class SubgoalQuestionAnswer {
      *
      * @throws IllegalArgumentException if {@code questionMessage} is empty
      */
-    public SubgoalQuestionAnswer(int id,
-                           int subgoalId,
+    public SubgoalQuestionAnswer(String id, String subgoalId,
                            String questionMessage,
                            String responseMessage) {
 
@@ -42,10 +41,10 @@ public class SubgoalQuestionAnswer {
     }
 
     /** @return the unique ID of this question–answer entry */
-    public int getId() { return id; }
+    public String getId() { return id; }
 
     /** @return the ID of the subgoal this entry belongs to */
-    public int getSubgoalId() { return subgoalId; }
+    public String getSubgoalId() { return subgoalId; }
 
     /** @return the user's question text */
     public String getQuestionMessage() { return questionMessage; }
