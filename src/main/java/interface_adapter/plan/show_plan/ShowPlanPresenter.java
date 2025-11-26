@@ -20,10 +20,8 @@ public class ShowPlanPresenter implements ShowPlanOutputBoundary {
         showPlanState.setPlanDescription(showPlanOutputData.getPlanDescription());
         showPlanState.setSubgoalList(showPlanOutputData.getSubgoalList());
         showPlanState.setPlanExists(showPlanOutputData.isCreated());
-        showPlanState.setSuccess(true);
         showPlanViewModel.firePropertyChange();
         dialogManagerModel.setState(showPlanViewModel.getViewName());
         dialogManagerModel.firePropertyChange();
     }
-
 }

@@ -3,7 +3,6 @@ package use_case.login;
 import data_access.InMemoryUserDataAccessObject;
 import entity.user.UserFactory;
 import entity.user.User;
-import interface_adapter.login.LoginPresenter;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,14 +20,7 @@ class LoginInteractorTest {
         userRepository.save(user);
 
         // This creates a successPresenter that tests whether the test case is as we expect.
-        LoginOutputBoundary successPresenter = new LoginPresenter(
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null) {
+        LoginOutputBoundary successPresenter = new LoginOutputBoundary() {
             @Override
             public void prepareSuccessView(LoginOutputData user) {
                 assertEquals("Paul", user.getUsername());
@@ -58,13 +50,7 @@ class LoginInteractorTest {
         userRepository.save(user);
 
         // This creates a presenter that tests whether the test case is as we expect.
-        LoginOutputBoundary failurePresenter = new LoginPresenter(null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null) {
+        LoginOutputBoundary failurePresenter = new LoginOutputBoundary() {
             @Override
             public void prepareSuccessView(LoginOutputData user) {
                 // this should never be reached since the test case should fail
@@ -89,13 +75,7 @@ class LoginInteractorTest {
         // Add Paul to the repo so that when we check later they already exist
 
         // This creates a presenter that tests whether the test case is as we expect.
-        LoginOutputBoundary failurePresenter = new LoginPresenter(null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null) {
+        LoginOutputBoundary failurePresenter = new LoginOutputBoundary() {
             @Override
             public void prepareSuccessView(LoginOutputData user) {
                 // this should never be reached since the test case should fail
