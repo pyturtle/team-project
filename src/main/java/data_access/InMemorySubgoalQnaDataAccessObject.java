@@ -26,22 +26,11 @@ public class InMemorySubgoalQnaDataAccessObject implements SubgoalQnaDataAccessI
         List<SubgoalQuestionAnswer> history =
                 historyBySubgoal.computeIfAbsent(subgoalId, k -> new ArrayList<>());
 
-        int nextId = history.stream()
-                .mapToInt(SubgoalQuestionAnswer::getId)
-                .max()
-                .orElse(0) + 1;
-
-        // SubgoalQuestionAnswer stores subgoalId as an int, but our key is a String,
-        // so we convert if possible; otherwise fall back to hashCode.
-        int numericSubgoalId;
-        try {
-            numericSubgoalId = Integer.parseInt(subgoalId);
-        } catch (NumberFormatException e) {
-            numericSubgoalId = subgoalId.hashCode();
-        }
+        // Generate a unique String id for this Q/A entry.
+        String entryId = UUID.randomUUID().toString();
 
         SubgoalQuestionAnswer entry =
-                new SubgoalQuestionAnswer(nextId, numericSubgoalId, questionMessage, responseMessage);
+                new SubgoalQuestionAnswer(entryId, subgoalId, questionMessage, responseMessage);
 
         history.add(entry);
         return entry;
