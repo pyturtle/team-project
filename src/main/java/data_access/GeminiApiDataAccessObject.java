@@ -10,7 +10,7 @@ import com.google.genai.types.GenerateContentResponse;
 import java.time.LocalDate;
 
 public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterface {
-    private final String apiKey = "AIzaSyCub87wCtvtm4OBN-BHmFPSoBCaaE4hKT0";
+    private final String apiKey = "INSERT YOUR KEY HERE";
     private final Client client;
 
     public GeminiApiDataAccessObject() {
@@ -79,6 +79,10 @@ public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterfac
                         subgoal.has("description") &&
                         subgoal.has("deadline");
                 LocalDate.parse(subgoal.getString("deadline"));
+                i++;
+                if (i == subgoals.length()) {
+                    break;
+                }
             }
         } catch (Exception e) {
             isValid = false;

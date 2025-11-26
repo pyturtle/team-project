@@ -1,7 +1,6 @@
 package use_case.plan.generate_plan;
 
 import data_access.GeminiApiDataAccessObject;
-import data_access.InMemoryUserDataAccessObject;
 import interface_adapter.plan.generate_plan.GeneratePlanPresenter;
 import interface_adapter.plan.generate_plan.GeneratePlanViewModel;
 import org.junit.jupiter.api.Test;
