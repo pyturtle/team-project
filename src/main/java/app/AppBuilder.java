@@ -227,6 +227,9 @@ public class AppBuilder {
                 new SubgoalQnaView(subgoalQnaViewModel, subgoalQnaController);
         dialogViews.put(subgoalQnaView.getViewName(), subgoalQnaView);
 
+        // give the SubgoalView access to the Q/A controller for its Q/A button
+        subgoalView.setQnaController(subgoalQnaController);
+
         // Connect the SubgoalView to the CalendarView if it exists
         if (calendarView != null) {
             calendarView.setSubgoalView(subgoalView);
