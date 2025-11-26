@@ -7,6 +7,7 @@ import interface_adapter.subgoal_qna.SubgoalQnaViewModel;
 
 import javax.swing.*;
 import java.awt.*;
+import javax.swing.ScrollPaneConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -43,6 +44,8 @@ public class SubgoalQnaView extends JPanel
 
         messagesPanel.setLayout(new BoxLayout(messagesPanel, BoxLayout.Y_AXIS));
         JScrollPane scrollPane = new JScrollPane(messagesPanel);
+//        add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         add(scrollPane, BorderLayout.CENTER);
 
         questionInput.setLineWrap(true);
@@ -76,10 +79,10 @@ public class SubgoalQnaView extends JPanel
         messagesPanel.removeAll();
         List<SubgoalQuestionAnswer> history = state.getHistory();
         for (SubgoalQuestionAnswer entry : history) {
-            messagesPanel.add(new JLabel("Q: " + entry.getQuestionMessage()));
+            messagesPanel.add(createMessageArea("Q: " + entry.getQuestionMessage()));
             String response = entry.getResponseMessage();
             if (response != null && !response.isEmpty()) {
-                messagesPanel.add(new JLabel("A: " + response));
+                messagesPanel.add(createMessageArea("A: " + response));
             }
             messagesPanel.add(Box.createVerticalStrut(8));
         }
@@ -109,5 +112,16 @@ public class SubgoalQnaView extends JPanel
         }
         controller.askQuestion(currentSubgoalId, question);
         questionInput.setText("");
+    }
+
+    private JTextArea createMessageArea(String text) {
+        JTextArea area = new JTextArea(text);
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+        area.setEditable(false);
+        area.setOpaque(false); // make it blend with background
+        area.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+        area.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return area;
     }
 }
