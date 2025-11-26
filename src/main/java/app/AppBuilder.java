@@ -38,6 +38,9 @@ import interface_adapter.show_subgoal.ShowSubgoalViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.subgoal_qna.SubgoalQnaController;
+import interface_adapter.subgoal_qna.SubgoalQnaPresenter;
+import interface_adapter.subgoal_qna.SubgoalQnaViewModel;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -69,6 +72,10 @@ import use_case.signup.SignupOutputBoundary;
 import use_case.subgoal.show_subgoal.ShowSubgoalInputBoundary;
 import use_case.subgoal.show_subgoal.ShowSubgoalInteractor;
 import use_case.subgoal.show_subgoal.ShowSubgoalOutputBoundary;
+import use_case.subgoal.qna.SubgoalQnaDataAccessInterface;
+import use_case.subgoal.qna.SubgoalQnaInputBoundary;
+import use_case.subgoal.qna.SubgoalQnaInteractor;
+import use_case.subgoal.qna.SubgoalQnaOutputBoundary;
 import view.*;
 import view.plan.GeneratePlanView;
 import view.plan.SavePlanView;
@@ -205,6 +212,20 @@ public class AppBuilder {
             parentFrame = new JFrame();
         }
         subgoalView = new SubgoalView(parentFrame, showSubgoalViewModel, showSubgoalController);
+
+        // Create Subgoal Q/A components and register the Q/A dialog with DialogManager
+        SubgoalQnaViewModel subgoalQnaViewModel = new SubgoalQnaViewModel();
+        SubgoalQnaDataAccessInterface subgoalQnaDataAccessObject =
+                new InMemorySubgoalQnaDataAccessObject();
+        SubgoalQnaOutputBoundary subgoalQnaPresenter =
+                new SubgoalQnaPresenter(subgoalQnaViewModel, dialogManagerModel);
+        SubgoalQnaInputBoundary subgoalQnaInteractor =
+                new SubgoalQnaInteractor(subgoalQnaDataAccessObject, subgoalQnaPresenter);
+        SubgoalQnaController subgoalQnaController =
+                new SubgoalQnaController(subgoalQnaInteractor);
+        SubgoalQnaView subgoalQnaView =
+                new SubgoalQnaView(subgoalQnaViewModel, subgoalQnaController);
+        dialogViews.put(subgoalQnaView.getViewName(), subgoalQnaView);
 
         // Connect the SubgoalView to the CalendarView if it exists
         if (calendarView != null) {
