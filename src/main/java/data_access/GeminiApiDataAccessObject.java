@@ -1,7 +1,6 @@
 package data_access;
 
 import okhttp3.*;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import use_case.plan.generate_plan.GeneratePlanDataAccessInterface;
 import com.google.genai.Client;
@@ -12,7 +11,7 @@ import java.time.LocalDate;
 
 public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterface,
         SubgoalQnaGeminiDataAccessInterface {
-    private final String apiKey = "INSERT YOUR KEY HERE";
+    private final String apiKey = "AIzaSyCub87wCtvtm4OBN-BHmFPSoBCaaE4hKT0";
     private final Client client;
 
     public GeminiApiDataAccessObject() {
@@ -34,13 +33,16 @@ public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterfac
                             + "." +
                             "Generate a json of the following format:" +
                             "For the plan, the key-value pairs should be: " +
-                            "1. name - plan name string" +
-                            "2. description - plan description string" +
-                            "3. subgoals - json array of subgoals" +
+                            "1. id - (generate unique guid)" +
+                            "2. name - plan name string" +
+                            "3. description - plan description string" +
+                            "3. user_email - sample email string" +
+                            "4. subgoals - json array of subgoals" +
                             "For each subgoal, the key-value pairs should be: " +
-                            "1. name - subgoal name string" +
-                            "2. description - subgoal description string" +
-                            "3. deadline - subgoal description YYYY-MM-DD string" +
+                            "1. id - (generate unique guid)" +
+                            "2. name - subgoal name string" +
+                            "3. description - subgoal description string" +
+                            "4. deadline - subgoal description YYYY-MM-DD string" +
                             "IMPORTANT: Do not include anything else in the response apart from the json object.",
                     null);
             String rawResult = response.text();
@@ -51,15 +53,7 @@ public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterfac
                     ? rawResult.substring(first + 1, last)
                     : "";
             JSONObject responseObject = new JSONObject(responseText);
-            boolean isValid = validateJsonObject(responseObject);
-            if (isValid) {
-                return prepareResponse(responseObject, "Plan generated successfully!",
-                        true);
-            }
-            else {
-                return prepareResponse(new JSONObject(), "Something went wrong. Please, try again.",
-                        false);
-            }
+            return prepareResponse(responseObject, "Plan generated successfully!", true);
         }
         catch (Exception e) {
             return prepareResponse(new JSONObject(), "Something went wrong. Please, try again.",
@@ -67,30 +61,6 @@ public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterfac
         }
     }
 
-    private boolean validateJsonObject(JSONObject responseObject) {
-        boolean isValid;
-        try {
-            isValid = responseObject.has("name") &&
-                    responseObject.has("description") &&
-                    responseObject.has("subgoals");
-            JSONArray subgoals =  responseObject.getJSONArray("subgoals");
-            int i = 0;
-            while(isValid) {
-                JSONObject subgoal = subgoals.getJSONObject(i);
-                isValid = subgoal.has("name") &&
-                        subgoal.has("description") &&
-                        subgoal.has("deadline");
-                LocalDate.parse(subgoal.getString("deadline"));
-                i++;
-                if (i == subgoals.length()) {
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            isValid = false;
-        }
-        return isValid;
-      
     @Override
     public String getAnswerForQuestion(String userMessage) {
         try {
