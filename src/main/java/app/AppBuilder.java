@@ -217,7 +217,7 @@ public class AppBuilder {
         // Create Subgoal Q/A components and register the Q/A dialog with DialogManager
         SubgoalQnaViewModel subgoalQnaViewModel = new SubgoalQnaViewModel();
         SubgoalQnaDataAccessInterface subgoalQnaDataAccessObject =
-                new InMemorySubgoalQnaDataAccessObject();
+                new FileSubgoalQnaDataAccessObject("subgoal_qna.json");
         SubgoalQnaOutputBoundary subgoalQnaPresenter =
                 new SubgoalQnaPresenter(subgoalQnaViewModel, dialogManagerModel);
         SubgoalQnaGeminiDataAccessInterface qnaGeminiGateway = generatePlanDataAccessObject;
