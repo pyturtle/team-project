@@ -34,6 +34,7 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
         }
 
         ShowSubgoalOutputData out = new ShowSubgoalOutputData(
+                id,
                 s.getName(),
                 s.getDescription(),
                 s.isPriority(),
@@ -53,17 +54,7 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
         Subgoal s = subgoalDAO.getSubgoalById(id);
         if (s == null) {
             presenter.presentError("Subgoal with id " + id + " was not found after updating priority.");
-            return;
         }
-
-        ShowSubgoalOutputData out = new ShowSubgoalOutputData(
-                s.getName(),
-                s.getDescription(),
-                s.isPriority(),
-                s.isCompleted()
-        );
-
-        presenter.present(out);
     }
 
     @Override
@@ -76,16 +67,6 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
         Subgoal s = subgoalDAO.getSubgoalById(id);
         if (s == null) {
             presenter.presentError("Subgoal with id " + id + " was not found after updating completion.");
-            return;
         }
-
-        ShowSubgoalOutputData out = new ShowSubgoalOutputData(
-                s.getName(),
-                s.getDescription(),
-                s.isPriority(),
-                s.isCompleted()
-        );
-
-        presenter.present(out);
     }
 }

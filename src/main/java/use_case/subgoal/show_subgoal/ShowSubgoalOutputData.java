@@ -7,6 +7,7 @@ package use_case.subgoal.show_subgoal;
  */
 public class ShowSubgoalOutputData {
 
+    private final String id;
     private final String name;
     private final String description;
     private final boolean priority;
@@ -20,10 +21,11 @@ public class ShowSubgoalOutputData {
      * @param priority whether the subgoal is marked as high priority
      * @param completed whether the subgoal is completed
      */
-    public ShowSubgoalOutputData(String name,
+    public ShowSubgoalOutputData(String id, String name,
                                  String description,
                                  boolean priority,
                                  boolean completed) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.priority = priority;
@@ -41,4 +43,8 @@ public class ShowSubgoalOutputData {
 
     /** @return whether the subgoal is completed */
     public boolean isCompleted() { return completed; }
+
+    public String getId() {
+        return id;
+    }
 }

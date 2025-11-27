@@ -15,9 +15,6 @@ import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.logout.LogoutPresenter;
-import interface_adapter.message.SendMessageController;
-import interface_adapter.message.SendMessagePresenter;
-import interface_adapter.message.SendMessageViewModel;
 import interface_adapter.plan.delete_plan.DeletePlanController;
 import interface_adapter.plan.delete_plan.DeletePlanPresenter;
 import interface_adapter.plan.generate_plan.GeneratePlanController;
@@ -47,9 +44,6 @@ import use_case.login.LoginOutputBoundary;
 import use_case.logout.LogoutInputBoundary;
 import use_case.logout.LogoutInteractor;
 import use_case.logout.LogoutOutputBoundary;
-import use_case.message.SendMessageInputBoundary;
-import use_case.message.SendMessageInteractor;
-import use_case.message.SendMessageOutputBoundary;
 import use_case.plan.delete_plan.DeletePlanInputBoundary;
 import use_case.plan.delete_plan.DeletePlanInteractor;
 import use_case.plan.delete_plan.DeletePlanOutputBoundary;
@@ -132,17 +126,18 @@ public class AppBuilder {
     private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
     private GeneratePlanViewModel generatePlanViewModel;
-    private SendMessageViewModel sendMessageViewModel;
     private ShowPlanViewModel showPlanViewModel;
     private SavePlanViewModel savePlanViewModel;
     private CalendarViewModel calendarViewModel;
     private ShowSubgoalViewModel showSubgoalViewModel;
+    private SubgoalQnaViewModel subgoalQnaViewModel;
     private LoginView loginView;
     private GeneratePlanView generatePlanView;
     private ShowPlanView showPlanView;
     private SavePlanView savePlanView;
     private CalendarView calendarView;
-    private SubgoalView subgoalView;
+    private ShowSubgoalView showSubgoalView;
+    private SubgoalQnaView subgoalQnaView;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -190,62 +185,28 @@ public class AppBuilder {
     }
     public AppBuilder addCalendarView() {
         calendarViewModel = new CalendarViewModel();
-        calendarView = new CalendarView(calendarViewModel, viewManagerModel, subgoalDataAccessObject);
+        calendarView = new CalendarView(calendarViewModel, subgoalDataAccessObject);
         partialViews.put(calendarView.getViewName(), calendarView);
         return this;
     }
 
-    public AppBuilder addSubgoalView() {
-        // Create the ShowSubgoal use case components
-        showSubgoalViewModel = new ShowSubgoalViewModel();
-        ShowSubgoalOutputBoundary showSubgoalPresenter = new ShowSubgoalPresenter(showSubgoalViewModel);
-        ShowSubgoalInputBoundary showSubgoalInteractor = new ShowSubgoalInteractor(
-                subgoalDataAccessObject,
-                showSubgoalPresenter);
-        ShowSubgoalController showSubgoalController = new ShowSubgoalController(showSubgoalInteractor);
-
-        // Create the SubgoalView dialog (needs a parent frame, we'll use null for now)
-        // The dialog will be modal and will work with any parent
-        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(cardPanel);
-        if (parentFrame == null) {
-            // If no parent frame yet, create a temporary reference
-            // This will be resolved when the view is actually shown
-            parentFrame = new JFrame();
-        }
-        subgoalView = new SubgoalView(parentFrame, showSubgoalViewModel, showSubgoalController);
-
-        // Create Subgoal Q/A components and register the Q/A dialog with DialogManager
-        SubgoalQnaViewModel subgoalQnaViewModel = new SubgoalQnaViewModel();
-        SubgoalQnaDataAccessInterface subgoalQnaDataAccessObject =
-                new FileSubgoalQnaDataAccessObject("subgoal_qna.json");
-        SubgoalQnaOutputBoundary subgoalQnaPresenter =
-                new SubgoalQnaPresenter(subgoalQnaViewModel, dialogManagerModel);
-        SubgoalQnaGeminiDataAccessInterface qnaGeminiGateway = generatePlanDataAccessObject;
-        SubgoalQnaInputBoundary subgoalQnaInteractor =
-                new SubgoalQnaInteractor(subgoalQnaDataAccessObject,
-                        qnaGeminiGateway,
-                        subgoalQnaPresenter);
-        SubgoalQnaController subgoalQnaController =
-                new SubgoalQnaController(subgoalQnaInteractor);
-        SubgoalQnaView subgoalQnaView =
-                new SubgoalQnaView(subgoalQnaViewModel, subgoalQnaController);
+    public AppBuilder addSubgoalQnaView() {
+        subgoalQnaViewModel = new SubgoalQnaViewModel();
+        subgoalQnaView = new SubgoalQnaView(subgoalQnaViewModel);
         dialogViews.put(subgoalQnaView.getViewName(), subgoalQnaView);
+        return this;
+    }
 
-        // give the SubgoalView access to the Q/A controller for its Q/A button
-        subgoalView.setQnaController(subgoalQnaController);
-
-        // Connect the SubgoalView to the CalendarView if it exists
-        if (calendarView != null) {
-            calendarView.setSubgoalView(subgoalView);
-        }
-
+    public AppBuilder addShowSubgoalView() {
+        showSubgoalViewModel = new ShowSubgoalViewModel();
+        showSubgoalView = new ShowSubgoalView(showSubgoalViewModel);
+        dialogViews.put(showSubgoalView.getViewName(), showSubgoalView);
         return this;
     }
 
     public AppBuilder addGeneratePlanView() {
         generatePlanViewModel = new GeneratePlanViewModel();
-        sendMessageViewModel = new SendMessageViewModel();
-        generatePlanView = new GeneratePlanView(generatePlanViewModel, sendMessageViewModel);
+        generatePlanView = new GeneratePlanView(generatePlanViewModel);
         partialViews.put(generatePlanView.getViewName(), generatePlanView);
         return this;
     }
@@ -300,7 +261,6 @@ public class AppBuilder {
 
         final ShowPlansController showPlansController = new ShowPlansController(showPlansInteractor);
         showPlansView.setShowPlansController(showPlansController);
-        calendarView.setShowPlansController(showPlansController);
         mainPageView.setShowPlansController(showPlansController);
         return this;
     }
@@ -325,27 +285,56 @@ public class AppBuilder {
         final GeneratePlanInputBoundary generatePlanInteractor = new GeneratePlanInteractor(
                 generatePlanDataAccessObject, generatePlanOutputBoundary);
         GeneratePlanController generatePlanController = new GeneratePlanController(generatePlanInteractor);
+        generatePlanView.setGeneratePlanController(generatePlanController);
+        return this;
+    }
 
-        final SendMessageOutputBoundary sendMessageOutputBoundary = new SendMessagePresenter(sendMessageViewModel);
-        final SendMessageInputBoundary sendMessageInteractor = new SendMessageInteractor(sendMessageOutputBoundary);
-        SendMessageController sendMessageController = new SendMessageController(sendMessageInteractor);
-
-        final ShowPlanOutputBoundary showPlanOutputBoundary = new ShowPlanPresenter(showPlanViewModel,
-                dialogManagerModel);
-        final ShowPlanInputBoundary showPlanInteractor = new ShowPlanInteractor(showPlanOutputBoundary,
-                planDataAccessObject);
-        ShowPlanController showPlanController = new ShowPlanController(showPlanInteractor);
-
+    public AppBuilder addSavePlanUseCase() {
         final SavePlanOutputBoundary savePlanOutputBoundary = new SavePlanPresenter(savePlanViewModel,
                 dialogManagerModel);
         final SavePlanInputBoundary savePlanInteractor = new SavePlanInteractor(savePlanOutputBoundary,
                 planDataAccessObject, subgoalDataAccessObject);
         SavePlanController savePlanController = new SavePlanController(savePlanInteractor);
-
-        generatePlanView.setGeneratePlanController(generatePlanController);
-        generatePlanView.setSendMessageController(sendMessageController);
-        generatePlanView.setShowPlanController(showPlanController);
         showPlanView.setSavePlanController(savePlanController);
+        return this;
+    }
+
+    public AppBuilder addShowPlanUseCase() {
+        final ShowPlanOutputBoundary showPlanOutputBoundary = new ShowPlanPresenter(showPlanViewModel,
+                dialogManagerModel);
+        final ShowPlanInputBoundary showPlanInteractor = new ShowPlanInteractor(showPlanOutputBoundary,
+                planDataAccessObject);
+        ShowPlanController showPlanController = new ShowPlanController(showPlanInteractor);
+        generatePlanView.setShowPlanController(showPlanController);
+        return this;
+    }
+
+    public AppBuilder addShowSubgoalUseCase() {
+        ShowSubgoalOutputBoundary showSubgoalPresenter = new ShowSubgoalPresenter(
+                showSubgoalViewModel, dialogManagerModel);
+        ShowSubgoalInputBoundary showSubgoalInteractor = new ShowSubgoalInteractor(
+                subgoalDataAccessObject,
+                showSubgoalPresenter);
+        ShowSubgoalController showSubgoalController = new ShowSubgoalController(showSubgoalInteractor);
+        showSubgoalView.setShowSubgoalController(showSubgoalController);
+        calendarView.setShowSubgoalController(showSubgoalController);
+        return this;
+    }
+
+    public AppBuilder addSubgoalQnaUseCase() {
+        SubgoalQnaDataAccessInterface subgoalQnaDataAccessObject =
+                new FileSubgoalQnaDataAccessObject("subgoal_qna.json");
+        SubgoalQnaOutputBoundary subgoalQnaPresenter =
+                new SubgoalQnaPresenter(subgoalQnaViewModel, dialogManagerModel);
+        SubgoalQnaGeminiDataAccessInterface qnaGeminiGateway = generatePlanDataAccessObject;
+        SubgoalQnaInputBoundary subgoalQnaInteractor =
+                new SubgoalQnaInteractor(subgoalQnaDataAccessObject,
+                        qnaGeminiGateway,
+                        subgoalQnaPresenter);
+        SubgoalQnaController subgoalQnaController =
+                new SubgoalQnaController(subgoalQnaInteractor);
+        subgoalQnaView.setSubgoalQnaController(subgoalQnaController);
+        showSubgoalView.setQnaController(subgoalQnaController);
         return this;
     }
 
@@ -361,7 +350,6 @@ public class AppBuilder {
                 new LogoutInteractor(userDataAccessObject, logoutOutputBoundary);
 
         final LogoutController logoutController = new LogoutController(logoutInteractor);
-        calendarView.setLogoutController(logoutController);
         showPlansView.setLogoutController(logoutController);
         mainPageView.setLogoutController(logoutController);
         return this;

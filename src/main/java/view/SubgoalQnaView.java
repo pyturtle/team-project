@@ -1,9 +1,11 @@
 package view;
 
 import entity.SubgoalQuestionAnswer;
+import interface_adapter.plan.generate_plan.GeneratePlanViewModel;
 import interface_adapter.subgoal_qna.SubgoalQnaController;
 import interface_adapter.subgoal_qna.SubgoalQnaState;
 import interface_adapter.subgoal_qna.SubgoalQnaViewModel;
+import view.ui_elements.Message;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,20 +22,20 @@ import java.util.List;
 public class SubgoalQnaView extends JPanel
         implements PropertyChangeListener, ActionListener {
 
-    private final SubgoalQnaViewModel viewModel;
-    private final SubgoalQnaController controller;
+    private final SubgoalQnaViewModel subgoalQnaViewModel;
+
+    private SubgoalQnaController subgoalQnaController;
 
     private final JPanel messagesPanel = new JPanel();
+    private final JScrollPane messagesScrollPane = new JScrollPane(messagesPanel);
     private final JTextArea questionInput = new JTextArea(3, 30);
-    private final JButton sendButton = new JButton("Send");
+    private final JButton sendButton = new JButton(SubgoalQnaViewModel.SEND_BUTTON_LABEL);
 
     private String currentSubgoalId = "";
 
-    public SubgoalQnaView(SubgoalQnaViewModel viewModel,
-                          SubgoalQnaController controller) {
-        this.viewModel = viewModel;
-        this.controller = controller;
-        this.viewModel.addPropertyChangeListener(this);
+    public SubgoalQnaView(SubgoalQnaViewModel subgoalQnaViewModel) {
+        this.subgoalQnaViewModel = subgoalQnaViewModel;
+        this.subgoalQnaViewModel.addPropertyChangeListener(this);
 
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -43,10 +45,8 @@ public class SubgoalQnaView extends JPanel
         add(title, BorderLayout.NORTH);
 
         messagesPanel.setLayout(new BoxLayout(messagesPanel, BoxLayout.Y_AXIS));
-        JScrollPane scrollPane = new JScrollPane(messagesPanel);
-//        add(scrollPane, BorderLayout.CENTER);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        add(scrollPane, BorderLayout.CENTER);
+        messagesScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        add(messagesScrollPane, BorderLayout.CENTER);
 
         questionInput.setLineWrap(true);
         questionInput.setWrapStyleWord(true);
@@ -63,39 +63,34 @@ public class SubgoalQnaView extends JPanel
 
     /** Used by AppBuilder to register this view with DialogManager. */
     public String getViewName() {
-        return viewModel.getViewName();   // "subgoal qna"
+        return "subgoal qna";  // "subgoal qna"
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (!(evt.getNewValue() instanceof SubgoalQnaState)) {
-            return;
-        }
+        final Object newState = evt.getNewValue();
 
-        SubgoalQnaState state = (SubgoalQnaState) evt.getNewValue();
-        currentSubgoalId = state.getSubgoalId();
+        if (newState instanceof SubgoalQnaState) {
+            SubgoalQnaState state = (SubgoalQnaState) evt.getNewValue();
+            messagesPanel.removeAll();
+            showLastMessages();
+            messagesPanel.revalidate();
+            messagesPanel.repaint();
+            Message.scrollToBottom(messagesScrollPane);
 
-        // rebuild messages panel
-        messagesPanel.removeAll();
-        List<SubgoalQuestionAnswer> history = state.getHistory();
-        for (SubgoalQuestionAnswer entry : history) {
-            messagesPanel.add(createMessageArea("Q: " + entry.getQuestionMessage()));
-            String response = entry.getResponseMessage();
-            if (response != null && !response.isEmpty()) {
-                messagesPanel.add(createMessageArea("A: " + response));
+            currentSubgoalId = state.getSubgoalId();
+            sendButton.setEnabled(true);
+            sendButton.setText(SubgoalQnaViewModel.SEND_BUTTON_LABEL);
+
+            if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        state.getErrorMessage(),
+                        "Q/A Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
-            messagesPanel.add(Box.createVerticalStrut(8));
-        }
-        messagesPanel.revalidate();
-        messagesPanel.repaint();
-
-        if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    state.getErrorMessage(),
-                    "Q/A Error",
-                    JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -106,22 +101,50 @@ public class SubgoalQnaView extends JPanel
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
-        String question = questionInput.getText().trim();
+        sendButton.setEnabled(false);
+        sendButton.setText(GeneratePlanViewModel.LOADING_LABEL);
+        String question = questionInput.getText();
+        messagesPanel.add(Message.createMessage(Message.createTextBox(question), true));
+        messagesPanel.revalidate();
+        messagesPanel.repaint();
+        Message.scrollToBottom(messagesScrollPane);
+
         if (question.isEmpty()) {
             return;
         }
-        controller.askQuestion(currentSubgoalId, question);
+        sendButton.setEnabled(false);
+        sendButton.setText(SubgoalQnaViewModel.LOADING_LABEL);
         questionInput.setText("");
+        startAskQuestionInBackground(question);
     }
 
-    private JTextArea createMessageArea(String text) {
-        JTextArea area = new JTextArea(text);
-        area.setLineWrap(true);
-        area.setWrapStyleWord(true);
-        area.setEditable(false);
-        area.setOpaque(false); // make it blend with background
-        area.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
-        area.setAlignmentX(Component.LEFT_ALIGNMENT);
-        return area;
+    private void showLastMessages() {
+        List<SubgoalQuestionAnswer> history = subgoalQnaViewModel.getState().getHistory();
+        for (SubgoalQuestionAnswer entry : history) {
+            messagesPanel.add(Message.createMessage(Message.createTextBox(entry.getQuestionMessage()),
+                    true));
+            messagesPanel.add(Message.createMessage(Message.createTextBox(entry.getResponseMessage()),
+                    false));
+        }
+        messagesPanel.revalidate();
+        messagesPanel.repaint();
+        Message.scrollToBottom(messagesScrollPane);
+    }
+
+
+    private void startAskQuestionInBackground(String question) {
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() {
+                subgoalQnaController.askQuestion(currentSubgoalId, question);
+                return null;
+            }
+        };
+        worker.execute();
+    }
+
+
+    public void setSubgoalQnaController(SubgoalQnaController subgoalQnaController) {
+        this.subgoalQnaController = subgoalQnaController;
     }
 }
