@@ -40,6 +40,9 @@ public class SubgoalQnaView extends JPanel
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Set a larger preferred size for the dialog
+        setPreferredSize(new Dimension(700, 600));
+
         JLabel title = new JLabel("Subgoal Q/A");
         title.setFont(title.getFont().deriveFont(Font.BOLD, 16f));
         add(title, BorderLayout.NORTH);
