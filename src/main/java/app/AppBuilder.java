@@ -162,7 +162,7 @@ public class AppBuilder {
 
     public AppBuilder addShowPlansView() {
         showPlansViewModel = new ShowPlansViewModel();
-        showPlansView = new ShowPlansView(showPlansViewModel, savePlanViewModel, viewManagerModel);
+        showPlansView = new ShowPlansView(showPlansViewModel, savePlanViewModel);
         partialViews.put(showPlansView.getViewName(), showPlansView);
         return this;
     }
@@ -291,7 +291,7 @@ public class AppBuilder {
 
     public AppBuilder addSavePlanUseCase() {
         final SavePlanOutputBoundary savePlanOutputBoundary = new SavePlanPresenter(savePlanViewModel,
-                dialogManagerModel);
+                dialogManagerModel, calendarViewModel);
         final SavePlanInputBoundary savePlanInteractor = new SavePlanInteractor(savePlanOutputBoundary,
                 planDataAccessObject, subgoalDataAccessObject);
         SavePlanController savePlanController = new SavePlanController(savePlanInteractor);
@@ -311,7 +311,7 @@ public class AppBuilder {
 
     public AppBuilder addShowSubgoalUseCase() {
         ShowSubgoalOutputBoundary showSubgoalPresenter = new ShowSubgoalPresenter(
-                showSubgoalViewModel, dialogManagerModel);
+                showSubgoalViewModel, dialogManagerModel, calendarViewModel);
         ShowSubgoalInputBoundary showSubgoalInteractor = new ShowSubgoalInteractor(
                 subgoalDataAccessObject,
                 showSubgoalPresenter);
@@ -350,7 +350,6 @@ public class AppBuilder {
                 new LogoutInteractor(userDataAccessObject, logoutOutputBoundary);
 
         final LogoutController logoutController = new LogoutController(logoutInteractor);
-        showPlansView.setLogoutController(logoutController);
         mainPageView.setLogoutController(logoutController);
         return this;
     }

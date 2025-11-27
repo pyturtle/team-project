@@ -31,9 +31,9 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     private List<JButton> dayButtons;
 
     // Goal buttons, on the bottom i think...
-    private DefaultListModel<String> goalListModel;
-    private JList<String> goalList;
-    private JTextField goalInput;
+    private final DefaultListModel<String> goalListModel;
+    private final JList<String> goalList;
+    private final JTextField goalInput;
     private JButton addGoalButton;
     private JButton removeGoalButton;
 
@@ -46,6 +46,8 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
 
     // Map to track subgoal IDs for the displayed items
     private final Map<String, String> displayTextToSubgoalId = new HashMap<>();
+    // Map to track completion status for coloring
+    private final Map<String, Boolean> displayTextToCompleted = new HashMap<>();
 
     // Calendar state when we are in teh calendar view
     private CalendarViewModel viewModel;
@@ -83,6 +85,31 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         // Adding and removing subgoals
         goalListModel = new DefaultListModel<>();
         goalList = new JList<>(goalListModel);
+
+        // Set custom cell renderer to color completed subgoals green
+        goalList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                String text = value.toString();
+                Boolean isCompleted = displayTextToCompleted.get(text);
+
+                if (isCompleted != null && isCompleted) {
+                    // Completed subgoals have green background
+                    if (!isSelected) {
+                        c.setBackground(new Color(144, 238, 144)); // Light green
+                    }
+                } else {
+                    // Non-completed subgoals have default background
+                    if (!isSelected) {
+                        c.setBackground(Color.WHITE);
+                    }
+                }
+                return c;
+            }
+        });
+
         goalInput = new JTextField(15);
         addGoalButton = new JButton("Add Subgoal");
         removeGoalButton = new JButton("Remove Subgoal");
@@ -203,28 +230,34 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
                 viewModel.firePropertyChanged(); // refresh goals
             }
         } else if (src == removeGoalButton) {
-            String selectedGoal = goalList.getSelectedValue();
-            if (selectedGoal != null) {
-                // Extract date and goal text from the selected item
-                String goalText = selectedGoal;
-                if (selectedGoal.contains(" - ")) {
-                    String[] parts = selectedGoal.split(" - ", 2);
-                    if (parts.length == 2) {
-                        goalText = parts[1];
-                        try {
-                            LocalDate goalDate = LocalDate.parse(parts[0]);
-                            state.removeGoal(goalDate, goalText); // remove a goal/finish
-                            viewModel.firePropertyChanged(); // refresh goals
-                        } catch (Exception ex) {
-                            // If parsing fails, try to remove from selected date
-                            state.removeGoal(selectedDate, selectedGoal);
-                            viewModel.firePropertyChanged();
-                        }
+            String selectedValue = goalList.getSelectedValue();
+            if (selectedValue != null) {
+                String subgoalId = displayTextToSubgoalId.get(selectedValue);
+                if (subgoalId != null && subgoalDataAccess != null) {
+                    // Confirm deletion
+                    int confirm = JOptionPane.showConfirmDialog(this,
+                            "Are you sure you want to permanently delete this subgoal?",
+                            "Confirm Delete",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE);
+
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        // Delete the subgoal from the database
+                        subgoalDataAccess.deleteSubgoal(subgoalId);
+                        // Manually refresh the view
+                        viewModel.firePropertyChanged();
                     }
                 } else {
-                    state.removeGoal(selectedDate, goalText);
-                    viewModel.firePropertyChanged();
+                    JOptionPane.showMessageDialog(this,
+                            "Could not find subgoal ID for the selected item.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
                 }
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "Please select a subgoal first.",
+                        "No Selection",
+                        JOptionPane.INFORMATION_MESSAGE);
             }
         } else if (src == prevSubgoalsButton) {
             if (subgoalPageOffset > 0) {
@@ -288,6 +321,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         CalendarState state = viewModel.getCalendarState();
         goalListModel.clear();
         displayTextToSubgoalId.clear();
+        displayTextToCompleted.clear();
 
         if (subgoalDataAccess == null) {
             System.out.println("CalendarView: subgoalDataAccess is null");
@@ -305,19 +339,21 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         List<Subgoal> allSubgoals = subgoalDataAccess.getSubgoalsByUsername(state.getUsername());
         System.out.println("CalendarView: Found " + allSubgoals.size() + " total subgoals for user");
 
-        // Filter to upcoming subgoals (not completed and deadline is today or in the future)
+        // Filter to upcoming subgoals (deadline is today or in the future - include completed ones)
         LocalDate today = LocalDate.now();
         List<Subgoal> upcomingSubgoals = new ArrayList<>();
         for (Subgoal subgoal : allSubgoals) {
-            if (!subgoal.isCompleted() && !subgoal.getDeadline().isBefore(today)) {
+            if (!subgoal.getDeadline().isBefore(today)) {
                 upcomingSubgoals.add(subgoal);
             }
         }
 
-        System.out.println("CalendarView: Found " + upcomingSubgoals.size() + " upcoming subgoals");
+        System.out.println("CalendarView: Found " + upcomingSubgoals.size() + " upcoming subgoals (including completed)");
 
-        // Sort by deadline
-        upcomingSubgoals.sort(Comparator.comparing(Subgoal::getDeadline));
+        // Sort by deadline, then by completion status (incomplete first, then completed)
+        upcomingSubgoals.sort(Comparator
+                .comparing(Subgoal::getDeadline)
+                .thenComparing(Subgoal::isCompleted));
 
         // Calculate the range to display
         int startIdx = subgoalPageOffset;
@@ -329,10 +365,12 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         for (int i = startIdx; i < endIdx; i++) {
             Subgoal subgoal = upcomingSubgoals.get(i);
             String priorityFlag = subgoal.isPriority() ? " [PRIORITY]" : "";
-            String displayText = subgoal.getDeadline() + " - " + subgoal.getName() + priorityFlag;
+            String completedFlag = subgoal.isCompleted() ? " ✓" : "";
+            String displayText = subgoal.getDeadline() + " - " + subgoal.getName() + priorityFlag + completedFlag;
             goalListModel.addElement(displayText);
             displayTextToSubgoalId.put(displayText, subgoal.getId());
-            System.out.println("CalendarView: Added subgoal: " + displayText);
+            displayTextToCompleted.put(displayText, subgoal.isCompleted());
+            System.out.println("CalendarView: Added subgoal: " + displayText + (subgoal.isCompleted() ? " (completed)" : ""));
         }
 
         // Enable/disable navigation buttons

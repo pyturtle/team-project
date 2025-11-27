@@ -1,9 +1,7 @@
 package view.plan;
 
 import entity.plan.Plan;
-import interface_adapter.ViewManagerModel;
 import interface_adapter.plan.delete_plan.DeletePlanController;
-import interface_adapter.logout.LogoutController;
 import interface_adapter.plan.save_plan.SavePlanState;
 import interface_adapter.plan.save_plan.SavePlanViewModel;
 import interface_adapter.plan.show_plans.ShowPlansController;
@@ -12,8 +10,6 @@ import interface_adapter.plan.show_plans.ShowPlansViewModel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -35,7 +31,6 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
     private ShowPlansController showPlansController;
     private DeletePlanController deletePlanController;
-    private LogoutController logoutController;
 
 
     private final JPanel plansGridPanel;
@@ -43,15 +38,11 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     private final JButton nextButton;
     private final JLabel pageLabel;
 
-    // For switching views
-    private interface_adapter.ViewManagerModel viewManagerModel;
 
     public ShowPlansView(ShowPlansViewModel showPlansViewModel,
-                         SavePlanViewModel savePlanViewModel,
-                         ViewManagerModel viewManagerModel) {
+                         SavePlanViewModel savePlanViewModel) {
         this.showPlansViewModel = showPlansViewModel;
         this.savePlanViewModel = savePlanViewModel;
-        this.viewManagerModel = viewManagerModel;
 
         this.showPlansViewModel.addPropertyChangeListener(this);
         this.savePlanViewModel.addPropertyChangeListener(this);
@@ -235,7 +226,4 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         this.deletePlanController = controller;
     }
 
-    public void setLogoutController(LogoutController controller) {
-        this.logoutController = controller;
-    }
 }

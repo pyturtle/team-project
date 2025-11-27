@@ -42,4 +42,11 @@ public interface SubgoalDataAccessInterface {
      * @return a list of all subgoals for the user
      */
     java.util.List<Subgoal> getSubgoalsByUsername(String username);
+
+    /**
+     * Deletes the subgoal with the given ID.
+     *
+     * @param id the ID of the subgoal to delete
+     */
+    void deleteSubgoal(String id);
 }

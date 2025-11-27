@@ -179,4 +179,10 @@ public class FileSubgoalDataAccessObject implements SubgoalDataAccessInterface {
         return result;
     }
 
+    @Override
+    public void deleteSubgoal(String id) {
+        subgoals.remove(id);
+        this.save();
+    }
+
 }

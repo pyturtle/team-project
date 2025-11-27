@@ -54,6 +54,19 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
         Subgoal s = subgoalDAO.getSubgoalById(id);
         if (s == null) {
             presenter.presentError("Subgoal with id " + id + " was not found after updating priority.");
+        } else {
+            // Present the updated subgoal to trigger view refresh
+            ShowSubgoalOutputData out = new ShowSubgoalOutputData(
+                    s.getId(),
+                    s.getName(),
+                    s.getDescription(),
+                    s.isPriority(),
+                    s.isCompleted()
+            );
+            // Use presentUpdate to avoid opening a new dialog
+            if (presenter instanceof interface_adapter.show_subgoal.ShowSubgoalPresenter) {
+                ((interface_adapter.show_subgoal.ShowSubgoalPresenter) presenter).presentUpdate(out);
+            }
         }
     }
 
@@ -67,6 +80,19 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
         Subgoal s = subgoalDAO.getSubgoalById(id);
         if (s == null) {
             presenter.presentError("Subgoal with id " + id + " was not found after updating completion.");
+        } else {
+            // Present the updated subgoal to trigger view refresh
+            ShowSubgoalOutputData out = new ShowSubgoalOutputData(
+                    s.getId(),
+                    s.getName(),
+                    s.getDescription(),
+                    s.isPriority(),
+                    s.isCompleted()
+            );
+            // Use presentUpdate to avoid opening a new dialog
+            if (presenter instanceof interface_adapter.show_subgoal.ShowSubgoalPresenter) {
+                ((interface_adapter.show_subgoal.ShowSubgoalPresenter) presenter).presentUpdate(out);
+            }
         }
     }
 }
