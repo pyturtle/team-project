@@ -29,19 +29,19 @@ public class DialogManager implements PropertyChangeListener {
         }
     }
 
-    private void createDialog(JPanel view)
-    {
-        Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(view);
-        if (parentFrame == null) {
-            parentFrame = new JFrame();
+    private void createDialog(JPanel view) {
+        Window parentWindow = SwingUtilities.getWindowAncestor(view);
+        if (parentWindow == null) {
+            parentWindow = new JFrame();
         }
 
-        JDialog dialog = new JDialog(parentFrame, "Subgoal Details", true); // 'true' = modal
+        JDialog dialog = new JDialog(parentWindow, "Subgoal Details", Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setContentPane(view);
         dialog.pack();
-        dialog.setLocationRelativeTo(parentFrame);
+        dialog.setLocationRelativeTo(parentWindow);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
     }
+
 
 }
