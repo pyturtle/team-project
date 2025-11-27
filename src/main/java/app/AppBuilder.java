@@ -366,6 +366,7 @@ public class AppBuilder {
         SubgoalQnaGeminiDataAccessInterface qnaGeminiGateway = generatePlanDataAccessObject;
         SubgoalQnaInputBoundary subgoalQnaInteractor =
                 new SubgoalQnaInteractor(subgoalQnaDataAccessObject,
+                        subgoalDataAccessObject,
                         qnaGeminiGateway,
                         subgoalQnaPresenter);
         SubgoalQnaController subgoalQnaController =
