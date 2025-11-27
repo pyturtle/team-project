@@ -1,5 +1,6 @@
 package view;
 
+import entity.subgoal.Subgoal;
 import interface_adapter.show_subgoal.ShowSubgoalController;
 import interface_adapter.show_subgoal.ShowSubgoalState;
 import interface_adapter.show_subgoal.ShowSubgoalViewModel;
@@ -132,9 +133,21 @@ public class ShowSubgoalView extends JPanel implements PropertyChangeListener {
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
+
+        SwingUtilities.invokeLater(() -> {
+            Window window = SwingUtilities.getWindowAncestor(ShowSubgoalView.this);
+            if (window != null) {
+                window.toFront();
+                window.requestFocus();
+                window.setAlwaysOnTop(true);
+            }
+        });
+
+
     }
 
     public String getViewName() {
         return viewName;
     }
+
 }

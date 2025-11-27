@@ -105,7 +105,7 @@
     "id": "b1772e04-2377-41cb-b7b8-4f0bf05e7bf0",
     "completed": false,
     "deadline": "2026-02-12",
-    "priority": false,
+    "priority": true,
     "plan_id": "fa76f501-4f8d-4c15-8a62-86317991e153",
     "username": "1"
   },
@@ -123,7 +123,7 @@
     "name": "Testing & Evaluation",
     "description": "Thoroughly test your creation to ensure it functions as intended. Gather feedback if applicable. Make any final adjustments or improvements based on testing results.",
     "id": "68bc6e6f-39fb-41f6-9026-9d58ab62999e",
-    "completed": false,
+    "completed": true,
     "deadline": "2026-03-12",
     "priority": false,
     "plan_id": "fa76f501-4f8d-4c15-8a62-86317991e153",

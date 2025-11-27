@@ -3,6 +3,7 @@ package view;
 import interface_adapter.DialogManagerModel;
 
 import javax.swing.*;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
@@ -30,12 +31,17 @@ public class DialogManager implements PropertyChangeListener {
 
     private void createDialog(JPanel view)
     {
-        JFrame dialog = new JFrame();
-        dialog.setSize(400, 300);
-        dialog.setLocationRelativeTo(null);   // center on screen
-        dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(view);
+        if (parentFrame == null) {
+            parentFrame = new JFrame();
+        }
+
+        JDialog dialog = new JDialog(parentFrame, "Subgoal Details", true); // 'true' = modal
         dialog.setContentPane(view);
         dialog.pack();
+        dialog.setLocationRelativeTo(parentFrame);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
     }
+
 }
