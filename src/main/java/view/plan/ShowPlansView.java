@@ -1,12 +1,14 @@
 package view.plan;
 
 import entity.plan.Plan;
+import entity.subgoal.Subgoal;
 import interface_adapter.plan.delete_plan.DeletePlanController;
 import interface_adapter.plan.save_plan.SavePlanState;
 import interface_adapter.plan.save_plan.SavePlanViewModel;
 import interface_adapter.plan.show_plans.ShowPlansController;
 import interface_adapter.plan.show_plans.ShowPlansState;
 import interface_adapter.plan.show_plans.ShowPlansViewModel;
+import interface_adapter.show_subgoal.ShowSubgoalController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -157,10 +159,11 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         buttonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 10));
 
         final JButton subgoalsButton = new JButton(ShowPlansViewModel.SUBGOALS_BUTTON_LABEL);
+        subgoalsButton.setActionCommand(plan.getId());
         final JButton deleteButton = new JButton(ShowPlansViewModel.DELETE_BUTTON_LABEL);
 
-        // Subgoals button not implemented yet
-        subgoalsButton.setEnabled(false);
+        // ENABLING THE BUTTON!!!!
+        subgoalsButton.setEnabled(true);
 
         // Enable delete button and add action listener
         deleteButton.addActionListener(e -> {
@@ -191,6 +194,31 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
                 loadPlans(username, 0);
             }
         });
+        // subgoals BUTTON actionLISTENR!
+        subgoalsButton.addActionListener(e -> {
+            if (showSubgoalController != null) {
+                String planId = e.getActionCommand(); // planId
+                String username = plan.getUsername();
+
+                //GETSUBGOALS LIST
+                List<Subgoal> subgoals = showSubgoalController.getSubgoalsForPlan(planId, username);
+
+                StringBuilder sb = new StringBuilder();
+                for (Subgoal s : subgoals) {
+                    sb.append(s.getName())
+                            .append(" [Priority: ").append(s.isPriority())
+                            .append(", Completed: ").append(s.isCompleted())
+                            .append("]\n");
+                }
+
+                JOptionPane.showMessageDialog(this,
+                        sb.length() > 0 ? sb.toString() : "No subgoals yet.",
+                        "Subgoals for " + plan.getName(),
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+
 
         buttonsPanel.add(subgoalsButton);
         buttonsPanel.add(deleteButton);
@@ -218,6 +246,13 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         return viewName;
     }
 
+    private ShowSubgoalController showSubgoalController;
+
+    public void setShowSubgoalController(ShowSubgoalController controller) {
+        this.showSubgoalController = controller;
+    }
+
+
     public void setShowPlansController(ShowPlansController controller) {
         this.showPlansController = controller;
     }
@@ -225,5 +260,23 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     public void setDeletePlanController(DeletePlanController controller) {
         this.deletePlanController = controller;
     }
+
+    public JButton getSubgoalsButton(JPanel planPanel) {
+        for (Component comp : planPanel.getComponents()) {
+            if (comp instanceof JPanel) {
+                JPanel buttonsPanel = (JPanel) comp;
+                for (Component btn : buttonsPanel.getComponents()) {
+                    if (btn instanceof JButton) {
+                        JButton button = (JButton) btn;
+                        if (ShowPlansViewModel.SUBGOALS_BUTTON_LABEL.equals(button.getText())) {
+                            return button;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 
 }

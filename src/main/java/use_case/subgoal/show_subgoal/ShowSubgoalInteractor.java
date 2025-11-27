@@ -2,6 +2,8 @@ package use_case.subgoal.show_subgoal;
 
 import entity.subgoal.Subgoal;
 
+import java.util.List;
+
 /**
  * Interactor for the ShowSubgoal use case.
  * Implements the input boundary and coordinates data access and presentation.
@@ -95,4 +97,11 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
             }
         }
     }
+
+    @Override
+    public List<Subgoal> getSubgoalsByPlan(String planId, String userId) {
+        return subgoalDAO.getSubgoalsByPlan(planId, userId);
+    }
+
+
 }

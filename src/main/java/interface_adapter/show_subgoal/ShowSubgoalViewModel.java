@@ -1,6 +1,9 @@
 package interface_adapter.show_subgoal;
 
+import entity.subgoal.Subgoal;
 import interface_adapter.ViewModel;
+
+import java.util.List;
 
 /**
  * ViewModel for the Subgoal popup view.
@@ -16,4 +19,11 @@ public class ShowSubgoalViewModel extends ViewModel<ShowSubgoalState> {
         super("subgoal");
         setState(new ShowSubgoalState());
     }
+
+    public void setSubgoals(List<Subgoal> subgoals) {
+        ShowSubgoalState newState = getState();
+        newState.setSubgoals(subgoals);
+        setState(newState);
+    }
+
 }

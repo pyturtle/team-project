@@ -355,6 +355,8 @@ public class AppBuilder {
         showSubgoalView.setShowSubgoalController(showSubgoalController);
         calendarView.setShowSubgoalController(showSubgoalController);
 
+        showPlansView.setShowSubgoalController(showSubgoalController);
+
         return this;
     }
 
