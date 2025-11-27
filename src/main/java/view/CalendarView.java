@@ -21,6 +21,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
+import interface_adapter.show_subgoal.ShowSubgoalController;
 
 public class CalendarView extends JPanel implements ActionListener, PropertyChangeListener {
     // Views, go on the top right
@@ -40,6 +41,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     private JTextField goalInput;
     private JButton addGoalButton;
     private JButton removeGoalButton;
+    private ShowSubgoalController showSubgoalController;
 
     // Pagination for upcoming subgoals
     private int subgoalPageOffset = 0;
@@ -63,7 +65,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
 
     // Subgoal data access for fetching actual subgoals
     private SubgoalDataAccessInterface subgoalDataAccess;
-    private ShowSubgoalController showSubgoalController;
+    //private ShowSubgoalController showSubgoalController;
 
     public CalendarView(CalendarViewModel viewModel,
                         SubgoalDataAccessInterface subgoalDataAccess) {
@@ -370,9 +372,9 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         return "CalendarView";
     }
 
-    public void setLogoutController(LogoutController logoutController) {
-        this.logoutController = logoutController;
-    }
+    //public void setLogoutController(LogoutController logoutController) {
+        //this.logoutController = logoutController;
+    //}
 
     private void showFilterDialog() {
         String[] options = {"By Plan ID", "By Subgoal Name", "Priority Only", "Clear Filter", "Cancel"};
@@ -424,18 +426,11 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         }
     }
 
-
-    public void setShowPlansController(ShowPlansController showPlansController) {
-        this.showPlansController = showPlansController;
-    }
-
-    public void setSubgoalView(SubgoalView subgoalView) {
-        this.subgoalView = subgoalView;
-    public void setShowSubgoalController(ShowSubgoalController showSubgoalController) {
-        this.showSubgoalController = showSubgoalController;
-    }
-
     public void setFilterSubgoalsController(FilterSubgoalsController controller) {
         this.filterSubgoalsController = controller;
+    }
+
+    public void setShowSubgoalController(ShowSubgoalController showSubgoalController) {
+        this.showSubgoalController = showSubgoalController;
     }
 }

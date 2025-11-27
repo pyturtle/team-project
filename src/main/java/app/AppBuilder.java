@@ -143,6 +143,7 @@ public class AppBuilder {
     private ShowSubgoalView showSubgoalView;
     private SubgoalQnaView subgoalQnaView;
 
+
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
     }
@@ -337,8 +338,10 @@ public class AppBuilder {
                 subgoalDataAccessObject,
                 showSubgoalPresenter);
         ShowSubgoalController showSubgoalController = new ShowSubgoalController(showSubgoalInteractor);
+
         showSubgoalView.setShowSubgoalController(showSubgoalController);
-        calendarView.setShowSubgoalController(showSubgoalController);
+        calendarView.setShowSubgoalController(showSubgoalController);  // ADD THIS LINE
+
         return this;
     }
 
