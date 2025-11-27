@@ -1,12 +1,14 @@
 package view;
 
 import entity.subgoal.Subgoal;
+import interface_adapter.DialogManagerModel;
 import interface_adapter.calendar.CalendarViewModel;
 import interface_adapter.calendar.CalendarState;
 import interface_adapter.filter_subgoals.FilterSubgoalsController;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.plan.show_plans.ShowPlansController;
 import interface_adapter.filter_subgoals.FilterSubgoalsController;
+import interface_adapter.show_subgoal.ShowSubgoalController;
 import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
 
 import javax.swing.*;
@@ -54,13 +56,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     private LocalDate displayedMonth;
 
     // For switching views. This is not a button
-    private interface_adapter.ViewManagerModel viewManagerModel;
-
-    // Logout controller
-    private LogoutController logoutController;
-
-    // Show Plans controller for loading plans when switching views
-    private ShowPlansController showPlansController;
 
     //filter
     private JButton filterButton;
@@ -68,14 +63,11 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
 
     // Subgoal data access for fetching actual subgoals
     private SubgoalDataAccessInterface subgoalDataAccess;
+    private ShowSubgoalController showSubgoalController;
 
-    // SubgoalView for opening individual subgoals
-    private SubgoalView subgoalView;
-
-    public CalendarView(CalendarViewModel viewModel, interface_adapter.ViewManagerModel viewManagerModel,
+    public CalendarView(CalendarViewModel viewModel,
                         SubgoalDataAccessInterface subgoalDataAccess) {
         this.viewModel = viewModel;
-        this.viewManagerModel = viewManagerModel;
         this.subgoalDataAccess = subgoalDataAccess;
         this.displayedMonth = LocalDate.now().withDayOfMonth(1); // starting with current month, should prob be nov
 
@@ -257,10 +249,10 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
             updateUpcomingSubgoals();
         } else if (src == openSubgoalButton) {
             String selectedValue = goalList.getSelectedValue();
-            if (selectedValue != null && subgoalView != null) {
+            if (selectedValue != null && showSubgoalController != null) {
                 String subgoalId = displayTextToSubgoalId.get(selectedValue);
                 if (subgoalId != null) {
-                    subgoalView.openForSubgoal(subgoalId);
+                    showSubgoalController.execute(subgoalId);
                 } else {
                     JOptionPane.showMessageDialog(this,
                         "Could not find subgoal ID for the selected item.",
@@ -439,6 +431,8 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
 
     public void setSubgoalView(SubgoalView subgoalView) {
         this.subgoalView = subgoalView;
+    public void setShowSubgoalController(ShowSubgoalController showSubgoalController) {
+        this.showSubgoalController = showSubgoalController;
     }
 
     public void setFilterSubgoalsController(FilterSubgoalsController controller) {

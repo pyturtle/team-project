@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import interface_adapter.subgoal_qna.SubgoalQnaController;
 
 /**
  * Popup view that shows a single subgoal's details:
@@ -16,10 +17,13 @@ import java.beans.PropertyChangeListener;
  * This dialog listens to the ShowSubgoalViewModel for state changes
  * and updates its components accordingly.
  */
-public class SubgoalView extends JDialog implements PropertyChangeListener {
+public class ShowSubgoalView extends JPanel implements PropertyChangeListener {
+    private final String viewName = "show subgoal";
 
     private final ShowSubgoalViewModel viewModel;
-    private final ShowSubgoalController controller;
+    private ShowSubgoalController showSubgoalController;
+    private SubgoalQnaController qnaController;   // controller for Q/A dialog
+
 
     private final JLabel nameLabel = new JLabel();
     private final JTextArea descriptionArea = new JTextArea(5, 30);
@@ -27,29 +31,25 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
     private final JCheckBox completeCheckBox = new JCheckBox("Complete");
     private final JButton qaButton = new JButton("Q/A");
 
-    // We need to remember which subgoal is currently being displayed
-    private String currentSubgoalId = "";
-
     /**
      * Constructs a SubgoalView.
      *
-     * @param owner     the parent frame of this dialog
      * @param viewModel the view model providing subgoal state
-     * @param controller the controller to invoke the ShowSubgoal use case
      */
-    public SubgoalView(JFrame owner,
-                       ShowSubgoalViewModel viewModel,
-                       ShowSubgoalController controller) {
-        super(owner, "Subgoal", true); // modal dialog
+    public ShowSubgoalView(ShowSubgoalViewModel viewModel) {
         this.viewModel = viewModel;
-        this.controller = controller;
-
         this.viewModel.addPropertyChangeListener(this);
 
         setupUI();
         setupListeners();
     }
 
+    public void setQnaController(SubgoalQnaController qnaController) {
+        this.qnaController = qnaController;
+    }
+    public void setShowSubgoalController(ShowSubgoalController showSubgoalController) {
+        this.showSubgoalController = showSubgoalController;
+    }
     /**
      * Sets up the Swing components and layout.
      */
@@ -76,9 +76,8 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
         bottomPanel.add(qaButton);
         content.add(bottomPanel, BorderLayout.SOUTH);
 
-        setContentPane(content);
-        pack();
-        setLocationRelativeTo(getOwner());
+        this.setLayout(new  BoxLayout(this, BoxLayout.Y_AXIS));
+        this.add(content);
     }
 
     /**
@@ -87,38 +86,31 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
     private void setupListeners() {
         // Priority checkbox
         priorityCheckBox.addActionListener(e -> {
-            if (currentSubgoalId != "") {
-                controller.setPriority(currentSubgoalId, priorityCheckBox.isSelected());
+            if (viewModel.getState().getId() != "") {
+                showSubgoalController.setPriority(viewModel.getState().getId(), priorityCheckBox.isSelected());
             }
         });
 
         // Complete checkbox
         completeCheckBox.addActionListener(e -> {
-            if (currentSubgoalId != "") {
-                controller.setCompleted(currentSubgoalId, completeCheckBox.isSelected());
+            if (viewModel.getState().getId() != "") {
+                showSubgoalController.setCompleted(viewModel.getState().getId(), completeCheckBox.isSelected());
             }
         });
 
-        // Q/A button (placeholder for now)
-        qaButton.addActionListener(e ->
+        // Q/A button – open the Q/A dialog for this subgoal
+        qaButton.addActionListener(e -> {
+            // assume SubgoalView already tracks the currently opened subgoal id
+            // (e.g. a field currentSubgoalId set in propertyChange / update method)
+            if (qnaController != null && viewModel.getState().getId() != null && !viewModel.getState().getId().isEmpty()) {
+                qnaController.open(viewModel.getState().getId());
+            } else {
                 JOptionPane.showMessageDialog(this,
-                        "Q/A chat not implemented yet.",
+                        "Q/A chat is not available for this subgoal.",
                         "Q/A",
-                        JOptionPane.INFORMATION_MESSAGE));
-    }
-
-
-    /**
-     * Opens the dialog for a specific subgoal.
-     * This triggers the ShowSubgoal use case and then shows the popup.
-     *
-     * @param subgoalId the ID of the subgoal to display
-     */
-    public void openForSubgoal(String subgoalId) {
-        this.currentSubgoalId = subgoalId;
-        controller.execute(subgoalId);
-        setLocationRelativeTo(getOwner());
-        setVisible(true);
+                        JOptionPane.WARNING_MESSAGE);
+            }
+        });
     }
 
     /**
@@ -140,5 +132,9 @@ public class SubgoalView extends JDialog implements PropertyChangeListener {
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public String getViewName() {
+        return viewName;
     }
 }
