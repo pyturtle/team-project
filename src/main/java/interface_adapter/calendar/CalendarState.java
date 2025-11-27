@@ -103,7 +103,7 @@ public class CalendarState {
     private String subgoalToString(entity.subgoal.Subgoal subgoal) {
         // Convert Subgoal entity to display string
         // Adjust this based on your Subgoal class structure
-        return String.format("%s (Plan: %d, Priority: %s)",
+        return String.format("%s (Plan: %s, Priority: %s)",
                 subgoal.getName(),
                 subgoal.getPlanId(),
                 subgoal.isPriority() ? "High" : "Normal");

@@ -47,6 +47,8 @@ public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterfa
         return currentUsername;
     }
 
+
+
     @Override
     public void changePassword(User user) {
         // Replace the old entry with the new password

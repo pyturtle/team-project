@@ -1,15 +1,15 @@
 package use_case.filter_subgoals;
 
-import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;  // Use this import
+import data_access.SubgoalDataAccessInterface;  // Change this import
 import entity.subgoal.Subgoal;
 import java.util.List;
 
 public class FilterSubgoalsInteractor implements FilterSubgoalsInputBoundary {
 
-    private final use_case.subgoal.show_subgoal.SubgoalDataAccessInterface subgoalDAO;  // Use the correct interface
+    private final data_access.SubgoalDataAccessInterface subgoalDAO;  // Use this interface
     private final FilterSubgoalsOutputBoundary presenter;
 
-    public FilterSubgoalsInteractor(use_case.subgoal.show_subgoal.SubgoalDataAccessInterface subgoalDAO,
+    public FilterSubgoalsInteractor(data_access.SubgoalDataAccessInterface subgoalDAO,
                                     FilterSubgoalsOutputBoundary presenter) {
         this.subgoalDAO = subgoalDAO;
         this.presenter = presenter;
@@ -24,6 +24,9 @@ public class FilterSubgoalsInteractor implements FilterSubgoalsInputBoundary {
         }
         else if (inputData.getPlanId() != null) {
             result = subgoalDAO.getSubgoalsByPlan(inputData.getPlanId(), inputData.getUserId());
+        }
+        else if (inputData.getSubgoalName() != null) {
+            result = subgoalDAO.getSubgoalsByName(inputData.getSubgoalName(), inputData.getUserId());
         }
         else {
             result = subgoalDAO.getAllSubgoalsForUser(inputData.getUserId());

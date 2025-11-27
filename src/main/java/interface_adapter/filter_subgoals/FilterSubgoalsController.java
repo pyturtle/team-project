@@ -10,12 +10,12 @@ public class FilterSubgoalsController {
         this.filterSubgoalsInteractor = filterSubgoalsInteractor;
     }
 
-    public void execute(String planId, Boolean priorityOnly) {
+    public void execute(String planId, String subgoalName, Boolean priorityOnly) {
         // Get current user ID as String
         String currentUserId = getCurrentUserId();
 
         FilterSubgoalsInputData inputData = new FilterSubgoalsInputData(
-                currentUserId, planId, priorityOnly
+                currentUserId, planId, subgoalName, priorityOnly
         );
         filterSubgoalsInteractor.filter(inputData);
     }
@@ -26,8 +26,7 @@ public class FilterSubgoalsController {
     }
 
     private String getCurrentUserId() {
-        // You'll need to implement this based on how you handle current user
-        // For now, return a default or get from your user system
-        return "99"; // Using the test user ID from your example as String
+        // For now, return the correct user ID that matches your data
+        return "1"; // Changed from "99" to "1" to match your actual data
     }
 }

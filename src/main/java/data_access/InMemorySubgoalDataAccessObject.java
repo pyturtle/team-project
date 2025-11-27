@@ -88,6 +88,28 @@ public class InMemorySubgoalDataAccessObject implements SubgoalDataAccessInterfa
         }
     }
 
+    public List<Subgoal> getSubgoalsByName(String name, String userId) {
+        String searchTerm = name.toLowerCase();
+        return subgoals.stream()
+                .filter(s -> s.getUsername().equals(userId) &&
+                        s.getName().toLowerCase().contains(searchTerm))
+                .collect(Collectors.toList());
+    }
+
+
+    public List<Subgoal> getCompletedSubgoals(String userId) {
+        return subgoals.stream()
+                .filter(s -> s.getUsername().equals(userId) && s.isCompleted())
+                .collect(Collectors.toList());
+    }
+
+
+    public List<Subgoal> getIncompleteSubgoals(String userId) {
+        return subgoals.stream()
+                .filter(s -> s.getUsername().equals(userId) && !s.isCompleted())
+                .collect(Collectors.toList());
+    }
+
     // Helper for testing
     public void add(Subgoal s) {
         subgoals.add(s);

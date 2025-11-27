@@ -295,8 +295,21 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     public void propertyChange(PropertyChangeEvent evt) {
         CalendarState state = viewModel.getCalendarState();
 
-        // update upcoming subgoals
-        updateUpcomingSubgoals();
+        // Update the goal list display based on filter state
+        goalListModel.clear();
+
+        if (state.isFilterActive()) {
+            // Display filtered subgoals
+            List<entity.subgoal.Subgoal> filteredSubgoals = state.getFilteredSubgoals();
+            System.out.println("DEBUG: Showing " + filteredSubgoals.size() + " filtered subgoals");
+            for (entity.subgoal.Subgoal subgoal : filteredSubgoals) {
+                goalListModel.addElement(subgoal.getName());
+            }
+        } else {
+            // Display all goals for selected date (call updateUpcomingSubgoals or handle normally)
+            updateUpcomingSubgoals();
+        }
+
         updateCalendar();
 
         // error popups
@@ -304,7 +317,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
             JOptionPane.showMessageDialog(this, state.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             state.setErrorMessage("");
         }
-
     }
 
     private void updateUpcomingSubgoals() {
@@ -371,7 +383,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     }
 
     private void showFilterDialog() {
-        String[] options = {"By Plan ID", "Priority Only", "Clear Filter", "Cancel"};
+        String[] options = {"By Plan ID", "By Subgoal Name", "Priority Only", "Clear Filter", "Cancel"};
         int choice = JOptionPane.showOptionDialog(this,
                 "Filter subgoals:",
                 "Filter Subgoals",
@@ -382,9 +394,11 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
                 options[0]);
 
         switch (choice) {
-            case 0: filterByPlanId(); break;
-            case 1: filterByPriority(); break;
-            case 2: clearFilter(); break;
+            case 0: filterByPlanId(); break;        // "By Plan ID"
+            case 1: filterBySubgoalName(); break;   // "By Subgoal Name"
+            case 2: filterByPriority(); break;      // "Priority Only" - THIS WAS WRONG
+            case 3: clearFilter(); break;           // "Clear Filter"
+            // case 4: Cancel - do nothing
         }
     }
 
@@ -392,18 +406,14 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         String planIdStr = JOptionPane.showInputDialog(this, "Enter Plan ID to filter:");
         if (planIdStr != null && !planIdStr.trim().isEmpty()) {
             if (filterSubgoalsController != null) {
-                filterSubgoalsController.execute(planIdStr, false);  // Instance method call
-            } else {
-                JOptionPane.showMessageDialog(this, "Filter controller not available");
+                filterSubgoalsController.execute(planIdStr, null, false);  // Add null for subgoalName
             }
         }
     }
 
     private void filterByPriority() {
         if (filterSubgoalsController != null) {
-            filterSubgoalsController.execute(null, true);  // Instance method call
-        } else {
-            JOptionPane.showMessageDialog(this, "Filter controller not available");
+            filterSubgoalsController.execute(null, null, true);  // Add null for subgoalName
         }
     }
 
@@ -411,6 +421,15 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         CalendarState state = viewModel.getCalendarState();
         state.clearFilter();
         viewModel.firePropertyChanged();
+    }
+
+    private void filterBySubgoalName() {
+        String name = JOptionPane.showInputDialog(this, "Enter subgoal name to search for:");
+        if (name != null && !name.trim().isEmpty()) {
+            if (filterSubgoalsController != null) {
+                filterSubgoalsController.execute(null, name, false);
+            }
+        }
     }
 
 
