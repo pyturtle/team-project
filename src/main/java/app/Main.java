@@ -23,6 +23,7 @@ public class Main {
                 .addGeneratePlanUseCase()
                 .addSavePlanUseCase()
                 .addShowPlanUseCase()
+                .addFilterSubgoalsUseCase()
                 .addShowSubgoalUseCase()
                 .addSubgoalQnaUseCase()
                 .addLogoutUseCase()

@@ -91,4 +91,10 @@ public class Subgoal {
 
     /** @return whether the subgoal is marked as priority */
     public boolean isPriority() { return priority; }
+
+    @Override
+    public String toString() {
+        return name + " (id=" + id + ")";
+    }
+
 }

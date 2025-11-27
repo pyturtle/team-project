@@ -1,5 +1,4 @@
 package interface_adapter.show_subgoal;
-;
 import use_case.subgoal.show_subgoal.SetCompletedInputData;
 import use_case.subgoal.show_subgoal.SetPriorityInputData;
 import use_case.subgoal.show_subgoal.ShowSubgoalInputBoundary;
@@ -14,8 +13,7 @@ public class ShowSubgoalController {
     private final ShowSubgoalInputBoundary interactor;
 
     public ShowSubgoalController(ShowSubgoalInputBoundary interactor) {
-        this.interactor = interactor;
-    }
+        this.interactor = interactor;}
 
     public void execute(String subgoalId) {
         interactor.execute(new ShowSubgoalInputData(subgoalId));

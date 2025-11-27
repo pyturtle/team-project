@@ -1,11 +1,9 @@
 package view;
 
 import entity.subgoal.Subgoal;
-import interface_adapter.DialogManagerModel;
 import interface_adapter.calendar.CalendarViewModel;
 import interface_adapter.calendar.CalendarState;
-import interface_adapter.logout.LogoutController;
-import interface_adapter.plan.show_plans.ShowPlansController;
+import interface_adapter.filter_subgoals.FilterSubgoalsController;
 import interface_adapter.show_subgoal.ShowSubgoalController;
 import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
 
@@ -36,6 +34,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     private final JTextField goalInput;
     private JButton addGoalButton;
     private JButton removeGoalButton;
+    private ShowSubgoalController showSubgoalController;
 
     // Pagination for upcoming subgoals
     private int subgoalPageOffset = 0;
@@ -55,9 +54,13 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
 
     // For switching views. This is not a button
 
+    //filter
+    private JButton filterButton;
+    private FilterSubgoalsController filterSubgoalsController;
+
     // Subgoal data access for fetching actual subgoals
     private SubgoalDataAccessInterface subgoalDataAccess;
-    private ShowSubgoalController showSubgoalController;
+    //private ShowSubgoalController showSubgoalController;
 
     public CalendarView(CalendarViewModel viewModel,
                         SubgoalDataAccessInterface subgoalDataAccess) {
@@ -113,6 +116,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         goalInput = new JTextField(15);
         addGoalButton = new JButton("Add Subgoal");
         removeGoalButton = new JButton("Remove Subgoal");
+        filterButton = new JButton("Filter Subgoals");
 
         // Navigation buttons for upcoming subgoals
         prevSubgoalsButton = new JButton("<");
@@ -125,6 +129,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         goalControlPanel.add(goalInput);
         goalControlPanel.add(addGoalButton);
         goalControlPanel.add(removeGoalButton);
+        goalControlPanel.add(filterButton);
         goalControlPanel.add(openSubgoalButton);
 
         // Panel for subgoal navigation
@@ -142,10 +147,13 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         goalPanel.add(new JScrollPane(goalList), BorderLayout.CENTER);
         goalPanel.add(goalControlPanel, BorderLayout.SOUTH);
         add(goalPanel, BorderLayout.SOUTH);
+
+        // Action perofmred buttons
         prevMonthButton.addActionListener(this);
         nextMonthButton.addActionListener(this);
         addGoalButton.addActionListener(this);
         removeGoalButton.addActionListener(this);
+        filterButton.addActionListener(this);
         prevSubgoalsButton.addActionListener(this);
         nextSubgoalsButton.addActionListener(this);
         openSubgoalButton.addActionListener(this);
@@ -285,6 +293,8 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
                     "No Selection",
                     JOptionPane.INFORMATION_MESSAGE);
             }
+        } else if (src == filterButton) {
+            showFilterDialog();
         }
 
         // Day buttons inside the grid, so we can press each day
@@ -305,8 +315,38 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     public void propertyChange(PropertyChangeEvent evt) {
         CalendarState state = viewModel.getCalendarState();
 
-        // update upcoming subgoals
-        updateUpcomingSubgoals();
+        // Update the goal list display based on filter state
+        goalListModel.clear();
+        displayTextToSubgoalId.clear();
+        displayTextToCompleted.clear();
+
+        if (state.isFilterActive()) {
+            // Display filtered subgoals with same format as unfiltered
+            List<Subgoal> filteredSubgoals = state.getFilteredSubgoals();
+            System.out.println("CalendarView: Showing " + filteredSubgoals.size() + " filtered subgoals");
+
+            // Sort filtered subgoals by deadline, then by completion
+            filteredSubgoals.sort(Comparator
+                    .comparing(Subgoal::getDeadline)
+                    .thenComparing(Subgoal::isCompleted));
+
+            for (Subgoal subgoal : filteredSubgoals) {
+                String priorityFlag = subgoal.isPriority() ? " [PRIORITY]" : "";
+                String completedFlag = subgoal.isCompleted() ? " ✓" : "";
+                String displayText = subgoal.getDeadline() + " - " + subgoal.getName() + priorityFlag + completedFlag;
+                goalListModel.addElement(displayText);
+                displayTextToSubgoalId.put(displayText, subgoal.getId());
+                displayTextToCompleted.put(displayText, subgoal.isCompleted());
+            }
+
+            // Disable pagination for filtered results
+            prevSubgoalsButton.setEnabled(false);
+            nextSubgoalsButton.setEnabled(false);
+        } else {
+            // Display all goals for selected date (call updateUpcomingSubgoals or handle normally)
+            updateUpcomingSubgoals();
+        }
+
         updateCalendar();
 
         // error popups
@@ -314,7 +354,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
             JOptionPane.showMessageDialog(this, state.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             state.setErrorMessage("");
         }
-
     }
 
     private void updateUpcomingSubgoals() {
@@ -380,6 +419,80 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     public String getViewName() {
         return "CalendarView";
     }
+
+    //public void setLogoutController(LogoutController logoutController) {
+        //this.logoutController = logoutController;
+    //}
+
+    private void showFilterDialog() {
+        String[] options = {"By Plan ID", "By Subgoal Name", "Priority Only", "Clear Filter", "Cancel"};
+        int choice = JOptionPane.showOptionDialog(this,
+                "Filter subgoals:",
+                "Filter Subgoals",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
+
+        switch (choice) {
+            case 0: filterByPlanId(); break;        // "By Plan ID"
+            case 1: filterBySubgoalName(); break;   // "By Subgoal Name"
+            case 2: filterByPriority(); break;      // "Priority Only" - THIS WAS WRONG
+            case 3: clearFilter(); break;           // "Clear Filter"
+            // case 4: Cancel - do nothing
+        }
+    }
+
+    private void filterByPlanId() {
+        String planIdStr = JOptionPane.showInputDialog(this, "Enter Plan ID to filter:");
+        if (planIdStr != null && !planIdStr.trim().isEmpty()) {
+            if (filterSubgoalsController != null) {
+                String username = viewModel.getCalendarState().getUsername();
+                if (username != null) {
+                    filterSubgoalsController.execute(username, planIdStr, null, false);
+                } else {
+                    JOptionPane.showMessageDialog(this, "User not logged in", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+
+    private void filterByPriority() {
+        if (filterSubgoalsController != null) {
+            String username = viewModel.getCalendarState().getUsername();
+            if (username != null) {
+                filterSubgoalsController.execute(username, null, null, true);
+            } else {
+                JOptionPane.showMessageDialog(this, "User not logged in", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void clearFilter() {
+        CalendarState state = viewModel.getCalendarState();
+        state.clearFilter();
+        viewModel.firePropertyChanged();
+    }
+
+    private void filterBySubgoalName() {
+        String name = JOptionPane.showInputDialog(this, "Enter subgoal name to search for:");
+        if (name != null && !name.trim().isEmpty()) {
+            if (filterSubgoalsController != null) {
+                String username = viewModel.getCalendarState().getUsername();
+                if (username != null) {
+                    filterSubgoalsController.execute(username, null, name, false);
+                } else {
+                    JOptionPane.showMessageDialog(this, "User not logged in", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+
+    public void setFilterSubgoalsController(FilterSubgoalsController controller) {
+        this.filterSubgoalsController = controller;
+    }
+
     public void setShowSubgoalController(ShowSubgoalController showSubgoalController) {
         this.showSubgoalController = showSubgoalController;
     }
