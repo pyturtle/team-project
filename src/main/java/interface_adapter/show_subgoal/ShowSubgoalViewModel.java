@@ -23,7 +23,18 @@ public class ShowSubgoalViewModel extends ViewModel<ShowSubgoalState> {
     public void setSubgoals(List<Subgoal> subgoals) {
         ShowSubgoalState newState = getState();
         newState.setSubgoals(subgoals);
+        newState.setCurrentIndex(0);
         setState(newState);
+    }
+
+    public void setCurrentIndex(int index) {
+        ShowSubgoalState state = getState();
+        List<Subgoal> subgoals = state.getSubgoals();
+        if (subgoals != null && index >= 0 && index < subgoals.size()) {
+            state.setCurrentIndex(index);
+            state.setId(subgoals.get(index).getId());
+            setState(state);
+        }
     }
 
 }

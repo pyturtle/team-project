@@ -18,6 +18,7 @@ public class ShowSubgoalState {
     private String errorMessage = "";
 
     private List<Subgoal> subgoals = new ArrayList<>();
+    private int currentIndex = 0;
 
     public String getName() { return name; }
 
@@ -52,5 +53,17 @@ public class ShowSubgoalState {
     }
     public void setSubgoals(List<Subgoal> subgoals) {
         this.subgoals = subgoals;
+    }
+
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+    public void setCurrentIndex(int currentIndex) {
+        this.currentIndex = currentIndex;
+    }
+
+    public Subgoal getCurrentSubgoal() {
+        if (subgoals.isEmpty()) return null;
+        return subgoals.get(currentIndex);
     }
 }

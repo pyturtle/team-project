@@ -1,5 +1,6 @@
 package view;
 
+import entity.subgoal.Subgoal;
 import interface_adapter.show_subgoal.ShowSubgoalController;
 import interface_adapter.show_subgoal.ShowSubgoalState;
 import interface_adapter.show_subgoal.ShowSubgoalViewModel;
@@ -30,6 +31,8 @@ public class ShowSubgoalView extends JPanel implements PropertyChangeListener {
     private final JCheckBox priorityCheckBox = new JCheckBox("Priority");
     private final JCheckBox completeCheckBox = new JCheckBox("Complete");
     private final JButton qaButton = new JButton("Q/A");
+    private final JButton prevButton = new JButton("<");
+    private final JButton nextButton = new JButton(">");
 
     /**
      * Constructs a SubgoalView.
@@ -69,10 +72,13 @@ public class ShowSubgoalView extends JPanel implements PropertyChangeListener {
         JScrollPane scroll = new JScrollPane(descriptionArea);
         content.add(scroll, BorderLayout.CENTER);
 
+
         // Bottom: priority + Q/A button
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         bottomPanel.add(priorityCheckBox);
         bottomPanel.add(completeCheckBox);
+        bottomPanel.add(prevButton);
+        bottomPanel.add(nextButton);
         bottomPanel.add(qaButton);
         content.add(bottomPanel, BorderLayout.SOUTH);
 
@@ -98,6 +104,23 @@ public class ShowSubgoalView extends JPanel implements PropertyChangeListener {
             }
         });
 
+        prevButton.addActionListener(e -> {
+            ShowSubgoalState state = viewModel.getState();
+            if (state.getCurrentIndex() > 0) {
+                state.setCurrentIndex(state.getCurrentIndex() - 1);
+                updateViewFromState(state);
+            }
+        });
+
+        nextButton.addActionListener(e -> {
+            ShowSubgoalState state = viewModel.getState();
+            if (state.getCurrentIndex() < state.getSubgoals().size() - 1) {
+                state.setCurrentIndex(state.getCurrentIndex() + 1);
+                updateViewFromState(state);
+            }
+        });
+
+
         // Q/A button – open the Q/A dialog for this subgoal
         qaButton.addActionListener(e -> {
             // assume SubgoalView already tracks the currently opened subgoal id
@@ -113,6 +136,20 @@ public class ShowSubgoalView extends JPanel implements PropertyChangeListener {
         });
     }
 
+    private void updateViewFromState(ShowSubgoalState state) {
+        Subgoal current = state.getCurrentSubgoal();
+        if (current != null) {
+            nameLabel.setText(current.getName());
+            descriptionArea.setText(current.getDescription());
+            priorityCheckBox.setSelected(current.isPriority());
+            completeCheckBox.setSelected(current.isCompleted());
+            prevButton.setEnabled(state.getCurrentIndex() > 0);
+            nextButton.setEnabled(state.getCurrentIndex() < state.getSubgoals().size() - 1);
+            state.setId(current.getId());
+        }
+    }
+
+
     /**
      * Called when the ViewModel's state changes.
      * Updates the UI components.
@@ -120,11 +157,7 @@ public class ShowSubgoalView extends JPanel implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         ShowSubgoalState state = viewModel.getState();
-
-        nameLabel.setText(state.getName());
-        descriptionArea.setText(state.getDescription());
-        priorityCheckBox.setSelected(state.isPriority());
-        completeCheckBox.setSelected(state.isCompleted());
+        updateViewFromState(state);
 
         if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -134,7 +167,17 @@ public class ShowSubgoalView extends JPanel implements PropertyChangeListener {
         }
     }
 
+
     public String getViewName() {
         return viewName;
     }
+
+    public void openPopup() {
+        JDialog dialog = new JDialog((Frame) null, "Subgoal Details", true);
+        dialog.setContentPane(this);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
 }

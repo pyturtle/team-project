@@ -9,6 +9,8 @@ import interface_adapter.plan.show_plans.ShowPlansController;
 import interface_adapter.plan.show_plans.ShowPlansState;
 import interface_adapter.plan.show_plans.ShowPlansViewModel;
 import interface_adapter.show_subgoal.ShowSubgoalController;
+import interface_adapter.show_subgoal.ShowSubgoalViewModel;
+import view.ShowSubgoalView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,6 +35,10 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
     private ShowPlansController showPlansController;
     private DeletePlanController deletePlanController;
+
+    private ShowSubgoalViewModel showSubgoalViewModel = new ShowSubgoalViewModel();
+    private ShowSubgoalView showSubgoalView = new ShowSubgoalView(showSubgoalViewModel);
+
 
 
     private final JPanel plansGridPanel;
@@ -200,23 +206,29 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
                 String planId = e.getActionCommand(); // planId
                 String username = plan.getUsername();
 
-                //GETSUBGOALS LIST
+                // getSUBGOALS list
                 List<Subgoal> subgoals = showSubgoalController.getSubgoalsForPlan(planId, username);
 
-                StringBuilder sb = new StringBuilder();
-                for (Subgoal s : subgoals) {
-                    sb.append(s.getName())
-                            .append(" [Priority: ").append(s.isPriority())
-                            .append(", Completed: ").append(s.isCompleted())
-                            .append("]\n");
+                if (subgoals.isEmpty()) {
+                    JOptionPane.showMessageDialog(this,
+                            "No subgoals for this plan.",
+                            "Subgoals for " + plan.getName(),
+                            JOptionPane.INFORMATION_MESSAGE);
+                    return;
                 }
 
-                JOptionPane.showMessageDialog(this,
-                        sb.length() > 0 ? sb.toString() : "No subgoals yet.",
-                        "Subgoals for " + plan.getName(),
-                        JOptionPane.INFORMATION_MESSAGE);
+                // subgoals in fview model
+                showSubgoalViewModel.setSubgoals(subgoals);
+
+                // Refresh
+                showSubgoalView.propertyChange(null);
+
+                // popotup[
+                JOptionPane.showMessageDialog(this, showSubgoalView,
+                        "Subgoal Details - " + plan.getName(), JOptionPane.PLAIN_MESSAGE);
             }
         });
+
 
 
 
@@ -250,7 +262,9 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
     public void setShowSubgoalController(ShowSubgoalController controller) {
         this.showSubgoalController = controller;
+        showSubgoalView.setShowSubgoalController(controller);
     }
+
 
 
     public void setShowPlansController(ShowPlansController controller) {

@@ -5,6 +5,7 @@ import interface_adapter.calendar.CalendarViewModel;
 import interface_adapter.calendar.CalendarState;
 import interface_adapter.filter_subgoals.FilterSubgoalsController;
 import interface_adapter.show_subgoal.ShowSubgoalController;
+import interface_adapter.show_subgoal.ShowSubgoalViewModel;
 import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
 
 import javax.swing.*;
@@ -42,6 +43,8 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     private JButton prevSubgoalsButton;
     private JButton nextSubgoalsButton;
     private JButton openSubgoalButton;
+    private ShowSubgoalViewModel showSubgoalViewModel;
+
 
     // Map to track subgoal IDs for the displayed items
     private final Map<String, String> displayTextToSubgoalId = new HashMap<>();
@@ -61,6 +64,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     // Subgoal data access for fetching actual subgoals
     private SubgoalDataAccessInterface subgoalDataAccess;
     //private ShowSubgoalController showSubgoalController;
+
 
     public CalendarView(CalendarViewModel viewModel,
                         SubgoalDataAccessInterface subgoalDataAccess) {
@@ -168,6 +172,8 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         if (viewModel.getCalendarState().getUsername() != null) {
             updateUpcomingSubgoals();
         }
+        showSubgoalViewModel = new ShowSubgoalViewModel();
+
     }
     private void updateCalendar() {
         calendarGrid.removeAll(); //first start by removing everything so we can rewrite calendar.
@@ -280,18 +286,29 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
             if (selectedValue != null && showSubgoalController != null) {
                 String subgoalId = displayTextToSubgoalId.get(selectedValue);
                 if (subgoalId != null) {
-                    showSubgoalController.execute(subgoalId);
+                    // getall subgoals
+                    String username = viewModel.getCalendarState().getUsername();
+                    List<Subgoal> subgoals = showSubgoalController.getSubgoalsForPlan("", username);
+
+                    // viewmodel subgaols
+                    showSubgoalViewModel.setSubgoals(subgoals);
+                    showSubgoalViewModel.getState().setCurrentIndex(0);
+
+                    // popup, hopefully it works now?
+                    ShowSubgoalView subgoalView = new ShowSubgoalView(showSubgoalViewModel);
+                    subgoalView.setShowSubgoalController(showSubgoalController);
+                    subgoalView.openPopup();
                 } else {
                     JOptionPane.showMessageDialog(this,
-                        "Could not find subgoal ID for the selected item.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                            "Could not find subgoal ID for the selected item.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             } else if (selectedValue == null) {
                 JOptionPane.showMessageDialog(this,
-                    "Please select a subgoal first.",
-                    "No Selection",
-                    JOptionPane.INFORMATION_MESSAGE);
+                        "Please select a subgoal first.",
+                        "No Selection",
+                        JOptionPane.INFORMATION_MESSAGE);
             }
         } else if (src == filterButton) {
             showFilterDialog();
