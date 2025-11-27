@@ -185,4 +185,15 @@ public class FileSubgoalDataAccessObject implements SubgoalDataAccessInterface {
         this.save();
     }
 
+    @Override
+    public java.util.List<Subgoal> getSubgoalsByPlanId(String planId) {
+        java.util.List<Subgoal> result = new ArrayList<>();
+        for (Subgoal subgoal : subgoals.values()) {
+            if (subgoal.getPlanId().equals(planId)) {
+                result.add(subgoal);
+            }
+        }
+        return result;
+    }
+
 }

@@ -49,4 +49,12 @@ public interface SubgoalDataAccessInterface {
      * @param id the ID of the subgoal to delete
      */
     void deleteSubgoal(String id);
+
+    /**
+     * Returns all subgoals for a given plan ID.
+     *
+     * @param planId the plan ID to get subgoals for
+     * @return a list of all subgoals for the plan
+     */
+    java.util.List<Subgoal> getSubgoalsByPlanId(String planId);
 }

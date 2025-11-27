@@ -270,10 +270,10 @@ public class AppBuilder {
      * @return this builder
      */
     public AppBuilder addDeletePlanUseCase() {
-        final DeletePlanOutputBoundary deletePlanOutputBoundary = new DeletePlanPresenter(showPlansViewModel);
+        final DeletePlanOutputBoundary deletePlanOutputBoundary = new DeletePlanPresenter(showPlansViewModel, calendarViewModel);
 
         final DeletePlanInputBoundary deletePlanInteractor =
-                new DeletePlanInteractor(planDataAccessObject, deletePlanOutputBoundary);
+                new DeletePlanInteractor(planDataAccessObject, deletePlanOutputBoundary, subgoalDataAccessObject);
 
         final DeletePlanController deletePlanController = new DeletePlanController(deletePlanInteractor);
         showPlansView.setDeletePlanController(deletePlanController);
