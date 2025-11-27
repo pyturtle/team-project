@@ -80,6 +80,10 @@ import view.plan.ShowPlansView;
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
+import interface_adapter.filter_subgoals.FilterSubgoalsController;
+import interface_adapter.filter_subgoals.FilterSubgoalsPresenter;
+import use_case.filter_subgoals.FilterSubgoalsInputBoundary;
+import use_case.filter_subgoals.FilterSubgoalsInteractor;
 
 // Delete Plan functionality added
 public class AppBuilder {
@@ -138,6 +142,8 @@ public class AppBuilder {
     private CalendarView calendarView;
     private ShowSubgoalView showSubgoalView;
     private SubgoalQnaView subgoalQnaView;
+    private FilterSubgoalsController filterSubgoalsController;
+
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -162,7 +168,7 @@ public class AppBuilder {
 
     public AppBuilder addShowPlansView() {
         showPlansViewModel = new ShowPlansViewModel();
-        showPlansView = new ShowPlansView(showPlansViewModel, savePlanViewModel, viewManagerModel);
+        showPlansView = new ShowPlansView(showPlansViewModel, savePlanViewModel);
         partialViews.put(showPlansView.getViewName(), showPlansView);
         return this;
     }
@@ -265,15 +271,33 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addFilterSubgoalsUseCase() {
+        // Add these imports at the top of AppBuilder if not already there:
+        // import interface_adapter.filter_subgoals.FilterSubgoalsController;
+        // import interface_adapter.filter_subgoals.FilterSubgoalsPresenter;
+        // import use_case.filter_subgoals.FilterSubgoalsInputBoundary;
+        // import use_case.filter_subgoals.FilterSubgoalsInteractor;
+
+        final FilterSubgoalsPresenter filterSubgoalsPresenter = new FilterSubgoalsPresenter(calendarViewModel);
+        final FilterSubgoalsInputBoundary filterSubgoalsInteractor =
+                new FilterSubgoalsInteractor(subgoalDataAccessObject, filterSubgoalsPresenter);
+        filterSubgoalsController = new FilterSubgoalsController(filterSubgoalsInteractor);
+
+        System.out.println("AppBuilder: Created filterSubgoalsController: " + filterSubgoalsController);
+
+        calendarView.setFilterSubgoalsController(filterSubgoalsController);
+        return this;
+    }
+
     /**
      * Adds the Delete Plan Use Case to the application.
      * @return this builder
      */
     public AppBuilder addDeletePlanUseCase() {
-        final DeletePlanOutputBoundary deletePlanOutputBoundary = new DeletePlanPresenter(showPlansViewModel);
+        final DeletePlanOutputBoundary deletePlanOutputBoundary = new DeletePlanPresenter(showPlansViewModel, calendarViewModel);
 
         final DeletePlanInputBoundary deletePlanInteractor =
-                new DeletePlanInteractor(planDataAccessObject, deletePlanOutputBoundary);
+                new DeletePlanInteractor(planDataAccessObject, deletePlanOutputBoundary, subgoalDataAccessObject);
 
         final DeletePlanController deletePlanController = new DeletePlanController(deletePlanInteractor);
         showPlansView.setDeletePlanController(deletePlanController);
@@ -291,7 +315,7 @@ public class AppBuilder {
 
     public AppBuilder addSavePlanUseCase() {
         final SavePlanOutputBoundary savePlanOutputBoundary = new SavePlanPresenter(savePlanViewModel,
-                dialogManagerModel);
+                dialogManagerModel, calendarViewModel);
         final SavePlanInputBoundary savePlanInteractor = new SavePlanInteractor(savePlanOutputBoundary,
                 planDataAccessObject, subgoalDataAccessObject);
         SavePlanController savePlanController = new SavePlanController(savePlanInteractor);
@@ -311,13 +335,26 @@ public class AppBuilder {
 
     public AppBuilder addShowSubgoalUseCase() {
         ShowSubgoalOutputBoundary showSubgoalPresenter = new ShowSubgoalPresenter(
-                showSubgoalViewModel, dialogManagerModel);
+                showSubgoalViewModel, dialogManagerModel, calendarViewModel);
+
+        // Pass FilterSubgoalsController so presenter can re-apply filters after changes
+        System.out.println("AppBuilder.addShowSubgoalUseCase: filterSubgoalsController is " +
+                         (filterSubgoalsController == null ? "NULL" : "NOT NULL"));
+        if (filterSubgoalsController != null) {
+            ((ShowSubgoalPresenter) showSubgoalPresenter).setFilterSubgoalsController(filterSubgoalsController);
+            System.out.println("AppBuilder: Set filterSubgoalsController on ShowSubgoalPresenter");
+        } else {
+            System.out.println("AppBuilder: WARNING - filterSubgoalsController is null! Cannot set on presenter.");
+        }
+
         ShowSubgoalInputBoundary showSubgoalInteractor = new ShowSubgoalInteractor(
                 subgoalDataAccessObject,
                 showSubgoalPresenter);
         ShowSubgoalController showSubgoalController = new ShowSubgoalController(showSubgoalInteractor);
+
         showSubgoalView.setShowSubgoalController(showSubgoalController);
         calendarView.setShowSubgoalController(showSubgoalController);
+
         return this;
     }
 
@@ -350,7 +387,6 @@ public class AppBuilder {
                 new LogoutInteractor(userDataAccessObject, logoutOutputBoundary);
 
         final LogoutController logoutController = new LogoutController(logoutInteractor);
-        showPlansView.setLogoutController(logoutController);
         mainPageView.setLogoutController(logoutController);
         return this;
     }
@@ -369,6 +405,8 @@ public class AppBuilder {
 
         return application;
     }
+
+
 
 
 }

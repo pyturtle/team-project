@@ -1,6 +1,7 @@
 package use_case.subgoal.show_subgoal;
 
 import entity.subgoal.Subgoal;
+import java.util.List;  // Add this import
 
 /**
  * Data access interface for Subgoal entities used by the ShowSubgoal use case.
@@ -35,6 +36,25 @@ public interface SubgoalDataAccessInterface {
      */
     void updateCompleted(String id, boolean completed);
 
+    // ADD THESE FILTER METHODS:
+
+    /**
+     * Returns all subgoals for a specific plan and user.
+     *
+     * @param planId the plan ID to filter by
+     * @param userId the user ID to filter by
+     * @return list of subgoals matching the plan and user
+     */
+    List<Subgoal> getSubgoalsByPlan(String planId, String userId);
+
+    /**
+     * Returns all priority subgoals for a specific user.
+     *
+     * @param userId the user ID to filter by
+     * @return list of priority subgoals for the user
+     */
+    List<Subgoal> getPrioritySubgoals(String userId);
+
     /**
      * Returns all subgoals for a given username.
      *
@@ -42,4 +62,34 @@ public interface SubgoalDataAccessInterface {
      * @return a list of all subgoals for the user
      */
     java.util.List<Subgoal> getSubgoalsByUsername(String username);
+
+    /**
+     * Returns all subgoals for a specific user.
+     *
+     * @param userId the user ID to filter by
+     * @return list of all subgoals for the user
+     */
+    List<Subgoal> getAllSubgoalsForUser(String userId);
+
+    /**
+     * Saves an updated subgoal to the data store.
+     *
+     * @param subgoal the updated subgoal to save
+     */
+    void saveUpdatedSubgoal(Subgoal subgoal);
+
+    /**
+     * Deletes the subgoal with the given ID.
+     *
+     * @param id the ID of the subgoal to delete
+     */
+    void deleteSubgoal(String id);
+
+    /**
+     * Returns all subgoals for a given plan ID.
+     *
+     * @param planId the plan ID to get subgoals for
+     * @return a list of all subgoals for the plan
+     */
+    java.util.List<Subgoal> getSubgoalsByPlanId(String planId);
 }
