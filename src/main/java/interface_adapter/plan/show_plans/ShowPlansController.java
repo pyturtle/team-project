@@ -1,5 +1,7 @@
 package interface_adapter.plan.show_plans;
 
+import interface_adapter.plan.show_plan.ShowPlanController;
+import org.json.JSONObject;
 import use_case.plan.show_plans.ShowPlansInputBoundary;
 import use_case.plan.show_plans.ShowPlansInputData;
 
@@ -8,7 +10,20 @@ import use_case.plan.show_plans.ShowPlansInputData;
  */
 public class ShowPlansController {
 
+    //FOR SHOWING PLANS ALEXtqWANG
     private final ShowPlansInputBoundary showPlansInteractor;
+    private ShowPlanController showPlanController;
+    public void setShowPlanController(ShowPlanController showPlanController) {
+        this.showPlanController = showPlanController;
+    }
+    public void showSubgoalsForPlan(JSONObject planObject) {
+        if (showPlanController != null) {
+            showPlanController.execute(planObject);
+        } else {
+            System.err.println("ShowPlanController not set!");
+        }
+    }
+
 
     /**
      * Creates a new Show Plans Controller.

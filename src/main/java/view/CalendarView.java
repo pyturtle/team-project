@@ -7,6 +7,7 @@ import interface_adapter.logout.LogoutController;
 import interface_adapter.plan.show_plans.ShowPlansController;
 import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -356,8 +357,8 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     }
 
 
-    public void setShowPlansController(ShowPlansController showPlansController) {
-        this.showPlansController = showPlansController;
+    public void setShowPlansController(ShowPlansController controller) {
+        this.showPlansController = controller;
     }
 
     public void setSubgoalView(SubgoalView subgoalView) {

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "plan-001",
+    "name": "Learn Guitar",
+    "description": "Guitar in 6 months",
+    "username": "rapunzelsa"
+  },
+  {
+    "id": "plan-002",
+    "name": "Build Portfolio",
+    "description": "Create a professional portfolio website",
+    "username": "rapunzelsa"
+  }
+]
