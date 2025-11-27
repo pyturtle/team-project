@@ -10,24 +10,14 @@
     "username": "123"
   },
   {
-    "name": "Find Learning Resources",
-    "description": "Identify and choose your primary learning resources, such as online tutorials, beginner books, or a local guitar instructor.",
-    "id": "f23bd1e5-41bb-48e6-9807-d878d5c1312d",
+    "name": "Set Up Practice Space",
+    "description": "Arrange a dedicated and comfortable space for practicing, ensuring good lighting, a suitable chair, and a music stand (if applicable).",
+    "id": "bb07f312-5f53-4654-a3b0-a37f334dd733",
     "completed": false,
-    "deadline": "2026-01-31",
+    "deadline": "2025-12-16",
     "priority": false,
-    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
-    "username": "123"
-  },
-  {
-    "name": "Learn Your First Simple Song",
-    "description": "Apply your learned chords and strumming patterns to play a complete, simple song from start to finish.",
-    "id": "7bc9ac9f-695d-49b2-9c5f-54cdf5dbab9d",
-    "completed": false,
-    "deadline": "2026-04-11",
-    "priority": false,
-    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
-    "username": "123"
+    "plan_id": "78f04ad2-940f-4de2-b16b-456f2e0385a2",
+    "username": "1"
   },
   {
     "name": "Establish a Consistent Practice Routine",
@@ -40,14 +30,14 @@
     "username": "123"
   },
   {
-    "name": "Acquire a Guitar and Essential Gear",
-    "description": "Purchase or borrow a guitar along with necessary accessories such as picks, a tuner, a strap, and an amplifier (if electric).",
-    "id": "5e663df0-6735-4179-b8d3-f4b5a6063216",
+    "name": "Practice the Chosen Song (Hands Separate)",
+    "description": "Diligently practice the chosen song, focusing on playing each hand's part accurately and independently.",
+    "id": "438f6448-9c28-4838-9fd5-5e5d7e741f5d",
     "completed": false,
-    "deadline": "2026-01-24",
+    "deadline": "2026-03-24",
     "priority": false,
-    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
-    "username": "123"
+    "plan_id": "78f04ad2-940f-4de2-b16b-456f2e0385a2",
+    "username": "1"
   },
   {
     "name": "Learn Basic Guitar Fundamentals",
@@ -60,6 +50,16 @@
     "username": "123"
   },
   {
+    "name": "Master Basic Finger Exercises & Posture",
+    "description": "Learn and practice correct sitting posture, hand position, and fundamental finger exercises to develop strength and independence.",
+    "id": "0ed9058e-47b2-496a-94d9-667ba6eb4255",
+    "completed": false,
+    "deadline": "2026-01-20",
+    "priority": true,
+    "plan_id": "78f04ad2-940f-4de2-b16b-456f2e0385a2",
+    "username": "1"
+  },
+  {
     "name": "Practice Regular Strumming and Fingerpicking Patterns",
     "description": "Develop rhythm and dexterity by practicing various strumming patterns and simple fingerpicking exercises.",
     "id": "fb46ea83-b544-44e5-bc30-52cebecf2eb5",
@@ -68,6 +68,106 @@
     "priority": false,
     "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
     "username": "123"
+  },
+  {
+    "name": "Choose a Simple Beginner Song",
+    "description": "Select a very simple song (e.g., \"Mary Had a Little Lamb,\" \"Hot Cross Buns\") that is appropriate for a beginner to learn.",
+    "id": "9cd71ad1-b308-4b07-9065-cf6782409f31",
+    "completed": false,
+    "deadline": "2026-03-03",
+    "priority": false,
+    "plan_id": "78f04ad2-940f-4de2-b16b-456f2e0385a2",
+    "username": "1"
+  },
+  {
+    "name": "Find Learning Resources",
+    "description": "Identify and choose your primary learning resources, such as online tutorials, beginner books, or a local guitar instructor.",
+    "id": "f23bd1e5-41bb-48e6-9807-d878d5c1312d",
+    "completed": false,
+    "deadline": "2026-01-31",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Successfully Play the Chosen Song",
+    "description": "Perform the chosen song from beginning to end, demonstrating reasonable accuracy, rhythm, and musicality.",
+    "id": "b5bb9b86-2938-4f1d-a63d-37a404c80779",
+    "completed": false,
+    "deadline": "2026-04-21",
+    "priority": false,
+    "plan_id": "78f04ad2-940f-4de2-b16b-456f2e0385a2",
+    "username": "1"
+  },
+  {
+    "name": "Learn Your First Simple Song",
+    "description": "Apply your learned chords and strumming patterns to play a complete, simple song from start to finish.",
+    "id": "7bc9ac9f-695d-49b2-9c5f-54cdf5dbab9d",
+    "completed": false,
+    "deadline": "2026-04-11",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Acquire a Piano/Keyboard",
+    "description": "Obtain a working piano or digital keyboard, either by purchasing, borrowing, or renting one.",
+    "id": "38418555-f747-4f5e-8d35-c5551a7f7cc1",
+    "completed": false,
+    "deadline": "2025-12-09",
+    "priority": false,
+    "plan_id": "78f04ad2-940f-4de2-b16b-456f2e0385a2",
+    "username": "1"
+  },
+  {
+    "name": "Learn Basic Music Theory & Instrument Layout",
+    "description": "Familiarize yourself with the names of the white and black keys, basic note values (whole, half, quarter notes), and simple time signatures.",
+    "id": "9670ee80-bd95-460c-bf93-2a5344defd76",
+    "completed": false,
+    "deadline": "2025-12-30",
+    "priority": false,
+    "plan_id": "78f04ad2-940f-4de2-b16b-456f2e0385a2",
+    "username": "1"
+  },
+  {
+    "name": "Practice the Chosen Song (Hands Together)",
+    "description": "Combine both hands and practice playing the chosen song, synchronizing the movements and maintaining a steady tempo.",
+    "id": "fb55b170-1b23-4b4d-8cf3-dc59503a0323",
+    "completed": false,
+    "deadline": "2026-04-14",
+    "priority": false,
+    "plan_id": "78f04ad2-940f-4de2-b16b-456f2e0385a2",
+    "username": "1"
+  },
+  {
+    "name": "Acquire a Guitar and Essential Gear",
+    "description": "Purchase or borrow a guitar along with necessary accessories such as picks, a tuner, a strap, and an amplifier (if electric).",
+    "id": "5e663df0-6735-4179-b8d3-f4b5a6063216",
+    "completed": false,
+    "deadline": "2026-01-24",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Learn Major Scales (C, G, D)",
+    "description": "Practice playing the C, G, and D major scales accurately with both hands, focusing on smooth transitions and even rhythm.",
+    "id": "57ddc862-8a51-460f-9417-56e8024c059b",
+    "completed": false,
+    "deadline": "2026-02-10",
+    "priority": false,
+    "plan_id": "78f04ad2-940f-4de2-b16b-456f2e0385a2",
+    "username": "1"
+  },
+  {
+    "name": "Learn Basic Chords (C, G, F)",
+    "description": "Learn to form and play the C major, G major, and F major chords correctly with your left hand, and practice transitioning between them.",
+    "id": "9f477a25-e246-463f-9b28-5088f4943641",
+    "completed": false,
+    "deadline": "2026-02-24",
+    "priority": false,
+    "plan_id": "78f04ad2-940f-4de2-b16b-456f2e0385a2",
+    "username": "1"
   },
   {
     "name": "Master Basic Chords and Scales",

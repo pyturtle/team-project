@@ -1,7 +1,7 @@
 package data_access;
 
 import entity.subgoal.Subgoal;
-
+import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,9 +32,16 @@ public class InMemorySubgoalDataAccessObject implements SubgoalDataAccessInterfa
     }
 
     @Override
-    public Subgoal getSubgoalById(String subgoalId) {
+    public List<Subgoal> getSubgoalsByUsername(String username) {
         return subgoals.stream()
-                .filter(s -> s.getId().equals(subgoalId))
+                .filter(s -> s.getUsername().equals(username))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Subgoal getSubgoalById(String id) {
+        return subgoals.stream()
+                .filter(s -> s.getId().equals(id))
                 .findFirst()
                 .orElse(null);
     }
@@ -44,6 +51,43 @@ public class InMemorySubgoalDataAccessObject implements SubgoalDataAccessInterfa
         subgoals.removeIf(s -> s.getId().equals(subgoal.getId()));
         subgoals.add(subgoal);
     }
+
+    @Override
+    public void save() {
+        // In-memory doesn't need to save to persistent storage
+    }
+
+    @Override
+    public void save(Subgoal subgoal) {
+        subgoals.add(subgoal);
+    }
+
+    @Override
+    public void updatePriority(String id, boolean priority) {
+        Subgoal old = getSubgoalById(id);
+        if (old != null) {
+            Subgoal updated = new Subgoal(
+                    old.getId(), old.getPlanId(), old.getUsername(),
+                    old.getName(), old.getDescription(), old.getDeadline(),
+                    old.isCompleted(), priority
+            );
+            saveUpdatedSubgoal(updated);
+        }
+    }
+
+    @Override
+    public void updateCompleted(String id, boolean completed) {
+        Subgoal old = getSubgoalById(id);
+        if (old != null) {
+            Subgoal updated = new Subgoal(
+                    old.getId(), old.getPlanId(), old.getUsername(),
+                    old.getName(), old.getDescription(), old.getDeadline(),
+                    completed, old.isPriority()
+            );
+            saveUpdatedSubgoal(updated);
+        }
+    }
+
     // Helper for testing
     public void add(Subgoal s) {
         subgoals.add(s);

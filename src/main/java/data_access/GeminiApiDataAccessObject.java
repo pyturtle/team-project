@@ -9,7 +9,7 @@ import com.google.genai.types.GenerateContentResponse;
 import java.time.LocalDate;
 
 public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterface {
-    private final String apiKey = "AIzaSyAD_v1K4xQc4Uk45ecsU38_c_2ABx8zxYg";
+    private final String apiKey = "AIzaSyAaKY60ZyiNo-Tn0p0rUnERQzTllLD4FoQ";
     private final Client client;
 
     public GeminiApiDataAccessObject() {

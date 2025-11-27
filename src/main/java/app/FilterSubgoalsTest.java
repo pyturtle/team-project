@@ -1,19 +1,19 @@
 package app;
 
 import data_access.InMemorySubgoalDataAccessObject;
-import data_access.SubgoalDataAccessInterface;
 import entity.subgoal.Subgoal;
 import use_case.filter_subgoals.*;
-
 import java.time.LocalDate;
 import java.util.List;
+import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
+
 
 public class FilterSubgoalsTest {
 
     public static void main(String[] args) {
 
         // 1. Create fake DAO
-        SubgoalDataAccessInterface dao = new InMemorySubgoalDataAccessObject();
+        use_case.subgoal.show_subgoal.SubgoalDataAccessInterface dao = new InMemorySubgoalDataAccessObject();
 
         // 2. Add sample subgoals - FIXED: Use String IDs
         ((InMemorySubgoalDataAccessObject) dao).add(new Subgoal(

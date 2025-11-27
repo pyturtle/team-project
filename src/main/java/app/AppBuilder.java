@@ -289,12 +289,12 @@ public class AppBuilder {
         // import use_case.filter_subgoals.FilterSubgoalsInteractor;
 
         final FilterSubgoalsPresenter filterSubgoalsPresenter = new FilterSubgoalsPresenter(calendarViewModel);
-//        final FilterSubgoalsInputBoundary filterSubgoalsInteractor =
-//                new FilterSubgoalsInteractor(subgoalDataAccessObject, filterSubgoalsPresenter);
-//        final FilterSubgoalsController filterSubgoalsController =
-//                new FilterSubgoalsController(filterSubgoalsInteractor);
+        final FilterSubgoalsInputBoundary filterSubgoalsInteractor =
+                new FilterSubgoalsInteractor(subgoalDataAccessObject, filterSubgoalsPresenter);
+        final FilterSubgoalsController filterSubgoalsController =
+                new FilterSubgoalsController(filterSubgoalsInteractor);
 
-//        calendarView.setFilterSubgoalsController(filterSubgoalsController);
+        calendarView.setFilterSubgoalsController(filterSubgoalsController);
         return this;
     }
 

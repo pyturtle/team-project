@@ -1,6 +1,14 @@
-[{
-  "name": "Play Guitar",
-  "description": "A comprehensive plan to learn and start playing the guitar, from choosing an instrument to playing your first song.",
-  "id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
-  "username": "123"
-}]
+[
+  {
+    "name": "Play Guitar",
+    "description": "A comprehensive plan to learn and start playing the guitar, from choosing an instrument to playing your first song.",
+    "id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Play Piano",
+    "description": "Learn to play the piano from scratch and successfully perform a simple song.",
+    "id": "78f04ad2-940f-4de2-b16b-456f2e0385a2",
+    "username": "1"
+  }
+]
