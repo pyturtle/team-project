@@ -1,5 +1,4 @@
 package interface_adapter.subgoal_qna;
-
 import interface_adapter.DialogManagerModel;
 import use_case.subgoal.qna.SubgoalQnaOutputBoundary;
 import use_case.subgoal.qna.SubgoalQnaOutputData;

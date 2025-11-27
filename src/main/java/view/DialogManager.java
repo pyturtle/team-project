@@ -30,10 +30,10 @@ public class DialogManager implements PropertyChangeListener {
 
     private void createDialog(JPanel view)
     {
-        JDialog dialog = new JDialog();
+        JFrame dialog = new JFrame();
         dialog.setSize(400, 300);
         dialog.setLocationRelativeTo(null);   // center on screen
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         dialog.setContentPane(view);
         dialog.pack();
         dialog.setVisible(true);

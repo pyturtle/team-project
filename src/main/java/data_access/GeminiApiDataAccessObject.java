@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterface,
         SubgoalQnaGeminiDataAccessInterface {
-    private final String apiKey = "INSERT YOUR KEY HERE";
+    private final String apiKey = "INSERT YOUR API KEY HERE";
     private final Client client;
 
     public GeminiApiDataAccessObject() {
@@ -66,6 +66,27 @@ public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterfac
                     false);
         }
     }
+    @Override
+    public String getAnswerForQuestion(String userMessage) {
+        try {
+            GenerateContentResponse response = client.models.generateContent(
+                    "gemini-2.5-flash",
+                    "You are a helpful assistant helping a user with a subgoal in their plan. " +
+                            "Answer the following question clearly and concisely:\n\n" + userMessage +
+                            ". Do not apply any formating to your response.",
+                    null
+            );
+            String text = response.text();
+            if (text == null || text.trim().isEmpty()) {
+                return "Sorry, I couldn't get a response from Gemini.";
+            }
+            return text.trim();
+        }
+        catch (Exception e) {
+            return "Sorry, I couldn't get an answer from Gemini right now.";
+        }
+    }
+
 
     private boolean validateJsonObject(JSONObject responseObject) {
         boolean isValid;
@@ -90,25 +111,6 @@ public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterfac
             isValid = false;
         }
         return isValid;
-      
-    @Override
-    public String getAnswerForQuestion(String userMessage) {
-        try {
-            GenerateContentResponse response = client.models.generateContent(
-                    "gemini-2.5-flash",
-                    "You are a helpful assistant helping a user with a subgoal in their plan. " +
-                            "Answer the following question clearly and concisely:\n\n" + userMessage,
-                    null
-            );
-            String text = response.text();
-            if (text == null || text.trim().isEmpty()) {
-                return "Sorry, I couldn't get a response from Gemini.";
-            }
-            return text.trim();
-        }
-        catch (Exception e) {
-            return "Sorry, I couldn't get an answer from Gemini right now.";
-        }
     }
 
     private JSONObject prepareResponse(JSONObject responseObject, String responseMessage, boolean success) {

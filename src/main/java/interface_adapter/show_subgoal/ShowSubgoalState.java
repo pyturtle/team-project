@@ -6,6 +6,7 @@ package interface_adapter.show_subgoal;
  */
 public class ShowSubgoalState {
 
+    private String id = "";
     private String name = "";
     private String description = "";
     private boolean priority;
@@ -31,4 +32,12 @@ public class ShowSubgoalState {
     public String getErrorMessage() { return errorMessage; }
 
     public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }
