@@ -14,4 +14,5 @@ public interface SubgoalDataAccessInterface {
     List<Subgoal> getIncompleteSubgoals(String userId);// String, not int
     Subgoal getSubgoalById(String subgoalId);                         // String, not int
     void saveUpdatedSubgoal(Subgoal subgoal);
+    List<Subgoal> getSubgoalsByPlanId(String planId);
 }
