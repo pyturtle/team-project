@@ -272,12 +272,6 @@ public class AppBuilder {
     }
 
     public AppBuilder addFilterSubgoalsUseCase() {
-        // Add these imports at the top of AppBuilder if not already there:
-        // import interface_adapter.filter_subgoals.FilterSubgoalsController;
-        // import interface_adapter.filter_subgoals.FilterSubgoalsPresenter;
-        // import use_case.filter_subgoals.FilterSubgoalsInputBoundary;
-        // import use_case.filter_subgoals.FilterSubgoalsInteractor;
-
         final FilterSubgoalsPresenter filterSubgoalsPresenter = new FilterSubgoalsPresenter(calendarViewModel);
         final FilterSubgoalsInputBoundary filterSubgoalsInteractor =
                 new FilterSubgoalsInteractor(subgoalDataAccessObject, filterSubgoalsPresenter);
@@ -368,6 +362,7 @@ public class AppBuilder {
         SubgoalQnaGeminiDataAccessInterface qnaGeminiGateway = generatePlanDataAccessObject;
         SubgoalQnaInputBoundary subgoalQnaInteractor =
                 new SubgoalQnaInteractor(subgoalQnaDataAccessObject,
+                        subgoalDataAccessObject,
                         qnaGeminiGateway,
                         subgoalQnaPresenter);
         SubgoalQnaController subgoalQnaController =

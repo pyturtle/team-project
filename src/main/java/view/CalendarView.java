@@ -31,9 +31,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     // Goal buttons, on the bottom i think...
     private final DefaultListModel<String> goalListModel;
     private final JList<String> goalList;
-    private final JTextField goalInput;
-    private JButton addGoalButton;
-    private JButton removeGoalButton;
     private ShowSubgoalController showSubgoalController;
 
     //calendar buttons: below is the map to store if each date has a goal
@@ -125,9 +122,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
             }
         });
 
-        goalInput = new JTextField(15);
-        addGoalButton = new JButton("Add Subgoal");
-        removeGoalButton = new JButton("Remove Subgoal");
         filterButton = new JButton("Filter Subgoals");
 
         // Navigation buttons for upcoming subgoals
@@ -138,9 +132,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         openSubgoalButton = new JButton("Open Selected Subgoal");
 
         JPanel goalControlPanel = new JPanel();
-        goalControlPanel.add(goalInput);
-        goalControlPanel.add(addGoalButton);
-        goalControlPanel.add(removeGoalButton);
         goalControlPanel.add(filterButton);
         goalControlPanel.add(openSubgoalButton);
 
@@ -163,8 +154,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         // Action perofmred buttons
         prevMonthButton.addActionListener(this);
         nextMonthButton.addActionListener(this);
-        addGoalButton.addActionListener(this);
-        removeGoalButton.addActionListener(this);
         filterButton.addActionListener(this);
         prevSubgoalsButton.addActionListener(this);
         nextSubgoalsButton.addActionListener(this);
@@ -271,44 +260,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         }
 
         // goals
-        else if (src == addGoalButton) {
-            String text = goalInput.getText().trim();
-            if (!text.isEmpty()) {
-                state.addGoal(selectedDate, text); // add a goal
-                goalInput.setText("");
-                viewModel.firePropertyChanged(); // refresh goals
-            }
-        } else if (src == removeGoalButton) {
-            String selectedValue = goalList.getSelectedValue();
-            if (selectedValue != null) {
-                String subgoalId = displayTextToSubgoalId.get(selectedValue);
-                if (subgoalId != null && subgoalDataAccess != null) {
-                    // Confirm deletion
-                    int confirm = JOptionPane.showConfirmDialog(this,
-                            "Are you sure you want to permanently delete this subgoal?",
-                            "Confirm Delete",
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.WARNING_MESSAGE);
-
-                    if (confirm == JOptionPane.YES_OPTION) {
-                        // Delete the subgoal from the database
-                        subgoalDataAccess.deleteSubgoal(subgoalId);
-                        // Manually refresh the view
-                        viewModel.firePropertyChanged();
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(this,
-                            "Could not find subgoal ID for the selected item.",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-                JOptionPane.showMessageDialog(this,
-                        "Please select a subgoal first.",
-                        "No Selection",
-                        JOptionPane.INFORMATION_MESSAGE);
-            }
-        } else if (src == prevSubgoalsButton) {
+        if (src == prevSubgoalsButton) {
             if (subgoalPageOffset > 0) {
                 subgoalPageOffset -= SUBGOALS_PER_PAGE;
                 updateUpcomingSubgoals();
@@ -462,10 +414,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     public String getViewName() {
         return "CalendarView";
     }
-
-    //public void setLogoutController(LogoutController logoutController) {
-        //this.logoutController = logoutController;
-    //}
 
     private void showFilterDialog() {
         String[] options = {"By Plan ID", "By Subgoal Name", "Priority Only", "Clear Filter", "Cancel"};
