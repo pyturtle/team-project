@@ -133,17 +133,6 @@ public class ShowSubgoalView extends JPanel implements PropertyChangeListener {
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
-
-        SwingUtilities.invokeLater(() -> {
-            Window window = SwingUtilities.getWindowAncestor(ShowSubgoalView.this);
-            if (window != null) {
-                window.toFront();
-                window.requestFocus();
-                window.setAlwaysOnTop(true);
-            }
-        });
-
-
     }
 
     public String getViewName() {
