@@ -36,6 +36,7 @@ public class ShowSubgoalPresenter implements ShowSubgoalOutputBoundary {
         // Open the dialog when called from execute() method
         dialogManagerModel.setState("show subgoal");
         dialogManagerModel.firePropertyChange();
+
     }
 
     /**
