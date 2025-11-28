@@ -1,5 +1,9 @@
 package interface_adapter.show_subgoal;
 
+import entity.subgoal.Subgoal;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * State object for the ShowSubgoalViewModel.
  * Stores the values that the Subgoal popup view displays.
@@ -12,6 +16,8 @@ public class ShowSubgoalState {
     private boolean priority;
     private boolean completed;
     private String errorMessage = "";
+
+    private List<Subgoal> subgoals = new ArrayList<>();
 
     public String getName() { return name; }
 
@@ -39,5 +45,12 @@ public class ShowSubgoalState {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public List<Subgoal> getSubgoals() {
+        return subgoals;
+    }
+    public void setSubgoals(List<Subgoal> subgoals) {
+        this.subgoals = subgoals;
     }
 }

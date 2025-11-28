@@ -70,16 +70,6 @@
     "username": "1"
   },
   {
-    "name": "Refinement & Finishing Touches",
-    "description": "After the main construction, focus on refining details, adding aesthetics, polishing surfaces, or integrating final components. Ensure it meets your initial vision for appearance and quality.",
-    "id": "c7347e18-64ea-4be4-a0d0-5b066d5dd6e4",
-    "completed": false,
-    "deadline": "2026-02-26",
-    "priority": false,
-    "plan_id": "fa76f501-4f8d-4c15-8a62-86317991e153",
-    "username": "1"
-  },
-  {
     "name": "Find Learning Resources",
     "description": "Identify and choose your primary learning resources, such as online tutorials, beginner books, or a local guitar instructor.",
     "id": "f23bd1e5-41bb-48e6-9807-d878d5c1312d",
@@ -115,7 +105,7 @@
     "id": "b1772e04-2377-41cb-b7b8-4f0bf05e7bf0",
     "completed": false,
     "deadline": "2026-02-12",
-    "priority": false,
+    "priority": true,
     "plan_id": "fa76f501-4f8d-4c15-8a62-86317991e153",
     "username": "1"
   },
@@ -133,7 +123,7 @@
     "name": "Testing & Evaluation",
     "description": "Thoroughly test your creation to ensure it functions as intended. Gather feedback if applicable. Make any final adjustments or improvements based on testing results.",
     "id": "68bc6e6f-39fb-41f6-9026-9d58ab62999e",
-    "completed": false,
+    "completed": true,
     "deadline": "2026-03-12",
     "priority": false,
     "plan_id": "fa76f501-4f8d-4c15-8a62-86317991e153",

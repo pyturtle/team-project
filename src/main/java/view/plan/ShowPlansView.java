@@ -1,12 +1,16 @@
 package view.plan;
 
 import entity.plan.Plan;
+import entity.subgoal.Subgoal;
 import interface_adapter.plan.delete_plan.DeletePlanController;
 import interface_adapter.plan.save_plan.SavePlanState;
 import interface_adapter.plan.save_plan.SavePlanViewModel;
 import interface_adapter.plan.show_plans.ShowPlansController;
 import interface_adapter.plan.show_plans.ShowPlansState;
 import interface_adapter.plan.show_plans.ShowPlansViewModel;
+import interface_adapter.show_subgoal.ShowSubgoalController;
+import interface_adapter.show_subgoal.ShowSubgoalViewModel;
+import view.ShowSubgoalView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,10 +32,12 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     private final String viewName = "ShowPlansView";
     private final ShowPlansViewModel showPlansViewModel;
     private final SavePlanViewModel savePlanViewModel;
+    private final ShowSubgoalViewModel showSubgoalViewModel = new ShowSubgoalViewModel();
 
     private ShowPlansController showPlansController;
     private DeletePlanController deletePlanController;
 
+    private ShowSubgoalView showSubgoalView;
 
     private final JPanel plansGridPanel;
     private final JButton previousButton;
@@ -46,6 +52,7 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
         this.showPlansViewModel.addPropertyChangeListener(this);
         this.savePlanViewModel.addPropertyChangeListener(this);
+        showSubgoalView = new ShowSubgoalView(showSubgoalViewModel);
 
         this.setLayout(new BorderLayout());
 
@@ -135,6 +142,11 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         plansGridPanel.repaint();
     }
 
+    public void setShowSubgoalView(ShowSubgoalView view) {
+        this.showSubgoalView = view;
+    }
+
+
     /**
      * Creates a panel for a single plan.
      * @param plan the plan to display
@@ -157,10 +169,11 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         buttonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 10));
 
         final JButton subgoalsButton = new JButton(ShowPlansViewModel.SUBGOALS_BUTTON_LABEL);
+        subgoalsButton.setActionCommand(plan.getId());
         final JButton deleteButton = new JButton(ShowPlansViewModel.DELETE_BUTTON_LABEL);
 
-        // Subgoals button not implemented yet
-        subgoalsButton.setEnabled(false);
+        // ENABLING THE BUTTON!!!!
+        subgoalsButton.setEnabled(true);
 
         // Enable delete button and add action listener
         deleteButton.addActionListener(e -> {
@@ -191,6 +204,72 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
                 loadPlans(username, 0);
             }
         });
+        // subgoals BUTTON actionLISTENR!
+        subgoalsButton.addActionListener(e -> {
+            if (showSubgoalController != null) {
+                String planId = e.getActionCommand();
+                String username = plan.getUsername();
+                List<Subgoal> subgoals = showSubgoalController.getSubgoalsForPlan(planId, username);
+
+                JDialog subgoalDialog = new JDialog((Frame) null, "Subgoals for " + plan.getName(), true);
+                subgoalDialog.setLayout(new BorderLayout());
+                subgoalDialog.setSize(400, 400);
+                subgoalDialog.setLocationRelativeTo(null);
+
+                JLabel planTitle = new JLabel(plan.getName(), SwingConstants.CENTER);
+                planTitle.setFont(new Font("Arial", Font.BOLD, 18));
+                planTitle.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+                subgoalDialog.add(planTitle, BorderLayout.NORTH);
+
+                JPanel subgoalsPanel = new JPanel();
+                subgoalsPanel.setLayout(new BoxLayout(subgoalsPanel, BoxLayout.Y_AXIS));
+                JScrollPane scrollPane = new JScrollPane(subgoalsPanel);
+                subgoalDialog.add(scrollPane, BorderLayout.CENTER);
+
+                for (Subgoal s : subgoals) {
+                    JPanel box = new JPanel();
+                    box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
+                    box.setBorder(BorderFactory.createCompoundBorder(
+                            BorderFactory.createLineBorder(Color.GRAY, 1),
+                            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+                    ));
+                    box.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
+
+                    JLabel nameLabel = new JLabel(s.getName());
+                    nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
+                    box.add(nameLabel);
+
+                    JLabel descLabel = new JLabel("<html><i>" + s.getDescription() + "</i></html>");
+                    box.add(descLabel);
+
+                    JLabel dueLabel = new JLabel("Due: " + s.getDeadline());
+                    box.add(dueLabel);
+
+                    // ithink this lets me click it now.
+                    box.addMouseListener(new java.awt.event.MouseAdapter() {
+                        public void mouseClicked(java.awt.event.MouseEvent evt) {
+                            if (showSubgoalController != null && showSubgoalView != null) {
+                                showSubgoalController.execute(s.getId());  //this uses the same viewon calendarvew
+                            }
+
+                        }
+                    });
+
+
+
+
+                    subgoalsPanel.add(Box.createVerticalStrut(5));
+                    subgoalsPanel.add(box);
+                }
+
+
+
+                subgoalDialog.setVisible(true);
+            }
+        });
+
+
+
 
         buttonsPanel.add(subgoalsButton);
         buttonsPanel.add(deleteButton);
@@ -218,6 +297,13 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         return viewName;
     }
 
+    private ShowSubgoalController showSubgoalController;
+
+    public void setShowSubgoalController(ShowSubgoalController controller) {
+        this.showSubgoalController = controller;
+    }
+
+
     public void setShowPlansController(ShowPlansController controller) {
         this.showPlansController = controller;
     }
@@ -225,5 +311,23 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     public void setDeletePlanController(DeletePlanController controller) {
         this.deletePlanController = controller;
     }
+
+    public JButton getSubgoalsButton(JPanel planPanel) {
+        for (Component comp : planPanel.getComponents()) {
+            if (comp instanceof JPanel) {
+                JPanel buttonsPanel = (JPanel) comp;
+                for (Component btn : buttonsPanel.getComponents()) {
+                    if (btn instanceof JButton) {
+                        JButton button = (JButton) btn;
+                        if (ShowPlansViewModel.SUBGOALS_BUTTON_LABEL.equals(button.getText())) {
+                            return button;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 
 }

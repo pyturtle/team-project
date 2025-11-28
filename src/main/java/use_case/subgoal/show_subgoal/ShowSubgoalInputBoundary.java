@@ -1,5 +1,9 @@
 package use_case.subgoal.show_subgoal;
 
+import entity.subgoal.Subgoal;
+
+import java.util.List;
+
 /**
  * Input boundary for the ShowSubgoal use case.
  * Controllers call this interface to trigger showing a subgoal,
@@ -27,4 +31,6 @@ public interface ShowSubgoalInputBoundary {
      * @param inputData the input data containing the subgoal ID and new completed value
      */
     void setCompleted(SetCompletedInputData inputData);
+
+    List<Subgoal> getSubgoalsByPlan(String planId, String username);
 }
