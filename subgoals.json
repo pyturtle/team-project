@@ -100,6 +100,16 @@
     "username": "1"
   },
   {
+    "name": "Ideation & NOT Brainstorming",
+    "description": "DONT Dedicate time to brainstorm various ideas for what you want to make. Consider your interests, available resources, and desired outcome. Select one specific idea to pursue.",
+    "id": "401b4936-6e4e-4d3a-867e-1361e73685967",
+    "completed": false,
+    "deadline": "2025-12-11",
+    "priority": false,
+    "plan_id": "fa76f501-4f8d-4c15-8a62-86317991e153",
+    "username": "1"
+  },
+  {
     "name": "Construction & Execution",
     "description": "Proceed with the main construction or implementation of your 'something' based on your plan and any lessons learned from prototyping. Focus on building the core structure or functionality.",
     "id": "b1772e04-2377-41cb-b7b8-4f0bf05e7bf0",
