@@ -6,6 +6,7 @@ import interface_adapter.logout.LogoutController;
 import interface_adapter.plan.show_plans.ShowPlansController;
 import interface_adapter.plan.show_plans.ShowPlansState;
 import interface_adapter.plan.show_plans.ShowPlansViewModel;
+import view.view_manager.PartialViewManager;
 
 import javax.swing.*;
 import java.awt.*;

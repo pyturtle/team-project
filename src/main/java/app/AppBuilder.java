@@ -9,7 +9,6 @@ import data_access.file.FileUserDataAccessObject;
 import data_access.interfaces.subgoal.SubgoalQnaDataAccessInterface;
 import data_access.interfaces.subgoal.SubgoalQnaGeminiDataAccessInterface;
 import entity.user.UserFactory;
-import entity.plan.PlanFactory;
 import entity.subgoal.SubgoalBuilder;
 import interface_adapter.DialogManagerModel;
 import interface_adapter.PartialViewModel;
@@ -90,11 +89,13 @@ import use_case.filter_subgoals.FilterSubgoalsInputBoundary;
 import use_case.filter_subgoals.FilterSubgoalsInteractor;
 import view.subgoal.ShowSubgoalView;
 import view.subgoal.SubgoalQnaView;
+import view.view_manager.DialogManager;
+import view.view_manager.PartialViewManager;
+import view.view_manager.ViewManager;
 
 // Delete Plan functionality added
 public class AppBuilder {
     final UserFactory userFactory = new UserFactory();
-    final PlanFactory planFactory = new PlanFactory();
 
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();

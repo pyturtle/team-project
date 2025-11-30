@@ -1,4 +1,4 @@
-package view;
+package view.view_manager;
 
 import interface_adapter.DialogManagerModel;
 

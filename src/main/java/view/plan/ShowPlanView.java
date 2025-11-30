@@ -14,6 +14,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * ShowPlanView is a view that displays a generated plan,
+ * including its name, description, and list of subgoals, and allows
+ * the user to save the plan if it does not already exist.
+ */
 public class ShowPlanView extends JPanel implements PropertyChangeListener {
 
     private final String viewName = "show plan";
@@ -26,6 +31,13 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
     private final JButton createPlanButton = new JButton(ShowPlanViewModel.CREATE_BUTTON_LABEL);
     private SavePlanController savePlanController;
 
+    /**
+     * Creates a new ShowPlanView and registers it as a listener
+     * to the provided ShowPlanViewModel.
+     * The view displays plan information and subgoals and provides
+     * a button to create the plan in persistent storage.
+     * @param showPlanViewModel the view model whose state changes this view observes
+     */
     public ShowPlanView(ShowPlanViewModel showPlanViewModel) {
         showPlanViewModel.addPropertyChangeListener(this);
 
@@ -62,7 +74,6 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
         subgoalsPanel.setLayout(new BoxLayout(subgoalsPanel, BoxLayout.Y_AXIS));
         subgoalsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-
         subgoalsPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
 
         subgoalsContainer.setViewportView(subgoalsPanel);
@@ -85,6 +96,12 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
         add(createPlanButton);
     }
 
+    /**
+     * Handles property change events from the ShowPlanViewModel.
+     * Updates the labels, subgoals list, and create button enabled state
+     * based on the new ShowPlanState.
+     * @param evt the property change event containing the new state
+     */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         ShowPlanState newState = (ShowPlanState) evt.getNewValue();
@@ -115,6 +132,14 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
         subgoalsPanel.repaint();
     }
 
+    /**
+     * Creates a panel showing a single subgoal with its name,
+     * description, and deadline.
+     * @param name the subgoal name
+     * @param description the subgoal description
+     * @param deadline the subgoal deadline date
+     * @return a panel displaying the subgoal information
+     */
     private JPanel createSubgoalPanel(String name, String description, LocalDate deadline) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -144,6 +169,11 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
         return panel;
     }
 
+    /**
+     * Creates a horizontal separator used to visually divide subgoals
+     * and sections within the view.
+     * @return a configured JSeparator instance
+     */
     private JSeparator createDivider() {
         JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
         separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
@@ -152,10 +182,18 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
         return separator;
     }
 
+    /**
+     * Sets the controller used to save the displayed plan when the create button is pressed.
+     * @param savePlanController the controller responsible for the save plan use case
+     */
     public void setSavePlanController(SavePlanController savePlanController) {
         this.savePlanController = savePlanController;
     }
 
+    /**
+     * Returns the logical name of this view used by the dialog manager.
+     * @return the view name identifier
+     */
     public String getViewName() {
         return viewName;
     }

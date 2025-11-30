@@ -12,6 +12,11 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+/**
+ * GeneratePlanView is a view that lets the user enter a prompt to generate a plan,
+ * displays the conversation messages, and provides actions to show the generated plan
+ * or try generating it again.
+ */
 public class GeneratePlanView extends JPanel implements PropertyChangeListener {
     private final JTextField userMessageInputField = new JTextField(25);
     private final JPanel messagesPanel = new JPanel();
@@ -22,18 +27,20 @@ public class GeneratePlanView extends JPanel implements PropertyChangeListener {
     private GeneratePlanController generatePlanController;
     private ShowPlanController showPlanController;
 
+    /**
+     * Creates a new GeneratePlanView and binds it to the given view model.
+     * The view sets up all UI components and registers as a property change listener.
+     * @param generatePlanViewModel the view model that provides state for this view
+     */
     public GeneratePlanView(GeneratePlanViewModel generatePlanViewModel) {
         generatePlanViewModel.addPropertyChangeListener(this);
-
 
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setOpaque(false);
-
 
         final JLabel title = new JLabel(GeneratePlanViewModel.TITLE_LABEL);
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -42,10 +49,8 @@ public class GeneratePlanView extends JPanel implements PropertyChangeListener {
 
         centerPanel.add(Box.createVerticalStrut(10));
 
-
         messagesPanel.setLayout(new BoxLayout(messagesPanel, BoxLayout.Y_AXIS));
         messagesPanel.setOpaque(false);
-
 
         messagesPanel.setBorder(
                 BorderFactory.createCompoundBorder(
@@ -61,9 +66,7 @@ public class GeneratePlanView extends JPanel implements PropertyChangeListener {
 
         centerPanel.add(messagesContainer);
 
-
         this.add(centerPanel, BorderLayout.CENTER);
-
 
         final JPanel userInputPanel = new JPanel();
         userInputPanel.setLayout(new BoxLayout(userInputPanel, BoxLayout.X_AXIS));
@@ -80,9 +83,7 @@ public class GeneratePlanView extends JPanel implements PropertyChangeListener {
         userInputPanel.add(Box.createHorizontalStrut(8));
         userInputPanel.add(sendButton);
 
-
         this.add(userInputPanel, BorderLayout.SOUTH);
-
 
         sendButton.addActionListener(
                 evt -> {
@@ -103,7 +104,12 @@ public class GeneratePlanView extends JPanel implements PropertyChangeListener {
                 });
     }
 
-
+    /**
+     * Handles property change events from the GeneratePlanViewModel.
+     * When the state changes, this method updates the UI with the response message,
+     * and either shows a button to view the plan or to try again.
+     * @param evt the property change event containing the new state
+     */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         final Object newState = evt.getNewValue();
@@ -135,11 +141,15 @@ public class GeneratePlanView extends JPanel implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Starts the generate plan use case in a background thread using SwingWorker.
+     * This keeps the UI responsive while the plan is being generated.
+     * @param userMessage the message entered by the user to generate a plan
+     */
     private void startGeneratePlanInBackground(String userMessage) {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
-
                 generatePlanController.execute(userMessage);
                 return null;
             }
@@ -147,6 +157,11 @@ public class GeneratePlanView extends JPanel implements PropertyChangeListener {
         worker.execute();
     }
 
+    /**
+     * Creates a panel containing a button that, when clicked, triggers showing the generated plan.
+     * @param planObject the JSON object representing the generated plan
+     * @return a panel containing the Show Plan button
+     */
     private JPanel createShowPlanButton(JSONObject planObject) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -158,6 +173,12 @@ public class GeneratePlanView extends JPanel implements PropertyChangeListener {
         return panel;
     }
 
+    /**
+     * Creates a panel containing a button that retries plan generation with the given message.
+     * When clicked, the button is disabled and the generate plan process is started again.
+     * @param userMessage the message to reuse when retrying plan generation
+     * @return a panel containing the Try Again button
+     */
     private JPanel createTryAgainButton(String userMessage) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -174,14 +195,26 @@ public class GeneratePlanView extends JPanel implements PropertyChangeListener {
         return panel;
     }
 
+    /**
+     * Returns the logical name of this view used by the view manager.
+     * @return the view name identifier
+     */
     public String getViewName() {
         return "generate plan";
     }
 
+    /**
+     * Sets the controller used to trigger the generate plan use case.
+     * @param generatePlanController the controller to use for plan generation
+     */
     public void setGeneratePlanController(GeneratePlanController generatePlanController) {
         this.generatePlanController = generatePlanController;
     }
 
+    /**
+     * Sets the controller used to trigger the show plan use case.
+     * @param showPlanController the controller to use for showing the generated plan
+     */
     public void setShowPlanController(ShowPlanController showPlanController) {
         this.showPlanController = showPlanController;
     }
