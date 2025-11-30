@@ -50,26 +50,6 @@ class FilterSubgoalsInteractorTest {
         assertTrue(presenter.lastOutputData.getPriorityOnly());
     }
 
-//    @Test
-//    void testFilterByPlanId() {
-//        // Arrange
-//        FilterSubgoalsInputData inputData = new FilterSubgoalsInputData(
-//                USER_ID, PLAN_ID, null, false
-//        );
-//
-//        Subgoal mockSubgoal = createMockSubgoal("subgoal1", "Plan Subgoal");
-//        subgoalDAO.setSubgoalsByPlanId(Arrays.asList(mockSubgoal));
-//
-//        // Act
-//        interactor.filter(inputData);
-//
-//        // Assert
-//        assertEquals("getSubgoalsByPlanId", subgoalDAO.lastCalledMethod);
-//        assertEquals(PLAN_ID, subgoalDAO.lastPlanId);
-//        assertEquals(1, presenter.lastOutputData.getFilteredSubgoals().size());
-//        assertEquals(PLAN_ID, presenter.lastOutputData.getPlanId());
-//        assertFalse(presenter.lastOutputData.getPriorityOnly());
-//    }
 
     @Test
     void testFilterBySubgoalName() {
