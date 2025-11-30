@@ -19,7 +19,7 @@ import data_access.interfaces.subgoal.SubgoalQnaGeminiDataAccessInterface;
 public class GeminiApiDataAccessObject
         implements GeneratePlanDataAccessInterface, SubgoalQnaGeminiDataAccessInterface {
 
-    private final String apiKey = "AIzaSyAocuTT3FAEL2-C_OZjIxSPZ6CDox4rRNw";
+    private final String apiKey = "AIzaSyA9Jnzup3cQapCPuDcwBev3RVlRbbaxhSI";
     private final Client client;
 
     /**
@@ -44,6 +44,7 @@ public class GeminiApiDataAccessObject
     public JSONObject getPlan(String userMessage) {
         boolean success = true;
         String responseMessage = "Plan generated successfully!";
+        JSONObject responseObject = new JSONObject();
         try {
             final GenerateContentResponse response = client.models.generateContent(
                     "gemini-2.5-flash",
@@ -74,7 +75,7 @@ public class GeminiApiDataAccessObject
             final String responseText = (first >= 0 && last > first)
                     ? rawResult.substring(first + 1, last)
                     : "";
-            final JSONObject responseObject = new JSONObject(responseText);
+            responseObject = new JSONObject(responseText);
             final boolean isValid = validateJsonObject(responseObject);
             if (!isValid) {
                 responseMessage = "Something went wrong! Please, try again.";
@@ -85,7 +86,7 @@ public class GeminiApiDataAccessObject
             responseMessage = "Something went wrong! Please, try again.";
             success = false;
         }
-        return prepareResponse(new JSONObject(), responseMessage, success);
+        return prepareResponse(responseObject, responseMessage, success);
     }
 
     /**
