@@ -14,6 +14,7 @@ import use_case.subgoal.save_subgoal.SaveSubgoalInputData;
  * and sends the result to the presenter.
  */
 public class SavePlanInteractor implements SavePlanInputBoundary {
+
     private final SavePlanOutputBoundary savePlanPresenter;
     private final SavePlanDataAccessInterface planDataAccess;
     private final SubgoalDataAccessInterface subgoalDataAccess;
@@ -22,8 +23,9 @@ public class SavePlanInteractor implements SavePlanInputBoundary {
 
     /**
      * Creates a new SavePlanInteractor with required dependencies.
+     *
      * @param savePlanPresenter the presenter to receive the output
-     * @param planDataAccess the data access object used to persist plans
+     * @param planDataAccess    the data access object used to persist plans
      * @param subgoalDataAccess the data access object used to persist subgoals
      */
     public SavePlanInteractor(SavePlanOutputBoundary savePlanPresenter,
@@ -37,14 +39,16 @@ public class SavePlanInteractor implements SavePlanInputBoundary {
     /**
      * Executes the save plan use case by creating a plan and its subgoals,
      * saving them to persistent storage, and generating output data.
+     *
      * @param savePlanInputData the input containing plan and subgoal details
      */
     @Override
     public void execute(SavePlanInputData savePlanInputData) {
         boolean success;
         String message;
+
         try {
-            Plan newPlan = planBuilder
+            final Plan newPlan = planBuilder
                     .generateId()
                     .setName(savePlanInputData.getName())
                     .setDescription(savePlanInputData.getDescription())
@@ -54,7 +58,7 @@ public class SavePlanInteractor implements SavePlanInputBoundary {
             planDataAccess.savePlan(newPlan);
 
             for (SaveSubgoalInputData subgoalInputData : savePlanInputData.getSubgoals()) {
-                Subgoal subgoal = subgoalBuilder
+                final Subgoal subgoal = subgoalBuilder
                         .generateId()
                         .setPlanId(newPlan.getId())
                         .setName(subgoalInputData.getName())
@@ -67,12 +71,15 @@ public class SavePlanInteractor implements SavePlanInputBoundary {
 
             success = true;
             message = "Plan was created successfully";
-        } catch (Exception e) {
+        }
+        // -@cs[IllegalCatch] catch generic exception to show user-friendly error message
+        catch (Exception ex) {
             message = "Something went wrong";
             success = false;
         }
 
-        SavePlanOutputData savePlanOutputData = new SavePlanOutputData(success, message);
+        final SavePlanOutputData savePlanOutputData =
+                new SavePlanOutputData(success, message);
         savePlanPresenter.prepareView(savePlanOutputData);
     }
 }

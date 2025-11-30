@@ -40,6 +40,7 @@ public class SubgoalQuestionAnswer {
     }
 
     /**
+     * Returns the unique ID of this question–answer entry.
      * @return the unique ID of this question–answer entry
      */
     public String getId() {
@@ -47,6 +48,7 @@ public class SubgoalQuestionAnswer {
     }
 
     /**
+     * Returns the ID of the subgoal this entry belongs to.
      * @return the ID of the subgoal this entry belongs to
      */
     public String getSubgoalId() {
@@ -54,6 +56,7 @@ public class SubgoalQuestionAnswer {
     }
 
     /**
+     * Returns the user's question text.
      * @return the user's question text
      */
     public String getQuestionMessage() {
@@ -61,6 +64,7 @@ public class SubgoalQuestionAnswer {
     }
 
     /**
+     * Returns the system's answer text (may be null).
      * @return the system's answer text (may be null)
      */
     public String getResponseMessage() {

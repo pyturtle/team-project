@@ -35,7 +35,7 @@ public class SavePlanPresenter implements SavePlanOutputBoundary {
      */
     @Override
     public void prepareView(SavePlanOutputData savePlanOutputData) {
-        SavePlanState savePlanState = savePlanViewModel.getState();
+        final SavePlanState savePlanState = savePlanViewModel.getState();
         savePlanState.setMessage(savePlanOutputData.getMessage());
         savePlanViewModel.firePropertyChange();
 

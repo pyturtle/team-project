@@ -1,7 +1,7 @@
 package use_case.plan.show_plan;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * ShowPlanOutputData contains the processed data required to display a plan,
@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class ShowPlanOutputData {
     private final String planName;
     private final String planDescription;
-    private final ArrayList<HashMap<String, String>> subgoalList;
+    private final ArrayList<Map<String, String>> subgoalList;
     private final boolean isCreated;
 
     /**
@@ -22,7 +22,7 @@ public class ShowPlanOutputData {
      * @param isCreated whether the plan already exists in storage
      */
     public ShowPlanOutputData(String planName, String planDescription,
-                              ArrayList<HashMap<String, String>> subgoalList, boolean isCreated) {
+                              ArrayList<Map<String, String>> subgoalList, boolean isCreated) {
         this.planName = planName;
         this.planDescription = planDescription;
         this.subgoalList = subgoalList;
@@ -50,7 +50,7 @@ public class ShowPlanOutputData {
      * Each subgoal is represented as a map of its attributes.
      * @return the subgoal list
      */
-    public ArrayList<HashMap<String, String>> getSubgoalList() {
+    public ArrayList<Map<String, String>> getSubgoalList() {
         return subgoalList;
     }
 

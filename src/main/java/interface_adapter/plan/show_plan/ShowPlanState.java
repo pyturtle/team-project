@@ -1,7 +1,7 @@
 package interface_adapter.plan.show_plan;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * ShowPlanState stores the details of a selected plan, including its name,
@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class ShowPlanState {
     private String planName;
     private String planDescription;
-    private ArrayList<HashMap<String, String>> subgoalList;
+    private ArrayList<Map<String, String>> subgoalList;
     private String username;
     private boolean planExists;
 
@@ -51,7 +51,7 @@ public class ShowPlanState {
      * Each subgoal is represented as a map of its fields.
      * @return a list of subgoal maps
      */
-    public ArrayList<HashMap<String, String>> getSubgoalList() {
+    public ArrayList<Map<String, String>> getSubgoalList() {
         return subgoalList;
     }
 
@@ -59,7 +59,7 @@ public class ShowPlanState {
      * Sets the list of subgoals associated with the plan.
      * @param subgoalList the list of subgoals to store
      */
-    public void setSubgoalList(ArrayList<HashMap<String, String>> subgoalList) {
+    public void setSubgoalList(ArrayList<Map<String, String>> subgoalList) {
         this.subgoalList = subgoalList;
     }
 

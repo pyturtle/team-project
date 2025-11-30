@@ -23,7 +23,6 @@ public class Subgoal {
     private final boolean isCompleted;
     private final boolean priority;
 
-
     /**
      * Constructs a new Subgoal entity.
      *
@@ -68,6 +67,7 @@ public class Subgoal {
     }
 
     /**
+     * Returns the unique ID of the subgoal.
      * @return the unique ID of the subgoal
      */
     public String getId() {
@@ -75,6 +75,7 @@ public class Subgoal {
     }
 
     /**
+     * Returns the ID of the plan this subgoal belongs to.
      * @return the ID of the plan this subgoal belongs to
      */
     public String getPlanId() {
@@ -82,6 +83,7 @@ public class Subgoal {
     }
 
     /**
+     * Returns the ID of the user who owns this subgoal.
      * @return the ID of the user who owns this subgoal
      */
     public String getUsername() {
@@ -89,6 +91,7 @@ public class Subgoal {
     }
 
     /**
+     * Returns the name/title of the subgoal.
      * @return the name/title of the subgoal
      */
     public String getName() {
@@ -96,6 +99,7 @@ public class Subgoal {
     }
 
     /**
+     * Returns the description of the subgoal.
      * @return the description of the subgoal
      */
     public String getDescription() {
@@ -103,6 +107,7 @@ public class Subgoal {
     }
 
     /**
+     * Returns the deadline of the subgoal.
      * @return the deadline of the subgoal
      */
     public LocalDate getDeadline() {
@@ -110,6 +115,7 @@ public class Subgoal {
     }
 
     /**
+     * Returns whether the subgoal is completed.
      * @return whether the subgoal is completed
      */
     public boolean isCompleted() {
@@ -117,6 +123,7 @@ public class Subgoal {
     }
 
     /**
+     * Returns whether the subgoal is marked as priority.
      * @return whether the subgoal is marked as priority
      */
     public boolean isPriority() {

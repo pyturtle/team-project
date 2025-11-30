@@ -1,6 +1,7 @@
 package interface_adapter.plan.show_plan;
 
 import org.json.JSONObject;
+
 import use_case.plan.show_plan.ShowPlanInputBoundary;
 import use_case.plan.show_plan.ShowPlanInputData;
 

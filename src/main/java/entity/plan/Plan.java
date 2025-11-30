@@ -8,9 +8,10 @@ public class Plan {
 
     /**
      * Creates a new plan with an id, given name, description, and an associated username.
-     *
+     * @param id          the unique identifier of the plan
      * @param name        the plan's name
      * @param description the description of the plan.
+     * @param username    the username of the plan owner.
      * @throws IllegalArgumentException if the name or description are empty
      */
 
@@ -42,6 +43,4 @@ public class Plan {
     public String getUsername() {
         return username;
     }
-
-
 }
