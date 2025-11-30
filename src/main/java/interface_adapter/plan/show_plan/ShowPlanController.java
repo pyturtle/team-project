@@ -11,8 +11,7 @@ public class ShowPlanController {
         this.showPlanInteractor = showPlanInteractor;
     }
 
-    public void execute(JSONObject planObject)
-    {
+    public void execute(JSONObject planObject) {
         final ShowPlanInputData showPlanInputData =
                 new ShowPlanInputData(planObject);
         showPlanInteractor.execute(showPlanInputData);

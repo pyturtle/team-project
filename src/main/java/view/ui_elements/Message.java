@@ -16,7 +16,7 @@ public class Message {
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setOpaque(false);
 
-        // Wrap text inside a fixed-width HTML container
+
         String wrappedHtml =
                 "<html><div style='width:200px;'>" +
                         messageText +
@@ -34,13 +34,13 @@ public class Message {
         JPanel messageBox = new JPanel();
         messageBox.setLayout(new BoxLayout(messageBox, BoxLayout.Y_AXIS));
 
-        // bubble color
+
         Color userBubbleColor = new Color(70, 130, 180);
         Color responseBubbleColor = new Color(60, 60, 60);
 
         messageBox.setBackground(isUser ? userBubbleColor : responseBubbleColor);
 
-        // padding + border
+
         messageBox.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Color.DARK_GRAY, 1),
                 BorderFactory.createEmptyBorder(8, 12, 8, 12)
@@ -48,13 +48,13 @@ public class Message {
 
         messageBox.add(messageBoxContent);
 
-        // Set a maximum width for the entire bubble (a bit bigger to include padding)
-        int bubbleMaxWidth = 240; // 200px text + padding
+
+        int bubbleMaxWidth = 240;
 
         messageBoxContent.revalidate();
         Dimension preferred = messageBox.getPreferredSize();
 
-        // enforce max width
+
         preferred.width = Math.min(preferred.width, bubbleMaxWidth);
 
         messageBox.setMaximumSize(new Dimension(preferred.width, preferred.height));

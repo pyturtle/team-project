@@ -9,9 +9,9 @@ import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 
 public class PartialViewManager implements PropertyChangeListener {
-    private JPanel contentPane;
     private final HashMap<String, JPanel> views;
     private final PartialViewModel partialViewModel;
+    private JPanel contentPane;
 
     public PartialViewManager(HashMap<String, JPanel> views,
                               PartialViewModel partialViewModel) {

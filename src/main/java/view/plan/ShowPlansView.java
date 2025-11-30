@@ -8,9 +8,9 @@ import interface_adapter.plan.save_plan.SavePlanViewModel;
 import interface_adapter.plan.show_plans.ShowPlansController;
 import interface_adapter.plan.show_plans.ShowPlansState;
 import interface_adapter.plan.show_plans.ShowPlansViewModel;
-import interface_adapter.show_subgoal.ShowSubgoalController;
-import interface_adapter.show_subgoal.ShowSubgoalViewModel;
-import view.ShowSubgoalView;
+import interface_adapter.subgoal.show_subgoal.ShowSubgoalController;
+import interface_adapter.subgoal.show_subgoal.ShowSubgoalViewModel;
+import view.subgoal.ShowSubgoalView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,17 +33,14 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     private final ShowPlansViewModel showPlansViewModel;
     private final SavePlanViewModel savePlanViewModel;
     private final ShowSubgoalViewModel showSubgoalViewModel = new ShowSubgoalViewModel();
-
-    private ShowPlansController showPlansController;
-    private DeletePlanController deletePlanController;
-
-    private ShowSubgoalView showSubgoalView;
-
     private final JPanel plansGridPanel;
     private final JButton previousButton;
     private final JButton nextButton;
     private final JLabel pageLabel;
-
+    private ShowPlansController showPlansController;
+    private DeletePlanController deletePlanController;
+    private ShowSubgoalView showSubgoalView;
+    private ShowSubgoalController showSubgoalController;
 
     public ShowPlansView(ShowPlansViewModel showPlansViewModel,
                          SavePlanViewModel savePlanViewModel) {
@@ -56,7 +53,7 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
         this.setLayout(new BorderLayout());
 
-        // Plans grid panel
+
         plansGridPanel = new JPanel();
         plansGridPanel.setLayout(new GridLayout(GRID_ROWS, GRID_COLS, 15, 15));
         plansGridPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -64,7 +61,7 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         final JScrollPane scrollPane = new JScrollPane(plansGridPanel);
         this.add(scrollPane, BorderLayout.CENTER);
 
-        // Pagination panel at bottom
+
         final JPanel paginationPanel = new JPanel();
         paginationPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
@@ -92,14 +89,15 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
         this.add(paginationPanel, BorderLayout.SOUTH);
 
-        // Initialize with empty state
+
         updateView();
     }
 
     /**
      * Loads plans for the given username and page.
+     *
      * @param username the username
-     * @param page the page number (0-indexed)
+     * @param page     the page number (0-indexed)
      */
     private void loadPlans(String username, int page) {
         if (showPlansController != null) {
@@ -113,10 +111,10 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     private void updateView() {
         final ShowPlansState state = showPlansViewModel.getState();
 
-        // Clear existing plans
+
         plansGridPanel.removeAll();
 
-        // Display plans or empty message
+
         final List<Plan> plans = state.getPlans();
         if (plans.isEmpty()) {
             final JLabel emptyLabel = new JLabel("You haven't created any plans yet");
@@ -124,17 +122,16 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
             emptyLabel.setFont(new Font("Arial", Font.ITALIC, 16));
             plansGridPanel.setLayout(new BorderLayout());
             plansGridPanel.add(emptyLabel, BorderLayout.CENTER);
-        }
-        else {
+        } else {
             plansGridPanel.setLayout(new GridLayout(GRID_ROWS, GRID_COLS, 15, 15));
             for (Plan plan : plans) {
                 plansGridPanel.add(createPlanPanel(plan));
             }
         }
 
-        // Update pagination controls
+
         pageLabel.setText("Page " + (state.getCurrentPage() + 1) + " / " +
-                         Math.max(1, state.getTotalPages()));
+                Math.max(1, state.getTotalPages()));
         previousButton.setEnabled(state.hasPreviousPage());
         nextButton.setEnabled(state.hasNextPage());
 
@@ -146,9 +143,9 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         this.showSubgoalView = view;
     }
 
-
     /**
      * Creates a panel for a single plan.
+     *
      * @param plan the plan to display
      * @return the plan panel
      */
@@ -158,13 +155,13 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         panel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
         panel.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
 
-        // Plan title
+
         final JLabel titleLabel = new JLabel("<html><b># " + plan.getName() + "</b></html>");
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 5, 5, 5));
         panel.add(titleLabel, BorderLayout.NORTH);
 
-        // Buttons panel
+
         final JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 10));
 
@@ -172,17 +169,17 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         subgoalsButton.setActionCommand(plan.getId());
         final JButton deleteButton = new JButton(ShowPlansViewModel.DELETE_BUTTON_LABEL);
 
-        // ENABLING THE BUTTON!!!!
+
         subgoalsButton.setEnabled(true);
 
-        // Enable delete button and add action listener
+
         deleteButton.addActionListener(e -> {
             final int choice = JOptionPane.showConfirmDialog(
-                this,
-                "Are you sure you want to delete plan: " + plan.getName() + "?",
-                "Confirm Delete",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
+                    this,
+                    "Are you sure you want to delete plan: " + plan.getName() + "?",
+                    "Confirm Delete",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE
             );
 
             if (choice == JOptionPane.YES_OPTION && deletePlanController != null) {
@@ -190,21 +187,21 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
                 final String username = state.getUsername();
                 final int currentPage = state.getCurrentPage();
 
-                // Delete the plan
+
                 deletePlanController.execute(plan.getId(), username);
 
-                // Small delay to ensure deletion is processed
+
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 }
 
-                // Reload - go to page 0 to avoid issues with empty pages
+
                 loadPlans(username, 0);
             }
         });
-        // subgoals BUTTON actionLISTENR!
+
         subgoalsButton.addActionListener(e -> {
             if (showSubgoalController != null) {
                 String planId = e.getActionCommand();
@@ -245,17 +242,15 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
                     JLabel dueLabel = new JLabel("Due: " + s.getDeadline());
                     box.add(dueLabel);
 
-                    // ithink this lets me click it now.
+
                     box.addMouseListener(new java.awt.event.MouseAdapter() {
                         public void mouseClicked(java.awt.event.MouseEvent evt) {
                             if (showSubgoalController != null && showSubgoalView != null) {
-                                showSubgoalController.execute(s.getId());  //this uses the same viewon calendarvew
+                                showSubgoalController.execute(s.getId());
                             }
 
                         }
                     });
-
-
 
 
                     subgoalsPanel.add(Box.createVerticalStrut(5));
@@ -263,12 +258,9 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
                 }
 
 
-
                 subgoalDialog.setVisible(true);
             }
         });
-
-
 
 
         buttonsPanel.add(subgoalsButton);
@@ -278,7 +270,6 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
         return panel;
     }
-
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -296,8 +287,6 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     public String getViewName() {
         return viewName;
     }
-
-    private ShowSubgoalController showSubgoalController;
 
     public void setShowSubgoalController(ShowSubgoalController controller) {
         this.showSubgoalController = controller;

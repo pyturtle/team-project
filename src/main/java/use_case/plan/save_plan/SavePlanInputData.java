@@ -8,7 +8,8 @@ public class SavePlanInputData {
     private final String name;
     private final String description;
     private final String username;
-    private ArrayList<SaveSubgoalInputData> subgoals;
+    private final ArrayList<SaveSubgoalInputData> subgoals;
+
     public SavePlanInputData(String name,
                              String description, String username,
                              ArrayList<SaveSubgoalInputData> subgoals) {

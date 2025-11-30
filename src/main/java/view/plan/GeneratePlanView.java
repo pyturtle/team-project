@@ -9,38 +9,32 @@ import view.ui_elements.Message;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-public class GeneratePlanView extends JPanel implements ActionListener, PropertyChangeListener {
-    private final String viewName = "generate plan";
-    private final GeneratePlanViewModel generatePlanViewModel;
-    private GeneratePlanController generatePlanController;
-    private ShowPlanController showPlanController;
-
+public class GeneratePlanView extends JPanel implements PropertyChangeListener {
     private final JTextField userMessageInputField = new JTextField(25);
     private final JPanel messagesPanel = new JPanel();
     private final JScrollPane messagesContainer = new JScrollPane(
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     private final JButton sendButton;
+    private GeneratePlanController generatePlanController;
+    private ShowPlanController showPlanController;
 
     public GeneratePlanView(GeneratePlanViewModel generatePlanViewModel) {
-        this.generatePlanViewModel = generatePlanViewModel;
         generatePlanViewModel.addPropertyChangeListener(this);
 
-        // Use BorderLayout so input panel stays at bottom
+
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // ----- Center: Title + Messages -----
+
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setOpaque(false);
 
-        // Title
+
         final JLabel title = new JLabel(GeneratePlanViewModel.TITLE_LABEL);
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
         title.setFont(title.getFont().deriveFont(Font.BOLD, 18f));
@@ -48,11 +42,11 @@ public class GeneratePlanView extends JPanel implements ActionListener, Property
 
         centerPanel.add(Box.createVerticalStrut(10));
 
-        // Messages area
+
         messagesPanel.setLayout(new BoxLayout(messagesPanel, BoxLayout.Y_AXIS));
         messagesPanel.setOpaque(false);
 
-        // Slight border around the messages panel
+
         messagesPanel.setBorder(
                 BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
@@ -67,10 +61,10 @@ public class GeneratePlanView extends JPanel implements ActionListener, Property
 
         centerPanel.add(messagesContainer);
 
-        // Put title + messages in the center of the main layout
+
         this.add(centerPanel, BorderLayout.CENTER);
 
-        // ----- Input area (always at bottom) -----
+
         final JPanel userInputPanel = new JPanel();
         userInputPanel.setLayout(new BoxLayout(userInputPanel, BoxLayout.X_AXIS));
 
@@ -86,35 +80,29 @@ public class GeneratePlanView extends JPanel implements ActionListener, Property
         userInputPanel.add(Box.createHorizontalStrut(8));
         userInputPanel.add(sendButton);
 
-        // Anchor input panel to bottom
+
         this.add(userInputPanel, BorderLayout.SOUTH);
 
-        // Button listener
-        sendButton.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        String message = userMessageInputField.getText();
-                        if (message == null || message.trim().isEmpty()) {
-                            return;
-                        }
-                        messagesPanel.add(Message.createMessage(Message.createTextBox(message),
-                                true));
-                        messagesPanel.revalidate();
-                        messagesPanel.repaint();
-                        Message.scrollToBottom(messagesContainer);
 
-                        userMessageInputField.setText("");
-                        sendButton.setEnabled(false);
-                        sendButton.setText(GeneratePlanViewModel.LOADING_LABEL);
-                        startGeneratePlanInBackground(message);
+        sendButton.addActionListener(
+                evt -> {
+                    String message = userMessageInputField.getText();
+                    if (message == null || message.trim().isEmpty()) {
+                        return;
                     }
+                    messagesPanel.add(Message.createMessage(Message.createTextBox(message),
+                            true));
+                    messagesPanel.revalidate();
+                    messagesPanel.repaint();
+                    Message.scrollToBottom(messagesContainer);
+
+                    userMessageInputField.setText("");
+                    sendButton.setEnabled(false);
+                    sendButton.setText(GeneratePlanViewModel.LOADING_LABEL);
+                    startGeneratePlanInBackground(message);
                 });
     }
 
-    @Override
-    public void actionPerformed(ActionEvent evt) {
-        // unused
-    }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -151,7 +139,7 @@ public class GeneratePlanView extends JPanel implements ActionListener, Property
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
-                // heavy work here, off the EDT
+
                 generatePlanController.execute(userMessage);
                 return null;
             }
@@ -165,12 +153,7 @@ public class GeneratePlanView extends JPanel implements ActionListener, Property
         panel.setOpaque(false);
         JButton showPlanButton = new JButton(GeneratePlanViewModel.SHOW_PLAN_BUTTON_LABEL);
         showPlanButton.setFont(showPlanButton.getFont().deriveFont(13f));
-        showPlanButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                showPlanController.execute(planObject);
-            }
-        });
+        showPlanButton.addActionListener(evt -> showPlanController.execute(planObject));
         panel.add(showPlanButton);
         return panel;
     }
@@ -181,21 +164,18 @@ public class GeneratePlanView extends JPanel implements ActionListener, Property
         panel.setOpaque(false);
         JButton button = new JButton(GeneratePlanViewModel.TRY_AGAIN_BUTTON_LABEL);
         button.setFont(button.getFont().deriveFont(13f));
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                button.setEnabled(false);
-                sendButton.setEnabled(false);
-                sendButton.setText(GeneratePlanViewModel.LOADING_LABEL);
-                startGeneratePlanInBackground(userMessage);
-            }
+        button.addActionListener(evt -> {
+            button.setEnabled(false);
+            sendButton.setEnabled(false);
+            sendButton.setText(GeneratePlanViewModel.LOADING_LABEL);
+            startGeneratePlanInBackground(userMessage);
         });
         panel.add(button);
         return panel;
     }
 
     public String getViewName() {
-        return viewName;
+        return "generate plan";
     }
 
     public void setGeneratePlanController(GeneratePlanController generatePlanController) {

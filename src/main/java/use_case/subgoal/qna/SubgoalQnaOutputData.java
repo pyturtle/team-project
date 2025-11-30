@@ -1,11 +1,9 @@
 package use_case.subgoal.qna;
 
-import entity.SubgoalQuestionAnswer;
+import entity.subgoal.SubgoalQuestionAnswer;
+
 import java.util.List;
 
-/**
- * Output data for Subgoal Q/A.
- */
 public class SubgoalQnaOutputData {
     private final String subgoalId;
     private final List<SubgoalQuestionAnswer> history;

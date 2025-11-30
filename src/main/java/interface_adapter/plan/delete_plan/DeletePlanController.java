@@ -12,6 +12,7 @@ public class DeletePlanController {
 
     /**
      * Creates a new Delete Plan Controller.
+     *
      * @param deletePlanInteractor the interactor for delete plan use case
      */
     public DeletePlanController(DeletePlanInputBoundary deletePlanInteractor) {
@@ -20,7 +21,8 @@ public class DeletePlanController {
 
     /**
      * Executes the delete plan use case.
-     * @param planId the ID of the plan to delete
+     *
+     * @param planId   the ID of the plan to delete
      * @param username the username of the plan owner
      */
     public void execute(String planId, String username) {

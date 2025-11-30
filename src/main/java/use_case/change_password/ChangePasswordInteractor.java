@@ -1,5 +1,6 @@
 package use_case.change_password;
 
+import data_access.interfaces.user.ChangePasswordUserDataAccessInterface;
 import entity.user.User;
 import entity.user.UserFactory;
 
@@ -23,8 +24,7 @@ public class ChangePasswordInteractor implements ChangePasswordInputBoundary {
     public void execute(ChangePasswordInputData changePasswordInputData) {
         if ("".equals(changePasswordInputData.getPassword())) {
             userPresenter.prepareFailView("New password cannot be empty");
-        }
-        else {
+        } else {
             final User user = userFactory.create(changePasswordInputData.getUsername(),
                     changePasswordInputData.getPassword());
 

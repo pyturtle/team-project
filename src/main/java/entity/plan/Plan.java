@@ -1,5 +1,4 @@
 package entity.plan;
-import java.util.UUID;
 
 public class Plan {
     private final String id;
@@ -9,7 +8,8 @@ public class Plan {
 
     /**
      * Creates a new plan with an id, given name, description, and an associated username.
-     * @param name the plan's name
+     *
+     * @param name        the plan's name
      * @param description the description of the plan.
      * @throws IllegalArgumentException if the name or description are empty
      */
@@ -27,7 +27,9 @@ public class Plan {
         this.username = username;
     }
 
-    public String getId() { return id; };
+    public String getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
@@ -37,8 +39,9 @@ public class Plan {
         return description;
     }
 
-    public String getUsername() { return username; }
-
+    public String getUsername() {
+        return username;
+    }
 
 
 }

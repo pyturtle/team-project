@@ -1,7 +1,9 @@
 package use_case.plan.delete_plan;
 
+import data_access.interfaces.plan.DeletePlanDataAccessInterface;
 import entity.subgoal.Subgoal;
 import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
+
 import java.util.List;
 
 /**
@@ -15,8 +17,9 @@ public class DeletePlanInteractor implements DeletePlanInputBoundary {
 
     /**
      * Creates a new Delete Plan Interactor.
-     * @param dataAccess the data access interface
-     * @param presenter the output boundary
+     *
+     * @param dataAccess        the data access interface
+     * @param presenter         the output boundary
      * @param subgoalDataAccess the subgoal data access interface
      */
     public DeletePlanInteractor(DeletePlanDataAccessInterface dataAccess,
@@ -37,7 +40,7 @@ public class DeletePlanInteractor implements DeletePlanInputBoundary {
                 return;
             }
 
-            // First, delete all subgoals related to this plan
+
             if (subgoalDataAccess != null) {
                 final List<Subgoal> relatedSubgoals = subgoalDataAccess.getSubgoalsByPlanId(planId);
                 for (Subgoal subgoal : relatedSubgoals) {
@@ -46,7 +49,7 @@ public class DeletePlanInteractor implements DeletePlanInputBoundary {
                 System.out.println("Deleted " + relatedSubgoals.size() + " subgoals for plan " + planId);
             }
 
-            // Then delete the plan itself
+
             final boolean deleted = dataAccess.deletePlan(planId);
 
             if (deleted) {

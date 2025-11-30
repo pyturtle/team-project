@@ -1,7 +1,9 @@
 package use_case.subgoal.qna;
 
-import entity.SubgoalQuestionAnswer;
+import data_access.interfaces.subgoal.SubgoalQnaDataAccessInterface;
+import data_access.interfaces.subgoal.SubgoalQnaGeminiDataAccessInterface;
 import entity.subgoal.Subgoal;
+import entity.subgoal.SubgoalQuestionAnswer;
 import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
 
 import java.util.ArrayList;
@@ -48,18 +50,18 @@ public class SubgoalQnaInteractor implements SubgoalQnaInputBoundary {
             return;
         }
 
-        // 1. Load current subgoal
+
         Subgoal subgoal = subgoalDAO.getSubgoalById(subgoalId);
         String subgoalName = subgoal != null ? subgoal.getName() : "(unknown)";
         String subgoalDescription = subgoal != null ? subgoal.getDescription() : "";
         String planId = subgoal != null ? subgoal.getPlanId() : "";
         String username = subgoal != null ? subgoal.getUsername() : "";
 
-        // 2. Get all subgoals in the same plan (regardless of user)
+
         List<Subgoal> planSubgoals = new ArrayList<>();
         if (subgoal != null && planId != null && !planId.isEmpty()) {
             planSubgoals = subgoalDAO.getSubgoalsByPlanId(planId);
-            // Sort subgoals: by deadline (if any), then by name
+
             Collections.sort(planSubgoals, new Comparator<Subgoal>() {
                 @Override
                 public int compare(Subgoal a, Subgoal b) {
@@ -80,7 +82,7 @@ public class SubgoalQnaInteractor implements SubgoalQnaInputBoundary {
             });
         }
 
-        // Find index of current subgoal in that plan list
+
         int currentIndex = -1;
         for (int i = 0; i < planSubgoals.size(); i++) {
             if (planSubgoals.get(i).getId().equals(subgoalId)) {
@@ -89,12 +91,12 @@ public class SubgoalQnaInteractor implements SubgoalQnaInputBoundary {
             }
         }
 
-        // 3. Load previous Q/A history for this subgoal
+
         List<SubgoalQuestionAnswer> history = qnaDAO.getHistory(subgoalId);
         int maxPairs = 5;
         int startIndex = Math.max(0, history.size() - maxPairs);
 
-        // 4. Build a context-rich prompt for Gemini
+
         StringBuilder prompt = new StringBuilder();
         prompt.append("You are helping a user with a specific subgoal in their planning app.\n");
         prompt.append("Here is the subgoal context:\n");
@@ -110,7 +112,7 @@ public class SubgoalQnaInteractor implements SubgoalQnaInputBoundary {
         }
         prompt.append("\n");
 
-        // Plan-level context: all subgoals, and which is current / before / after
+
         if (!planSubgoals.isEmpty()) {
             prompt.append("This subgoal is part of a plan with the following subgoals in order (each with description):\n");
             for (int i = 0; i < planSubgoals.size(); i++) {
@@ -159,16 +161,16 @@ public class SubgoalQnaInteractor implements SubgoalQnaInputBoundary {
         prompt.append(question).append("\n");
         prompt.append("Please answer based on the subgoal context, the plan's subgoals, and the previous conversation if helpful.\n");
 
-        // 5. Ask Gemini with the full prompt
+
         String answer = geminiGateway.getAnswerForQuestion(prompt.toString());
         if (answer == null || answer.trim().isEmpty()) {
             answer = "Sorry, I couldn't get an answer from Gemini.";
         }
 
-        // 6. Save the new Q/A pair
+
         qnaDAO.appendEntry(subgoalId, question, answer);
 
-        // 7. Reload updated history and present
+
         List<SubgoalQuestionAnswer> updatedHistory = qnaDAO.getHistory(subgoalId);
         SubgoalQnaOutputData out = new SubgoalQnaOutputData(subgoalId, updatedHistory);
         presenter.presentUpdate(out);

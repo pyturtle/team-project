@@ -7,8 +7,8 @@ import java.beans.PropertyChangeSupport;
 
 public class CalendarViewModel extends ViewModel<CalendarState> {
 
-    private CalendarState calendarState = new CalendarState();
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private CalendarState calendarState = new CalendarState();
 
     public CalendarViewModel() {
         super("Calendar");
@@ -17,12 +17,16 @@ public class CalendarViewModel extends ViewModel<CalendarState> {
     public CalendarState getCalendarState() {
         return calendarState;
     }
+
     public void setCalendarState(CalendarState calendarState) {
         this.calendarState = calendarState;
     }
+
+    @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
+
     public void firePropertyChanged() {
         propertyChangeSupport.firePropertyChange("state", null, this.calendarState);
     }

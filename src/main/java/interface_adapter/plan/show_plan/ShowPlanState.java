@@ -1,8 +1,5 @@
 package interface_adapter.plan.show_plan;
 
-import entity.subgoal.Subgoal;
-import interface_adapter.show_subgoal.ShowSubgoalState;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 

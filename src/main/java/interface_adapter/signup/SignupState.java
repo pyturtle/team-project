@@ -15,44 +15,44 @@ public class SignupState {
         return username;
     }
 
-    public String getUsernameError() {
-        return usernameError;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getPasswordError() {
-        return passwordError;
-    }
-
-    public String getRepeatPassword() {
-        return repeatPassword;
-    }
-
-    public String getRepeatPasswordError() {
-        return repeatPasswordError;
-    }
-
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getUsernameError() {
+        return usernameError;
     }
 
     public void setUsernameError(String usernameError) {
         this.usernameError = usernameError;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPasswordError() {
+        return passwordError;
     }
 
     public void setPasswordError(String passwordError) {
         this.passwordError = passwordError;
     }
 
+    public String getRepeatPassword() {
+        return repeatPassword;
+    }
+
     public void setRepeatPassword(String repeatPassword) {
         this.repeatPassword = repeatPassword;
+    }
+
+    public String getRepeatPasswordError() {
+        return repeatPasswordError;
     }
 
     public void setRepeatPasswordError(String repeatPasswordError) {

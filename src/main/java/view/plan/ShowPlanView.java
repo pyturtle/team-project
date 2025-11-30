@@ -1,8 +1,5 @@
 package view.plan;
 
-import interface_adapter.logged_in.LoggedInState;
-import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.plan.generate_plan.GeneratePlanController;
 import interface_adapter.plan.save_plan.SavePlanController;
 import interface_adapter.plan.show_plan.ShowPlanState;
 import interface_adapter.plan.show_plan.ShowPlanViewModel;
@@ -20,24 +17,20 @@ import java.util.HashMap;
 public class ShowPlanView extends JPanel implements PropertyChangeListener {
 
     private final String viewName = "show plan";
-
-    private SavePlanController savePlanController;
-
     private final JScrollPane subgoalsContainer = new JScrollPane(
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
     private final JLabel planNameLabel = new JLabel();
     private final JLabel planDescriptionLabel = new JLabel();
     private final JPanel subgoalsPanel = new JPanel();
-
     private final JButton createPlanButton = new JButton(ShowPlanViewModel.CREATE_BUTTON_LABEL);
+    private SavePlanController savePlanController;
 
     public ShowPlanView(ShowPlanViewModel showPlanViewModel) {
         showPlanViewModel.addPropertyChangeListener(this);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15)); // outer padding
+        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel title = new JLabel(ShowPlanViewModel.TITLE_LABEL);
@@ -69,7 +62,7 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
         subgoalsPanel.setLayout(new BoxLayout(subgoalsPanel, BoxLayout.Y_AXIS));
         subgoalsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // *** KEY FIX: add right padding so content doesn't sit under the scrollbar ***
+
         subgoalsPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
 
         subgoalsContainer.setViewportView(subgoalsPanel);
@@ -136,7 +129,7 @@ public class ShowPlanView extends JPanel implements PropertyChangeListener {
         JLabel descLabel = new JLabel("<html>" + description + "</html>");
         descLabel.setFont(descLabel.getFont().deriveFont(13f));
         descLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        // Optional extra safety: padding inside the label itself
+
         descLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
 
         JLabel deadlineLabel = new JLabel("Due: " + deadline);

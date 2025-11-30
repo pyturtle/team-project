@@ -1,7 +1,6 @@
 package interface_adapter.plan.show_plans;
 
 import interface_adapter.ViewManagerModel;
-import interface_adapter.logged_in.LoggedInViewModel;
 import use_case.plan.show_plans.ShowPlansOutputBoundary;
 import use_case.plan.show_plans.ShowPlansOutputData;
 
@@ -12,20 +11,17 @@ public class ShowPlansPresenter implements ShowPlansOutputBoundary {
 
     private final ViewManagerModel viewManagerModel;
     private final ShowPlansViewModel showPlansViewModel;
-    private final LoggedInViewModel loggedInViewModel;
 
     /**
      * Creates a new Show Plans Presenter.
-     * @param viewManagerModel the view manager model
+     *
+     * @param viewManagerModel   the view manager model
      * @param showPlansViewModel the show plans view model
-     * @param loggedInViewModel the logged in view model
      */
     public ShowPlansPresenter(ViewManagerModel viewManagerModel,
-                              ShowPlansViewModel showPlansViewModel,
-                              LoggedInViewModel loggedInViewModel) {
+                              ShowPlansViewModel showPlansViewModel) {
         this.viewManagerModel = viewManagerModel;
         this.showPlansViewModel = showPlansViewModel;
-        this.loggedInViewModel = loggedInViewModel;
     }
 
     @Override
@@ -55,8 +51,6 @@ public class ShowPlansPresenter implements ShowPlansOutputBoundary {
     public void switchToShowPlansView() {
         viewManagerModel.setState(showPlansViewModel.getViewName());
         viewManagerModel.firePropertyChange();
-
-        // Trigger view update to load plans
         showPlansViewModel.firePropertyChange();
     }
 }

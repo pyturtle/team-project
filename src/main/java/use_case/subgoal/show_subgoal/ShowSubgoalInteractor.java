@@ -1,6 +1,7 @@
 package use_case.subgoal.show_subgoal;
 
 import entity.subgoal.Subgoal;
+import interface_adapter.subgoal.show_subgoal.ShowSubgoalPresenter;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
      * Constructs a new ShowSubgoalInteractor.
      *
      * @param subgoalDAO the data access object for subgoals
-     * @param presenter the output boundary to present results to
+     * @param presenter  the output boundary to present results to
      */
     public ShowSubgoalInteractor(SubgoalDataAccessInterface subgoalDAO,
                                  ShowSubgoalOutputBoundary presenter) {
@@ -57,7 +58,7 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
         if (s == null) {
             presenter.presentError("Subgoal with id " + id + " was not found after updating priority.");
         } else {
-            // Present the updated subgoal to trigger view refresh
+
             ShowSubgoalOutputData out = new ShowSubgoalOutputData(
                     s.getId(),
                     s.getName(),
@@ -65,9 +66,9 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
                     s.isPriority(),
                     s.isCompleted()
             );
-            // Use presentUpdate to avoid opening a new dialog
-            if (presenter instanceof interface_adapter.show_subgoal.ShowSubgoalPresenter) {
-                ((interface_adapter.show_subgoal.ShowSubgoalPresenter) presenter).presentUpdate(out);
+
+            if (presenter instanceof ShowSubgoalPresenter) {
+                ((ShowSubgoalPresenter) presenter).presentUpdate(out);
             }
         }
     }
@@ -83,7 +84,7 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
         if (s == null) {
             presenter.presentError("Subgoal with id " + id + " was not found after updating completion.");
         } else {
-            // Present the updated subgoal to trigger view refresh
+
             ShowSubgoalOutputData out = new ShowSubgoalOutputData(
                     s.getId(),
                     s.getName(),
@@ -91,9 +92,9 @@ public class ShowSubgoalInteractor implements ShowSubgoalInputBoundary {
                     s.isPriority(),
                     s.isCompleted()
             );
-            // Use presentUpdate to avoid opening a new dialog
-            if (presenter instanceof interface_adapter.show_subgoal.ShowSubgoalPresenter) {
-                ((interface_adapter.show_subgoal.ShowSubgoalPresenter) presenter).presentUpdate(out);
+
+            if (presenter instanceof ShowSubgoalPresenter) {
+                ((ShowSubgoalPresenter) presenter).presentUpdate(out);
             }
         }
     }

@@ -1,5 +1,6 @@
 package use_case.plan.save_plan;
 
+import data_access.interfaces.plan.SavePlanDataAccessInterface;
 import entity.plan.Plan;
 import entity.plan.PlanBuilder;
 import entity.subgoal.Subgoal;
@@ -7,7 +8,7 @@ import entity.subgoal.SubgoalBuilder;
 import use_case.subgoal.save_subgoal.SaveSubgoalInputData;
 import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
 
-public class SavePlanInteractor implements SavePlanInputBoundary{
+public class SavePlanInteractor implements SavePlanInputBoundary {
     private final SavePlanOutputBoundary savePlanPresenter;
     private final SavePlanDataAccessInterface planDataAccess;
     private final SubgoalDataAccessInterface subgoalDataAccess;
@@ -47,8 +48,7 @@ public class SavePlanInteractor implements SavePlanInputBoundary{
             success = true;
             message = "Plan was created successfully";
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             message = "Something went wrong";
             success = false;
         }

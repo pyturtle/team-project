@@ -12,6 +12,7 @@ public class SavePlanOutputData {
     public Boolean getSuccess() {
         return success;
     }
+
     public String getMessage() {
         return message;
     }

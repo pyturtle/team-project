@@ -16,10 +16,10 @@ public class ShowSubgoalOutputData {
     /**
      * Constructs a new ShowSubgoalOutputData.
      *
-     * @param name the subgoal's name/title
+     * @param name        the subgoal's name/title
      * @param description the description of the subgoal
-     * @param priority whether the subgoal is marked as high priority
-     * @param completed whether the subgoal is completed
+     * @param priority    whether the subgoal is marked as high priority
+     * @param completed   whether the subgoal is completed
      */
     public ShowSubgoalOutputData(String id, String name,
                                  String description,
@@ -32,17 +32,33 @@ public class ShowSubgoalOutputData {
         this.completed = completed;
     }
 
-    /** @return the subgoal's name/title */
-    public String getName() { return name; }
+    /**
+     * @return the subgoal's name/title
+     */
+    public String getName() {
+        return name;
+    }
 
-    /** @return the subgoal's description */
-    public String getDescription() { return description; }
+    /**
+     * @return the subgoal's description
+     */
+    public String getDescription() {
+        return description;
+    }
 
-    /** @return whether the subgoal is marked as priority */
-    public boolean isPriority() { return priority; }
+    /**
+     * @return whether the subgoal is marked as priority
+     */
+    public boolean isPriority() {
+        return priority;
+    }
 
-    /** @return whether the subgoal is completed */
-    public boolean isCompleted() { return completed; }
+    /**
+     * @return whether the subgoal is completed
+     */
+    public boolean isCompleted() {
+        return completed;
+    }
 
     public String getId() {
         return id;

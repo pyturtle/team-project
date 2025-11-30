@@ -1,5 +1,6 @@
 package use_case.plan.generate_plan;
 
+import data_access.interfaces.plan.GeneratePlanDataAccessInterface;
 import org.json.JSONObject;
 
 public class GeneratePlanInteractor implements GeneratePlanInputBoundary {

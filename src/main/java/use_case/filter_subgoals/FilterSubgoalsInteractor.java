@@ -1,15 +1,16 @@
 package use_case.filter_subgoals;
 
-import data_access.SubgoalDataAccessInterface;  // Change this import
+import data_access.interfaces.subgoal.SubgoalDataAccessInterface;
 import entity.subgoal.Subgoal;
+
 import java.util.List;
 
 public class FilterSubgoalsInteractor implements FilterSubgoalsInputBoundary {
 
-    private final data_access.SubgoalDataAccessInterface subgoalDAO;  // Use this interface
+    private final SubgoalDataAccessInterface subgoalDAO;  // Use this interface
     private final FilterSubgoalsOutputBoundary presenter;
 
-    public FilterSubgoalsInteractor(data_access.SubgoalDataAccessInterface subgoalDAO,
+    public FilterSubgoalsInteractor(SubgoalDataAccessInterface subgoalDAO,
                                     FilterSubgoalsOutputBoundary presenter) {
         this.subgoalDAO = subgoalDAO;
         this.presenter = presenter;
@@ -21,14 +22,11 @@ public class FilterSubgoalsInteractor implements FilterSubgoalsInputBoundary {
 
         if (inputData.isPriorityOnly()) {
             result = subgoalDAO.getPrioritySubgoals(inputData.getUserId());
-        }
-        else if (inputData.getPlanId() != null) {
+        } else if (inputData.getPlanId() != null) {
             result = subgoalDAO.getSubgoalsByPlan(inputData.getPlanId(), inputData.getUserId());
-        }
-        else if (inputData.getSubgoalName() != null) {
+        } else if (inputData.getSubgoalName() != null) {
             result = subgoalDAO.getSubgoalsByName(inputData.getSubgoalName(), inputData.getUserId());
-        }
-        else {
+        } else {
             result = subgoalDAO.getAllSubgoalsForUser(inputData.getUserId());
         }
 

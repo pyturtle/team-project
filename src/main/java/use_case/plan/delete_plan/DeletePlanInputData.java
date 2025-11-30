@@ -10,7 +10,8 @@ public class DeletePlanInputData {
 
     /**
      * Creates input data for deleting a plan.
-     * @param planId the ID of the plan to delete
+     *
+     * @param planId   the ID of the plan to delete
      * @param username the username of the plan owner
      */
     public DeletePlanInputData(String planId, String username) {

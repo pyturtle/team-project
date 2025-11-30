@@ -19,9 +19,17 @@ public class SetCompletedInputData {
         this.completed = completed;
     }
 
-    /** @return the ID of the subgoal whose completion should be updated */
-    public String getSubgoalId() { return subgoalId; }
+    /**
+     * @return the ID of the subgoal whose completion should be updated
+     */
+    public String getSubgoalId() {
+        return subgoalId;
+    }
 
-    /** @return the new completed value */
-    public boolean isCompleted() { return completed; }
+    /**
+     * @return the new completed value
+     */
+    public boolean isCompleted() {
+        return completed;
+    }
 }

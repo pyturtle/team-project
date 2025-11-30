@@ -22,7 +22,7 @@ public class SavePlanController {
                         String username,
                         List<HashMap<String, String>> subgoals) {
         final ArrayList<SaveSubgoalInputData> saveSubgoalInputDataList = new ArrayList<>();
-        for  (HashMap<String,String> subgoal : subgoals) {
+        for (HashMap<String, String> subgoal : subgoals) {
             final SaveSubgoalInputData saveSubgoalInputData = new SaveSubgoalInputData(
                     subgoal.get("name"),
                     subgoal.get("description"),

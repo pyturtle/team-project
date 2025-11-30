@@ -5,13 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import entity.subgoal.Subgoal;
-
 
 
 public class CalendarState {
     private LocalDate selectedDate = LocalDate.now();
-    private Map<LocalDate, List<String>> goalsByDate = new HashMap<>();
+    private final Map<LocalDate, List<String>> goalsByDate = new HashMap<>();
     private String errorMessage;
     private String username;
     private boolean filterActive = false;
@@ -37,6 +35,7 @@ public class CalendarState {
     public LocalDate getSelectedDate() {
         return selectedDate;
     }
+
     public void setSelectedDate(LocalDate selectedDate) {
         this.selectedDate = selectedDate;
     }
@@ -57,13 +56,9 @@ public class CalendarState {
     public String getErrorMessage() {
         return errorMessage;
     }
+
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
-    }
-    public void setFilteredSubgoals(List<entity.subgoal.Subgoal> filteredSubgoals) {
-        this.filteredSubgoals = new ArrayList<>(filteredSubgoals);
-        this.filteredGoals = convertSubgoalsToStrings(filteredSubgoals);
-        this.filterActive = true;
     }
 
     public void clearFilter() {
@@ -108,6 +103,12 @@ public class CalendarState {
 
     public List<entity.subgoal.Subgoal> getFilteredSubgoals() {
         return new ArrayList<>(filteredSubgoals);
+    }
+
+    public void setFilteredSubgoals(List<entity.subgoal.Subgoal> filteredSubgoals) {
+        this.filteredSubgoals = new ArrayList<>(filteredSubgoals);
+        this.filteredGoals = convertSubgoalsToStrings(filteredSubgoals);
+        this.filterActive = true;
     }
 
     public String getCurrentFilter() {

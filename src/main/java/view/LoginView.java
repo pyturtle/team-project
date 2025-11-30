@@ -1,10 +1,10 @@
 package view;
 
+import entity.user.SavedUser;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
 import use_case.remember_me.RememberMe;
-import entity.SavedUser;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -137,7 +137,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
         this.add(checkboxes);
         this.add(buttons);
 
-        //We have to wait a bit for the auto login to work
+
         SwingUtilities.invokeLater(() -> {
             Timer timer = new Timer(1000, e -> attemptAutoLogin());
             timer.setRepeats(false);
@@ -190,6 +190,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
 
     /**
      * React to a button click that results in evt.
+     *
      * @param evt the ActionEvent to react to
      */
     public void actionPerformed(ActionEvent evt) {

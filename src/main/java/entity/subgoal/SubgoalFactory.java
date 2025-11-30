@@ -10,8 +10,7 @@ public class SubgoalFactory {
                           String description,
                           LocalDate deadline,
                           boolean isCompleted,
-                          boolean priority)
-    {
+                          boolean priority) {
         return new Subgoal(id, planId, userEmail, name, description, deadline, isCompleted, priority);
     }
 }

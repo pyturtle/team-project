@@ -1,10 +1,9 @@
 package use_case.plan.show_plan;
 
-import entity.subgoal.Subgoal;
+import data_access.interfaces.plan.ShowPlanDataAccessInterface;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 

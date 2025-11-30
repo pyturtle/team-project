@@ -1,15 +1,14 @@
 package use_case.plan.show_plan;
 
-import entity.subgoal.Subgoal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ShowPlanOutputData {
-    private String planName;
-    private String planDescription;
-    private ArrayList<HashMap<String, String>> subgoalList;
-    private boolean isCreated;
+    private final String planName;
+    private final String planDescription;
+    private final ArrayList<HashMap<String, String>> subgoalList;
+    private final boolean isCreated;
 
     public ShowPlanOutputData(String planName, String planDescription,
                               ArrayList<HashMap<String, String>> subgoalList, boolean isCreated) {

@@ -13,28 +13,28 @@ public class LoginState {
         return username;
     }
 
-    public String getLoginError() {
-        return loginError;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public boolean isRememberMe() {
-        return rememberMe;
-    }
-
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getLoginError() {
+        return loginError;
     }
 
     public void setLoginError(String usernameError) {
         this.loginError = usernameError;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isRememberMe() {
+        return rememberMe;
     }
 
     public void setRememberMe(boolean rememberMe) {

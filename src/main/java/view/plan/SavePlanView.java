@@ -4,7 +4,6 @@ import interface_adapter.plan.save_plan.SavePlanState;
 import interface_adapter.plan.save_plan.SavePlanViewModel;
 
 import javax.swing.*;
-import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 

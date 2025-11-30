@@ -1,7 +1,8 @@
 package use_case.subgoal.show_subgoal;
 
 import entity.subgoal.Subgoal;
-import java.util.List;  // Add this import
+
+import java.util.List;
 
 /**
  * Data access interface for Subgoal entities used by the ShowSubgoal use case.
@@ -11,7 +12,9 @@ import java.util.List;  // Add this import
 public interface SubgoalDataAccessInterface {
 
     void save();
+
     void save(Subgoal subgoal);
+
     /**
      * Returns the Subgoal with the given ID, or {@code null} if no such subgoal exists.
      *
@@ -23,7 +26,7 @@ public interface SubgoalDataAccessInterface {
     /**
      * Updates the priority flag of the Subgoal with the given ID.
      *
-     * @param id the ID of the subgoal to update
+     * @param id       the ID of the subgoal to update
      * @param priority the new priority value
      */
     void updatePriority(String id, boolean priority);
@@ -31,12 +34,11 @@ public interface SubgoalDataAccessInterface {
     /**
      * Updates the completion flag of the Subgoal with the given ID.
      *
-     * @param id the ID of the subgoal to update
+     * @param id        the ID of the subgoal to update
      * @param completed the new completed value
      */
     void updateCompleted(String id, boolean completed);
 
-    // ADD THESE FILTER METHODS:
 
     /**
      * Returns all subgoals for a specific plan and user.

@@ -1,7 +1,7 @@
 package use_case.remember_me;
 
 import data_access.PreferenceRepository;
-import entity.SavedUser;
+import entity.user.SavedUser;
 
 public class RememberMe {
 
