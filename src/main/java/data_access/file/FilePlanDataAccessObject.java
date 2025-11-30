@@ -1,15 +1,11 @@
 package data_access.file;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.json.JSONArray;
+import data_access.interfaces.file.JsonDataAccess;
 import org.json.JSONObject;
 
 import data_access.interfaces.plan.DeletePlanDataAccessInterface;
@@ -17,18 +13,19 @@ import data_access.interfaces.plan.SavePlanDataAccessInterface;
 import data_access.interfaces.plan.ShowPlanDataAccessInterface;
 import data_access.interfaces.plan.ShowPlansDataAccessInterface;
 import entity.plan.Plan;
+import use_case.edit_plan.EditPlanDataAccessInterface;
 
 /**
  * FilePlanDataAccessObject provides file-based persistence for plans.
  * It can load plans from a JSON file, cache them in memory,
  * and save changes back to disk.
  */
-public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
-        DeletePlanDataAccessInterface, SavePlanDataAccessInterface, ShowPlanDataAccessInterface {
+public class FilePlanDataAccessObject extends JsonDataAccess<Plan> implements ShowPlansDataAccessInterface,
+        DeletePlanDataAccessInterface, SavePlanDataAccessInterface, ShowPlanDataAccessInterface,
+        EditPlanDataAccessInterface {
 
     private final List<Plan> allPlans = new ArrayList<>();
     private final Map<String, List<Plan>> cachedUserPlans = new HashMap<>();
-    private final String plansFilePath;
 
     /**
      * Constructs a FilePlanDataAccessObject that loads plans from a JSON file if provided.
@@ -36,15 +33,34 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
      * @param plansDataFile path to the JSON file containing plans data, or null for demo data
      */
     public FilePlanDataAccessObject(String plansDataFile) {
-        this.plansFilePath = plansDataFile;
+        super(plansDataFile);
         if (plansDataFile != null) {
             try {
-                loadPlansFromJson(plansDataFile);
+                loadFromJson(allPlans);
             }
             catch (Exception ex) {
                 System.err.println("Could not load plans from file: " + ex.getMessage());
             }
         }
+    }
+
+    @Override
+    public Plan parseJsonObject(JSONObject jsonObject) {
+        final String planId = jsonObject.getString("id");
+        final String name = jsonObject.getString("name");
+        final String description = jsonObject.getString("description");
+        final String username = jsonObject.getString("username");
+        return new Plan(planId, name, description, username);
+    }
+
+    @Override
+    public JSONObject convertObjectToJson(Plan object) {
+        final JSONObject planObj = new JSONObject();
+        planObj.put("id", object.getId());
+        planObj.put("name", object.getName());
+        planObj.put("description", object.getDescription());
+        planObj.put("username", object.getUsername());
+        return planObj;
     }
 
     /**
@@ -53,59 +69,6 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
      */
     public FilePlanDataAccessObject() {
         this(null);
-    }
-
-    /**
-     * Loads plans from a JSON file.
-     * Expected format: array of plan objects with fields id, name, description, and username.
-     *
-     * @param filePath path to the JSON file
-     * @throws IOException if the file cannot be read
-     */
-    private void loadPlansFromJson(String filePath) throws IOException {
-        final String jsonContent = new String(Files.readAllBytes(Paths.get(filePath)));
-        final JSONArray plansArray = new JSONArray(jsonContent);
-        for (int i = 0; i < plansArray.length(); i++) {
-            try {
-                final JSONObject planObj = plansArray.getJSONObject(i);
-                final String planId = planObj.getString("id");
-                final String name = planObj.getString("name");
-                final String description = planObj.getString("description");
-                final String username = planObj.getString("username");
-                final Plan plan = new Plan(planId, name, description, username);
-                allPlans.add(plan);
-            }
-            catch (Exception ex) {
-                System.err.println(
-                        "Error parsing plan at index " + i + ": " + ex.getMessage());
-            }
-        }
-    }
-
-    /**
-     * Saves all plans in memory to the JSON file specified by plansFilePath.
-     * If no path was provided, this method does nothing.
-     */
-    private void savePlansToJson() {
-        if (plansFilePath != null) {
-            try {
-                final JSONArray plansArray = new JSONArray();
-                for (Plan plan : allPlans) {
-                    final JSONObject planObj = new JSONObject();
-                    planObj.put("id", plan.getId());
-                    planObj.put("name", plan.getName());
-                    planObj.put("description", plan.getDescription());
-                    planObj.put("username", plan.getUsername());
-                    plansArray.put(planObj);
-                }
-                final String jsonContent = plansArray.toString(2);
-                Files.write(Paths.get(plansFilePath), jsonContent.getBytes());
-                System.out.println("Plans saved to file: " + plansFilePath);
-            }
-            catch (IOException ex) {
-                System.err.println("Error saving plans to file: " + ex.getMessage());
-            }
-        }
     }
 
     /**
@@ -252,6 +215,16 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
                 .orElse(null);
     }
 
+    @Override
+    public void updatePlan(Plan plan) {
+        Plan existingPlan = getPlanById(plan.getId());
+        if (allPlans.contains(existingPlan)) {
+            allPlans.remove(existingPlan);
+        }
+        allPlans.add(plan);
+        saveToJson(allPlans);
+    }
+
     /**
      * Deletes a plan with the given ID, clears the cache, and saves changes to disk.
      *
@@ -263,7 +236,7 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
         final boolean removed = allPlans.removeIf(plan -> plan.getId().equals(planId));
         if (removed) {
             cachedUserPlans.clear();
-            savePlansToJson();
+            saveToJson(allPlans);
         }
         return removed;
     }
@@ -278,7 +251,7 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
     public void savePlan(Plan plan) {
         allPlans.add(plan);
         cachedUserPlans.remove(plan.getUsername());
-        savePlansToJson();
+        saveToJson(allPlans);
     }
 
     /**

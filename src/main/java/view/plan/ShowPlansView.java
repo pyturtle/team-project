@@ -45,9 +45,6 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     private final JButton previousButton;
     private final JButton nextButton;
     private final JLabel pageLabel;
-    private ShowPlansController showPlansController;
-    private DeletePlanController deletePlanController;
-    private ShowSubgoalView showSubgoalView;
     private ShowSubgoalController showSubgoalController;
 
     public ShowPlansView(ShowPlansViewModel showPlansViewModel,
