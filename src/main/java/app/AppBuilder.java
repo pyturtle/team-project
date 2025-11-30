@@ -1,19 +1,16 @@
 package app;
 
 import data_access.*;
-import data_access.api.GeminiApiDataAccessObject;
-import data_access.file.FilePlanDataAccessObject;
-import data_access.file.FileSubgoalDataAccessObject;
-import data_access.file.FileSubgoalQnaDataAccessObject;
-import data_access.file.FileUserDataAccessObject;
-import data_access.interfaces.subgoal.SubgoalQnaDataAccessInterface;
-import data_access.interfaces.subgoal.SubgoalQnaGeminiDataAccessInterface;
 import entity.user.UserFactory;
+import entity.plan.PlanFactory;
 import entity.subgoal.SubgoalBuilder;
+import entity.subgoal.SubgoalFactory;
 import interface_adapter.DialogManagerModel;
 import interface_adapter.PartialViewModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.calendar.CalendarViewModel;
+import interface_adapter.edit_plan.EditPlanController;
+import interface_adapter.edit_plan.EditPlanPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
@@ -34,15 +31,18 @@ import interface_adapter.plan.show_plan.ShowPlanViewModel;
 import interface_adapter.plan.show_plans.ShowPlansController;
 import interface_adapter.plan.show_plans.ShowPlansPresenter;
 import interface_adapter.plan.show_plans.ShowPlansViewModel;
-import interface_adapter.subgoal.show_subgoal.ShowSubgoalController;
-import interface_adapter.subgoal.show_subgoal.ShowSubgoalPresenter;
-import interface_adapter.subgoal.show_subgoal.ShowSubgoalViewModel;
+import interface_adapter.show_subgoal.ShowSubgoalController;
+import interface_adapter.show_subgoal.ShowSubgoalPresenter;
+import interface_adapter.show_subgoal.ShowSubgoalViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
-import interface_adapter.subgoal.subgoal_qna.SubgoalQnaController;
-import interface_adapter.subgoal.subgoal_qna.SubgoalQnaPresenter;
-import interface_adapter.subgoal.subgoal_qna.SubgoalQnaViewModel;
+import interface_adapter.subgoal_qna.SubgoalQnaController;
+import interface_adapter.subgoal_qna.SubgoalQnaPresenter;
+import interface_adapter.subgoal_qna.SubgoalQnaViewModel;
+import use_case.edit_plan.EditPlanInputBoundary;
+import use_case.edit_plan.EditPlanInteractor;
+import use_case.edit_plan.EditPlanOutputBoundary;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -71,9 +71,11 @@ import use_case.signup.SignupOutputBoundary;
 import use_case.subgoal.show_subgoal.ShowSubgoalInputBoundary;
 import use_case.subgoal.show_subgoal.ShowSubgoalInteractor;
 import use_case.subgoal.show_subgoal.ShowSubgoalOutputBoundary;
+import use_case.subgoal.qna.SubgoalQnaDataAccessInterface;
 import use_case.subgoal.qna.SubgoalQnaInputBoundary;
 import use_case.subgoal.qna.SubgoalQnaInteractor;
 import use_case.subgoal.qna.SubgoalQnaOutputBoundary;
+import use_case.subgoal.qna.SubgoalQnaGeminiDataAccessInterface;
 import view.*;
 import view.plan.GeneratePlanView;
 import view.plan.SavePlanView;
@@ -83,19 +85,16 @@ import view.plan.ShowPlansView;
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
-import interface_adapter.subgoal.filter_subgoals.FilterSubgoalsController;
-import interface_adapter.subgoal.filter_subgoals.FilterSubgoalsPresenter;
+import interface_adapter.filter_subgoals.FilterSubgoalsController;
+import interface_adapter.filter_subgoals.FilterSubgoalsPresenter;
 import use_case.filter_subgoals.FilterSubgoalsInputBoundary;
 import use_case.filter_subgoals.FilterSubgoalsInteractor;
-import view.subgoal.ShowSubgoalView;
-import view.subgoal.SubgoalQnaView;
-import view.view_manager.DialogManager;
-import view.view_manager.PartialViewManager;
-import view.view_manager.ViewManager;
 
 // Delete Plan functionality added
 public class AppBuilder {
     final UserFactory userFactory = new UserFactory();
+    final SubgoalFactory subgoalFactory = new SubgoalFactory();
+    final PlanFactory planFactory = new PlanFactory();
 
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -113,7 +112,7 @@ public class AppBuilder {
     // of the classes from the data_access package
 
     // DAO version using local file storage
-    final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.json");
+    final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
     final FileSubgoalDataAccessObject subgoalDataAccessObject = new FileSubgoalDataAccessObject(
             "subgoals.json",
             new SubgoalBuilder());
@@ -248,6 +247,21 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addEditPlanUseCase() {
+        final EditPlanOutputBoundary editPlanOutputBoundary =
+                new EditPlanPresenter(showPlansViewModel);
+
+        final EditPlanInputBoundary editPlanInteractor =
+                new EditPlanInteractor(planDataAccessObject, editPlanOutputBoundary);
+
+        final EditPlanController editPlanController =
+                new EditPlanController(editPlanInteractor);
+
+        showPlansView.setEditPlanController(editPlanController);
+        return this;
+    }
+
+
     public AppBuilder addLoginUseCase() {
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel,
                 loggedInViewModel, loginViewModel, signupViewModel, calendarViewModel, showPlansViewModel,
@@ -266,7 +280,7 @@ public class AppBuilder {
      */
     public AppBuilder addShowPlansUseCase() {
         final ShowPlansOutputBoundary showPlansOutputBoundary = new ShowPlansPresenter(
-                viewManagerModel, showPlansViewModel);
+                viewManagerModel, showPlansViewModel, loggedInViewModel);
 
         final ShowPlansInputBoundary showPlansInteractor =
                 new ShowPlansInteractor(planDataAccessObject, showPlansOutputBoundary);
@@ -339,7 +353,7 @@ public class AppBuilder {
 
         // Pass FilterSubgoalsController so presenter can re-apply filters after changes
         System.out.println("AppBuilder.addShowSubgoalUseCase: filterSubgoalsController is " +
-                (filterSubgoalsController == null ? "NULL" : "NOT NULL"));
+                         (filterSubgoalsController == null ? "NULL" : "NOT NULL"));
         if (filterSubgoalsController != null) {
             ((ShowSubgoalPresenter) showSubgoalPresenter).setFilterSubgoalsController(filterSubgoalsController);
             System.out.println("AppBuilder: Set filterSubgoalsController on ShowSubgoalPresenter");

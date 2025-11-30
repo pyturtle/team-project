@@ -51,6 +51,7 @@ public class Main {
                 .addLogoutUseCase()
                 .addShowPlansUseCase()
                 .addDeletePlanUseCase()
+                .addEditPlanUseCase()
                 .build();
 
         final int windowWidth = 1000;

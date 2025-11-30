@@ -2,6 +2,7 @@ package view.plan;
 
 import entity.plan.Plan;
 import entity.subgoal.Subgoal;
+import interface_adapter.edit_plan.EditPlanController;
 import interface_adapter.plan.delete_plan.DeletePlanController;
 import interface_adapter.plan.save_plan.SavePlanState;
 import interface_adapter.plan.save_plan.SavePlanViewModel;
@@ -33,6 +34,13 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     private final ShowPlansViewModel showPlansViewModel;
     private final SavePlanViewModel savePlanViewModel;
     private final ShowSubgoalViewModel showSubgoalViewModel = new ShowSubgoalViewModel();
+
+    private ShowPlansController showPlansController;
+    private EditPlanController editPlanController;
+    private DeletePlanController deletePlanController;
+
+    private ShowSubgoalView showSubgoalView;
+
     private final JPanel plansGridPanel;
     private final JButton previousButton;
     private final JButton nextButton;
@@ -53,7 +61,7 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
         this.setLayout(new BorderLayout());
 
-
+        // Plans grid panel
         plansGridPanel = new JPanel();
         plansGridPanel.setLayout(new GridLayout(GRID_ROWS, GRID_COLS, 15, 15));
         plansGridPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -61,7 +69,7 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         final JScrollPane scrollPane = new JScrollPane(plansGridPanel);
         this.add(scrollPane, BorderLayout.CENTER);
 
-
+        // Pagination panel at bottom
         final JPanel paginationPanel = new JPanel();
         paginationPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
@@ -89,7 +97,7 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
         this.add(paginationPanel, BorderLayout.SOUTH);
 
-
+        // Initialize with empty state
         updateView();
     }
 
@@ -97,12 +105,16 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
      * Loads plans for the given username and page.
      *
      * @param username the username
-     * @param page     the page number (0-indexed)
+     * @param page the page number (0-indexed)
      */
     private void loadPlans(String username, int page) {
         if (showPlansController != null) {
             showPlansController.execute(username, page, PLANS_PER_PAGE);
         }
+    }
+
+    public void setEditPlanController(EditPlanController controller) {
+        this.editPlanController = controller;
     }
 
     /**
@@ -111,10 +123,10 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
     private void updateView() {
         final ShowPlansState state = showPlansViewModel.getState();
 
-
+        // Clear existing plans
         plansGridPanel.removeAll();
 
-
+        // Display plans or empty message
         final List<Plan> plans = state.getPlans();
         if (plans.isEmpty()) {
             final JLabel emptyLabel = new JLabel("You haven't created any plans yet");
@@ -122,16 +134,17 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
             emptyLabel.setFont(new Font("Arial", Font.ITALIC, 16));
             plansGridPanel.setLayout(new BorderLayout());
             plansGridPanel.add(emptyLabel, BorderLayout.CENTER);
-        } else {
+        }
+        else {
             plansGridPanel.setLayout(new GridLayout(GRID_ROWS, GRID_COLS, 15, 15));
             for (Plan plan : plans) {
                 plansGridPanel.add(createPlanPanel(plan));
             }
         }
 
-
+        // Update pagination controls
         pageLabel.setText("Page " + (state.getCurrentPage() + 1) + " / " +
-                Math.max(1, state.getTotalPages()));
+                         Math.max(1, state.getTotalPages()));
         previousButton.setEnabled(state.hasPreviousPage());
         nextButton.setEnabled(state.hasNextPage());
 
@@ -143,9 +156,9 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
         this.showSubgoalView = view;
     }
 
+
     /**
      * Creates a panel for a single plan.
-     *
      * @param plan the plan to display
      * @return the plan panel
      */
@@ -172,7 +185,49 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
 
         subgoalsButton.setEnabled(true);
 
+        JButton editButton = new JButton("Edit");
 
+        editButton.addActionListener(e -> {
+            if (editPlanController == null) return;
+
+            JTextField nameField = new JTextField(plan.getName(), 20);
+            JTextField descField = new JTextField(plan.getDescription(), 20);
+
+            JPanel form = new JPanel(new GridLayout(0, 2, 5, 5));
+            form.add(new JLabel("Title:"));
+            form.add(nameField);
+            form.add(new JLabel("Description:"));
+            form.add(descField);
+
+            int result = JOptionPane.showConfirmDialog(
+                    this,
+                    form,
+                    "Edit Plan",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE
+            );
+
+            if (result == JOptionPane.OK_OPTION) {
+                String newName = nameField.getText().trim();
+                String newDesc = descField.getText().trim();
+
+                if (!newName.isEmpty() && !newDesc.isEmpty()) {
+                    editPlanController.execute(plan.getId(), newName, newDesc);
+                } else {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "All fields must be non-empty.",
+                            "Edit Plan Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+        });
+
+        // Add to your buttons panel
+        buttonsPanel.add(editButton);
+
+        // Enable delete button and add action listener
         deleteButton.addActionListener(e -> {
             final int choice = JOptionPane.showConfirmDialog(
                     this,
