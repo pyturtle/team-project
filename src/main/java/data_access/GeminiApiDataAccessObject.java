@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterface,
         SubgoalQnaGeminiDataAccessInterface {
-    private final String apiKey = "INSERT YOUR API KEY HERE";
+    private final String apiKey = "AIzaSyAwF5vNtPHzDQtiYmI4ekT4T72irD3gTb0";
     private final Client client;
 
     public GeminiApiDataAccessObject() {

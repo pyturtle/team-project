@@ -10,5 +10,17 @@
     "description": "A structured approach to bring a creative idea to life, from initial concept to final evaluation. This plan guides you through the essential steps to design, create, and refine your chosen 'something'.",
     "id": "fa76f501-4f8d-4c15-8a62-86317991e153",
     "username": "1"
+  },
+  {
+    "name": "C# Learning Journey",
+    "description": "A structured plan to learn C# from foundational concepts to advanced topics and practical application, ensuring a solid understanding and skill development.",
+    "id": "4c607e75-f420-4565-ba3b-7a0a493e04d8",
+    "username": "ilian"
+  },
+  {
+    "name": "Learn Java Programming",
+    "description": "A comprehensive, chronological plan to learn Java from fundamental concepts to building practical applications.",
+    "id": "c0b52812-1b5e-4807-b753-14024866061e",
+    "username": "ilian"
   }
 ]
