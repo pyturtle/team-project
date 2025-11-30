@@ -274,6 +274,7 @@ public class ShowPlansView extends JPanel implements PropertyChangeListener {
                 JScrollPane scrollPane = new JScrollPane(subgoalsPanel);
                 subgoalDialog.add(scrollPane, BorderLayout.CENTER);
 
+                subgoals.sort(java.util.Comparator.comparing(Subgoal::getDeadline));
                 for (Subgoal s : subgoals) {
                     JPanel box = new JPanel();
                     box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
