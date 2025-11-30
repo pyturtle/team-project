@@ -1,17 +1,11 @@
 package data_access.file;
-
+import data_access.interfaces.file.JsonDataAccess;
 import data_access.interfaces.subgoal.SubgoalDataAccessInterface;
 import entity.subgoal.Subgoal;
 import entity.subgoal.SubgoalBuilder;
-import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -21,133 +15,54 @@ import java.util.List;
  * It can be used as a placeholder until a file- or DB-backed DAO
  * is implemented by the team.
  */
-public class FileSubgoalDataAccessObject implements
-        SubgoalDataAccessInterface,
-        use_case.subgoal.show_subgoal.SubgoalDataAccessInterface {
-    private final String subgoalsFilePath;
+public class FileSubgoalDataAccessObject extends JsonDataAccess<Subgoal>
+        implements SubgoalDataAccessInterface{
     private final SubgoalBuilder subgoalBuilder;
-    private final HashMap<String, Subgoal> subgoals = new HashMap<>();
+    private final ArrayList<Subgoal> subgoals = new ArrayList<>();
 
     /**
      * Constructs an empty SubgoalDataAccessObject.
      */
     public FileSubgoalDataAccessObject(String subgoalsFilePath, SubgoalBuilder subgoalBuilder) {
-        this.subgoalsFilePath = subgoalsFilePath;
+        super(subgoalsFilePath);
         this.subgoalBuilder = subgoalBuilder;
         if (subgoalsFilePath != null) {
             try {
-                loadSubgoalsFromJson(subgoalsFilePath);
+                loadFromJson(subgoals);
             } catch (Exception e) {
                 System.err.println("Could not load subgoals from file: " + e.getMessage());
-                System.err.println("Will use demo data when needed.");
             }
         }
     }
 
-    private void loadSubgoalsFromJson(String filePath) throws IOException {
-        String jsonContent = new String(Files.readAllBytes(Paths.get(filePath)));
-        JSONArray subgoalsArray = new JSONArray(jsonContent);
-
-        for (int i = 0; i < subgoalsArray.length(); i++) {
-            try {
-                JSONObject subgoalObj = subgoalsArray.getJSONObject(i);
-
-                String subgoalId = subgoalObj.getString("id");
-                String planId = subgoalObj.getString("plan_id");
-                String username = subgoalObj.getString("username");
-                String name = subgoalObj.getString("name");
-                String description = subgoalObj.getString("description");
-                LocalDate date = LocalDate.parse(subgoalObj.getString("deadline"));
-                boolean isPriority = subgoalObj.getBoolean("priority");
-                boolean isCompleted = subgoalObj.getBoolean("completed");
-                Subgoal subgoal = subgoalBuilder
-                        .setId(subgoalId)
-                        .setPlanId(planId)
-                        .setUsername(username)
-                        .setName(name)
-                        .setDescription(description)
-                        .setDeadline(date)
-                        .setPriority(isPriority)
-                        .setIsCompleted(isCompleted)
-                        .build();
-                subgoals.put(subgoalId, subgoal);
-            } catch (Exception e) {
-                System.err.println("Error parsing subgoal at index " + i + ": " + e.getMessage());
-
-            }
-        }
-    }
-
-    @Override
-    public void save() {
-        if (subgoalsFilePath == null) {
-
-            return;
-        }
-
-        try {
-            JSONArray subgoalsArray = new JSONArray();
-            for (Subgoal subgoal : subgoals.values()) {
-                JSONObject subgoalObj = new JSONObject();
-                subgoalObj.put("id", subgoal.getId());
-                subgoalObj.put("plan_id", subgoal.getPlanId());
-                subgoalObj.put("username", subgoal.getUsername());
-                subgoalObj.put("name", subgoal.getName());
-                subgoalObj.put("description", subgoal.getDescription());
-                subgoalObj.put("deadline", subgoal.getDeadline());
-                subgoalObj.put("priority", subgoal.isPriority());
-                subgoalObj.put("completed", subgoal.isCompleted());
-                subgoalsArray.put(subgoalObj);
-            }
-
-            String jsonContent = subgoalsArray.toString(2);
-            Files.write(Paths.get(subgoalsFilePath), jsonContent.getBytes());
-            System.out.println("Subgoals saved to file: " + subgoalsFilePath);
-        } catch (IOException e) {
-            System.err.println("Error saving subgoals to file: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Adds or replaces a subgoal in the in-memory map.
-     * This is mainly useful for seeding data in AppBuilder.
-     *
-     * @param subgoal the subgoal to store
-     */
-    public void save(Subgoal subgoal) {
-        subgoals.put(subgoal.getId(), subgoal);
-        this.save();
-    }
 
     @Override
     public Subgoal getSubgoalById(String id) {
-        return subgoals.get(id);
+        return subgoals.stream()
+                .filter(subgoal -> subgoal.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public void updatePriority(String id, boolean priority) {
-        Subgoal old = subgoals.get(id);
+        Subgoal old = subgoals.stream()
+                .filter(subgoal -> subgoal.getId().equals(id))
+                .findFirst()
+                .orElse(null);
         if (old == null) {
             return;
         }
-        Subgoal updated = new Subgoal(
-                old.getId(),
-                old.getPlanId(),
-                old.getUsername(),
-                old.getName(),
-                old.getDescription(),
-                old.getDeadline(),
-                old.isCompleted(),
-                priority
-        );
-        subgoals.put(id, updated);
-        this.save();
+        subgoals.remove(old);
+        Subgoal updated = subgoalBuilder.copyFromSubgoal(old).setPriority(priority).build();
+        subgoals.add(updated);
+        this.saveToJson(subgoals);
     }
 
     @Override
     public List<Subgoal> getSubgoalsByPlan(String planId, String userId) {
         List<Subgoal> result = new ArrayList<>();
-        for (Subgoal subgoal : subgoals.values()) {
+        for (Subgoal subgoal : subgoals) {
             if (subgoal.getPlanId().equals(planId) && subgoal.getUsername().equals(userId)) {
                 result.add(subgoal);
             }
@@ -158,7 +73,7 @@ public class FileSubgoalDataAccessObject implements
     @Override
     public List<Subgoal> getPrioritySubgoals(String userId) {
         List<Subgoal> result = new ArrayList<>();
-        for (Subgoal subgoal : subgoals.values()) {
+        for (Subgoal subgoal : subgoals) {
             if (subgoal.getUsername().equals(userId) && subgoal.isPriority()) {
                 result.add(subgoal);
             }
@@ -170,7 +85,7 @@ public class FileSubgoalDataAccessObject implements
     @Override
     public List<Subgoal> getAllSubgoalsForUser(String userId) {
         List<Subgoal> result = new ArrayList<>();
-        for (Subgoal subgoal : subgoals.values()) {
+        for (Subgoal subgoal : subgoals) {
             if (subgoal.getUsername().equals(userId)) {
                 result.add(subgoal);
             }
@@ -179,37 +94,31 @@ public class FileSubgoalDataAccessObject implements
     }
 
     @Override
-    public void saveUpdatedSubgoal(Subgoal subgoal) {
-        subgoals.put(subgoal.getId(), subgoal);
-        this.save();
+    public void saveSubgoal(Subgoal subgoal) {
+        Subgoal existing = getSubgoalById(subgoal.getId());
+        if (existing != null) {
+            subgoals.remove(existing);
+        }
+        subgoals.add(subgoal);
+        this.saveToJson(subgoals);
     }
 
     public void updateCompleted(String id, boolean completed) {
-        Subgoal old = subgoals.get(id);
+        Subgoal old = getSubgoalById(id);
         if (old == null) {
             return;
         }
-
-        Subgoal updated = new Subgoal(
-                old.getId(),
-                old.getPlanId(),
-                old.getUsername(),
-                old.getName(),
-                old.getDescription(),
-                old.getDeadline(),
-                completed,
-                old.isPriority()
-        );
-
-        subgoals.put(id, updated);
-        this.save();
+        subgoals.remove(old);
+        Subgoal updated = subgoalBuilder.copyFromSubgoal(old).setIsCompleted(completed).build();
+        subgoals.add(updated);
+        this.saveToJson(subgoals);
     }
 
 
     public List<Subgoal> getSubgoalsByName(String name, String userId) {
         String searchTerm = name.toLowerCase();
         List<Subgoal> result = new ArrayList<>();
-        for (Subgoal subgoal : subgoals.values()) {
+        for (Subgoal subgoal : subgoals) {
             if (subgoal.getUsername().equals(userId) &&
                     subgoal.getName().toLowerCase().contains(searchTerm)) {
                 result.add(subgoal);
@@ -221,7 +130,7 @@ public class FileSubgoalDataAccessObject implements
     @Override
     public List<Subgoal> getIncompleteSubgoals(String userId) {
         List<Subgoal> result = new ArrayList<>();
-        for (Subgoal subgoal : subgoals.values()) {
+        for (Subgoal subgoal : subgoals) {
             if (subgoal.getUsername().equals(userId) && !subgoal.isCompleted()) {
                 result.add(subgoal);
             }
@@ -232,7 +141,7 @@ public class FileSubgoalDataAccessObject implements
     @Override
     public List<Subgoal> getCompletedSubgoals(String userId) {
         List<Subgoal> result = new ArrayList<>();
-        for (Subgoal subgoal : subgoals.values()) {
+        for (Subgoal subgoal : subgoals) {
             if (subgoal.getUsername().equals(userId) && subgoal.isCompleted()) {
                 result.add(subgoal);
             }
@@ -243,7 +152,7 @@ public class FileSubgoalDataAccessObject implements
     @Override
     public List<Subgoal> getSubgoalsByUsername(String username) {
         List<Subgoal> result = new ArrayList<>();
-        for (Subgoal subgoal : subgoals.values()) {
+        for (Subgoal subgoal : subgoals) {
             if (subgoal.getUsername().equals(username)) {
                 result.add(subgoal);
             }
@@ -253,14 +162,18 @@ public class FileSubgoalDataAccessObject implements
 
     @Override
     public void deleteSubgoal(String id) {
-        subgoals.remove(id);
-        this.save();
+        Subgoal subgoal = getSubgoalById(id);
+        if (subgoal == null) {
+            return;
+        }
+        subgoals.remove(subgoal);
+        this.saveToJson(subgoals);
     }
 
     @Override
     public java.util.List<Subgoal> getSubgoalsByPlanId(String planId) {
         java.util.List<Subgoal> result = new ArrayList<>();
-        for (Subgoal subgoal : subgoals.values()) {
+        for (Subgoal subgoal : subgoals) {
             if (subgoal.getPlanId().equals(planId)) {
                 result.add(subgoal);
             }
@@ -268,4 +181,39 @@ public class FileSubgoalDataAccessObject implements
         return result;
     }
 
+    @Override
+    public Subgoal parseJsonObject(JSONObject jsonObject) {
+        String subgoalId = jsonObject.getString("id");
+        String planId = jsonObject.getString("plan_id");
+        String username = jsonObject.getString("username");
+        String name = jsonObject.getString("name");
+        String description = jsonObject.getString("description");
+        LocalDate date = LocalDate.parse(jsonObject.getString("deadline"));
+        boolean isPriority = jsonObject.getBoolean("priority");
+        boolean isCompleted = jsonObject.getBoolean("completed");
+        return subgoalBuilder
+                .setId(subgoalId)
+                .setPlanId(planId)
+                .setUsername(username)
+                .setName(name)
+                .setDescription(description)
+                .setDeadline(date)
+                .setPriority(isPriority)
+                .setIsCompleted(isCompleted)
+                .build();
+    }
+
+    @Override
+    public JSONObject convertObjectToJson(Subgoal object) {
+        JSONObject subgoalObj = new JSONObject();
+        subgoalObj.put("id", object.getId());
+        subgoalObj.put("plan_id", object.getPlanId());
+        subgoalObj.put("username", object.getUsername());
+        subgoalObj.put("name", object.getName());
+        subgoalObj.put("description", object.getDescription());
+        subgoalObj.put("deadline", object.getDeadline());
+        subgoalObj.put("priority", object.isPriority());
+        subgoalObj.put("completed", object.isCompleted());
+        return subgoalObj;
+    }
 }

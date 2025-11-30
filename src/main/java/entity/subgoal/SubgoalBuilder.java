@@ -13,6 +13,18 @@ public class SubgoalBuilder {
     private boolean isCompleted = false;
     private boolean priority = false;
 
+    public SubgoalBuilder copyFromSubgoal(Subgoal subgoal) {
+        id = subgoal.getId();
+        planId = subgoal.getPlanId();
+        username = subgoal.getUsername();
+        name = subgoal.getName();
+        description = subgoal.getDescription();
+        deadline = subgoal.getDeadline();
+        isCompleted = subgoal.isCompleted();
+        priority = subgoal.isPriority();
+        return this;
+    }
+
     public SubgoalBuilder generateId() {
         this.id = UUID.randomUUID().toString();
         return this;

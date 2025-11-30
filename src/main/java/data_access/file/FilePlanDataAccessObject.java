@@ -17,6 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * FilePlanDataAccessObject provides file-based persistence for plans.
+ * It can load plans from a JSON file, cache them in memory, and save changes back to disk.
+ */
 public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
         DeletePlanDataAccessInterface, SavePlanDataAccessInterface, ShowPlanDataAccessInterface {
     private final List<Plan> allPlans = new ArrayList<>();
@@ -24,8 +28,7 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
     private final String plansFilePath;
 
     /**
-     * Constructs the data access object that loads plans from a JSON file.
-     *
+     * Constructs a FilePlanDataAccessObject that loads plans from a JSON file if provided.
      * @param plansDataFile path to the JSON file containing plans data, or null for demo data
      */
     public FilePlanDataAccessObject(String plansDataFile) {
@@ -35,13 +38,12 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
                 loadPlansFromJson(plansDataFile);
             } catch (Exception e) {
                 System.err.println("Could not load plans from file: " + e.getMessage());
-                System.err.println("Will use demo data when needed.");
             }
         }
     }
 
     /**
-     * Constructs the data access object with demo plans.
+     * Constructs a FilePlanDataAccessObject without an initial JSON file and uses demo data when needed.
      */
     public FilePlanDataAccessObject() {
         this(null);
@@ -49,13 +51,9 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
 
     /**
      * Loads plans from a JSON file.
-     * Expected format: Array of plan objects
-     * [
-     * {"planId": "...", "name": "...", "description": "...", "username": "..."},
-     * ...
-     * ]
-     *
+     * Expected format: array of plan objects with fields id, name, description, and username.
      * @param filePath path to the JSON file
+     * @throws IOException if the file cannot be read
      */
     private void loadPlansFromJson(String filePath) throws IOException {
         String jsonContent = new String(Files.readAllBytes(Paths.get(filePath)));
@@ -76,8 +74,8 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
     }
 
     /**
-     * Saves all plans to the JSON file.
-     * This persists changes to disk.
+     * Saves all plans in memory to the JSON file specified by plansFilePath.
+     * If no path was provided, this method does nothing.
      */
     private void savePlansToJson() {
         if (plansFilePath == null) {
@@ -102,10 +100,9 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
     }
 
     /**
-     * Initializes demo plans for a specific user.
-     * Used when no JSON file is provided or file is empty.
-     *
-     * @param username the user ID (username)
+     * Initializes demo plans in memory for the given user.
+     * Used when no JSON file is provided or when no plans exist.
+     * @param username the username to associate with the demo plans
      */
     private void initializeDemoPlansForUser(String username) {
         allPlans.add(new Plan("demo-001", "Learn Guitar", "Master guitar playing in 6 months", username));
@@ -119,10 +116,9 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
     }
 
     /**
-     * Gets all plans for a specific user by filtering on username.
-     *
-     * @param username the user ID (username) to filter by
-     * @return list of plans belonging to this user
+     * Returns all plans belonging to the given user, using an in-memory cache.
+     * @param username the username whose plans are requested
+     * @return a list of plans for the given user
      */
     private List<Plan> getPlansForUser(String username) {
         if (cachedUserPlans.containsKey(username)) {
@@ -130,21 +126,28 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
         }
         List<Plan> userPlans = allPlans.stream()
                 .filter(plan -> plan.getUsername().equals(username))
-                .collect(Collectors.toList());                /*if (userPlans.isEmpty() && allPlans.isEmpty()) {
-            initializeDemoPlansForUser(username);
-            userPlans = allPlans.stream()
-                    .filter(plan -> plan.getUsername().equals(username))
-                    .collect(Collectors.toList());
-        }*/
+                .collect(Collectors.toList());
         cachedUserPlans.put(username, userPlans);
         return userPlans;
     }
 
+    /**
+     * Returns all plans for the given username.
+     * @param username the username whose plans are requested
+     * @return a list of all plans belonging to the user
+     */
     @Override
     public List<Plan> getPlansByUsername(String username) {
         return getPlansForUser(username);
     }
 
+    /**
+     * Returns a paginated list of plans for the given username.
+     * @param username the username whose plans are requested
+     * @param page the zero-based page index
+     * @param pageSize the number of plans per page
+     * @return a sublist of the user's plans for the requested page, or an empty list if out of range
+     */
     @Override
     public List<Plan> getPlansByUsername(String username, int page, int pageSize) {
         final List<Plan> userPlans = getPlansForUser(username);
@@ -156,16 +159,21 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
         return userPlans.subList(start, end);
     }
 
+    /**
+     * Returns the number of plans for the given username.
+     * @param username the username whose plan count is requested
+     * @return the number of plans belonging to the user
+     */
     @Override
     public int getPlansCount(String username) {
         return getPlansForUser(username).size();
     }
 
     /**
-     * Removes a plan by planId.
-     *
-     * @param planId the plan ID to remove
-     * @return true if the plan was removed, false otherwise
+     * Removes a plan with the given plan ID from memory and clears the cache.
+     * This method does not persist changes to disk.
+     * @param planId the ID of the plan to remove
+     * @return true if a plan was removed, false otherwise
      */
     public boolean removePlan(String planId) {
         boolean removed = allPlans.removeIf(plan -> plan.getId().equals(planId));
@@ -176,10 +184,9 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
     }
 
     /**
-     * Gets a plan by its ID.
-     *
-     * @param planId the plan ID
-     * @return the plan, or null if not found
+     * Returns a plan with the given ID, or null if no such plan exists.
+     * @param planId the ID of the plan to find
+     * @return the matching plan or null if not found
      */
     public Plan getPlanById(String planId) {
         return allPlans.stream()
@@ -188,6 +195,11 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
                 .orElse(null);
     }
 
+    /**
+     * Deletes a plan with the given ID, clears the cache, and saves changes to disk.
+     * @param planId the ID of the plan to delete
+     * @return true if the plan was deleted, false otherwise
+     */
     @Override
     public boolean deletePlan(String planId) {
         boolean removed = allPlans.removeIf(plan -> plan.getId().equals(planId));
@@ -198,6 +210,11 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
         return removed;
     }
 
+    /**
+     * Saves a new plan or appends it to the in-memory list and persists to disk.
+     * Also invalidates the cache for that user's plans.
+     * @param plan the plan to save
+     */
     @Override
     public void savePlan(Plan plan) {
         allPlans.add(plan);
@@ -205,6 +222,11 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
         savePlansToJson();
     }
 
+    /**
+     * Checks whether a plan with the given name already exists.
+     * @param planName the name of the plan to check
+     * @return true if a plan with the given name exists, false otherwise
+     */
     @Override
     public boolean planExists(String planName) {
         return allPlans.stream()

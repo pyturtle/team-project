@@ -1,8 +1,8 @@
 package use_case.plan.delete_plan;
 
 import data_access.interfaces.plan.DeletePlanDataAccessInterface;
+import data_access.interfaces.subgoal.SubgoalDataAccessInterface;
 import entity.subgoal.Subgoal;
-import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
 
 import java.util.List;
 

@@ -1,12 +1,12 @@
 package use_case.plan.save_plan;
 
 import data_access.interfaces.plan.SavePlanDataAccessInterface;
+import data_access.interfaces.subgoal.SubgoalDataAccessInterface;
 import entity.plan.Plan;
 import entity.plan.PlanBuilder;
 import entity.subgoal.Subgoal;
 import entity.subgoal.SubgoalBuilder;
 import use_case.subgoal.save_subgoal.SaveSubgoalInputData;
-import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
 
 public class SavePlanInteractor implements SavePlanInputBoundary {
     private final SavePlanOutputBoundary savePlanPresenter;
@@ -43,7 +43,7 @@ public class SavePlanInteractor implements SavePlanInputBoundary {
                         .setDescription(subgoalInputData.getDescription())
                         .setDeadline(subgoalInputData.getDeadline())
                         .build();
-                subgoalDataAccess.save(subgoal);
+                subgoalDataAccess.saveSubgoal(subgoal);
             }
             success = true;
             message = "Plan was created successfully";

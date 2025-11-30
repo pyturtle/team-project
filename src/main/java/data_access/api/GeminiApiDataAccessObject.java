@@ -9,15 +9,30 @@ import org.json.JSONObject;
 
 import java.time.LocalDate;
 
+/**
+ * GeminiApiDataAccessObject is a data access class that communicates with the Gemini API.
+ * It generates structured plans with subgoals and answers user questions related to subgoals.
+ * This class implements both GeneratePlanDataAccessInterface and SubgoalQnaGeminiDataAccessInterface.
+ */
 public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterface,
         SubgoalQnaGeminiDataAccessInterface {
-    private final String apiKey = "AIzaSyAwF5vNtPHzDQtiYmI4ekT4T72irD3gTb0";
+    private final String apiKey = "AIzaSyAocuTT3FAEL2-C_OZjIxSPZ6CDox4rRNw";
     private final Client client;
 
+    /**
+     * Creates a new GeminiApiDataAccessObject and initializes the Gemini client with the API key.
+     */
     public GeminiApiDataAccessObject() {
         client = Client.builder().apiKey(apiKey).build();
     }
 
+    /**
+     * Requests a plan from the Gemini API based on the user's message.
+     * The response is expected to be a JSON object describing a plan with subgoals and deadlines.
+     * The returned JSON wrapper contains keys: success, responseMessage, and responseObject.
+     * @param userMessage the user's input describing the desired plan or goal
+     * @return a JSONObject containing the success flag, a response message, and the parsed plan object if valid
+     */
     @Override
     public JSONObject getPlan(String userMessage) {
         try {
@@ -64,6 +79,12 @@ public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterfac
         }
     }
 
+    /**
+     * Requests an answer from the Gemini API for a given user question about a subgoal.
+     * Returns a plain text answer or a fallback message if an error occurs or no text is returned.
+     * @param userMessage the question or prompt provided by the user
+     * @return a plain text answer from Gemini, or an error message if the request fails
+     */
     @Override
     public String getAnswerForQuestion(String userMessage) {
         try {
@@ -84,7 +105,13 @@ public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterfac
         }
     }
 
-
+    /**
+     * Validates that the given response JSON object has the expected plan structure.
+     * The object must contain name, description, and subgoals fields.
+     * Each subgoal must contain name, description, and deadline fields, and the deadline must be a valid date.
+     * @param responseObject the JSON object to validate
+     * @return true if the JSON object is structurally valid, false otherwise
+     */
     private boolean validateJsonObject(JSONObject responseObject) {
         boolean isValid;
         try {
@@ -110,6 +137,14 @@ public class GeminiApiDataAccessObject implements GeneratePlanDataAccessInterfac
         return isValid;
     }
 
+    /**
+     * Wraps a response object, message, and success flag into a standard JSON format.
+     * The returned JSON contains keys: success, responseMessage, and responseObject.
+     * @param responseObject the main response payload to include
+     * @param responseMessage a human-readable message describing the result
+     * @param success true if the operation succeeded, false otherwise
+     * @return a JSONObject containing the success flag, message, and response object
+     */
     private JSONObject prepareResponse(JSONObject responseObject, String responseMessage, boolean success) {
         return new JSONObject()
                 .put("success", success)

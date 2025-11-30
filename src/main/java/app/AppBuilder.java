@@ -1,6 +1,6 @@
 package app;
 
-import data_access.PreferenceRepository;
+import data_access.*;
 import data_access.api.GeminiApiDataAccessObject;
 import data_access.file.FilePlanDataAccessObject;
 import data_access.file.FileSubgoalDataAccessObject;
@@ -8,10 +8,9 @@ import data_access.file.FileSubgoalQnaDataAccessObject;
 import data_access.file.FileUserDataAccessObject;
 import data_access.interfaces.subgoal.SubgoalQnaDataAccessInterface;
 import data_access.interfaces.subgoal.SubgoalQnaGeminiDataAccessInterface;
+import entity.user.UserFactory;
 import entity.plan.PlanFactory;
 import entity.subgoal.SubgoalBuilder;
-import entity.subgoal.SubgoalFactory;
-import entity.user.UserFactory;
 import interface_adapter.DialogManagerModel;
 import interface_adapter.PartialViewModel;
 import interface_adapter.ViewManagerModel;
@@ -36,19 +35,15 @@ import interface_adapter.plan.show_plan.ShowPlanViewModel;
 import interface_adapter.plan.show_plans.ShowPlansController;
 import interface_adapter.plan.show_plans.ShowPlansPresenter;
 import interface_adapter.plan.show_plans.ShowPlansViewModel;
-import interface_adapter.signup.SignupController;
-import interface_adapter.signup.SignupPresenter;
-import interface_adapter.signup.SignupViewModel;
-import interface_adapter.subgoal.filter_subgoals.FilterSubgoalsController;
-import interface_adapter.subgoal.filter_subgoals.FilterSubgoalsPresenter;
 import interface_adapter.subgoal.show_subgoal.ShowSubgoalController;
 import interface_adapter.subgoal.show_subgoal.ShowSubgoalPresenter;
 import interface_adapter.subgoal.show_subgoal.ShowSubgoalViewModel;
+import interface_adapter.signup.SignupController;
+import interface_adapter.signup.SignupPresenter;
+import interface_adapter.signup.SignupViewModel;
 import interface_adapter.subgoal.subgoal_qna.SubgoalQnaController;
 import interface_adapter.subgoal.subgoal_qna.SubgoalQnaPresenter;
 import interface_adapter.subgoal.subgoal_qna.SubgoalQnaViewModel;
-import use_case.filter_subgoals.FilterSubgoalsInputBoundary;
-import use_case.filter_subgoals.FilterSubgoalsInteractor;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -74,48 +69,67 @@ import use_case.remember_me.RememberMe;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
-import use_case.subgoal.qna.SubgoalQnaInputBoundary;
-import use_case.subgoal.qna.SubgoalQnaInteractor;
-import use_case.subgoal.qna.SubgoalQnaOutputBoundary;
 import use_case.subgoal.show_subgoal.ShowSubgoalInputBoundary;
 import use_case.subgoal.show_subgoal.ShowSubgoalInteractor;
 import use_case.subgoal.show_subgoal.ShowSubgoalOutputBoundary;
+import use_case.subgoal.qna.SubgoalQnaInputBoundary;
+import use_case.subgoal.qna.SubgoalQnaInteractor;
+import use_case.subgoal.qna.SubgoalQnaOutputBoundary;
 import view.*;
 import view.plan.GeneratePlanView;
 import view.plan.SavePlanView;
 import view.plan.ShowPlanView;
 import view.plan.ShowPlansView;
-import view.subgoal.ShowSubgoalView;
-import view.subgoal.SubgoalQnaView;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
+import interface_adapter.subgoal.filter_subgoals.FilterSubgoalsController;
+import interface_adapter.subgoal.filter_subgoals.FilterSubgoalsPresenter;
+import use_case.filter_subgoals.FilterSubgoalsInputBoundary;
+import use_case.filter_subgoals.FilterSubgoalsInteractor;
+import view.subgoal.ShowSubgoalView;
+import view.subgoal.SubgoalQnaView;
 
-
+// Delete Plan functionality added
 public class AppBuilder {
     final UserFactory userFactory = new UserFactory();
-    final SubgoalFactory subgoalFactory = new SubgoalFactory();
     final PlanFactory planFactory = new PlanFactory();
+
+    private final JPanel cardPanel = new JPanel();
+    private final CardLayout cardLayout = new CardLayout();
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
+    ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
+
+    private final HashMap<String, JPanel> dialogViews = new HashMap<>();
     final DialogManagerModel dialogManagerModel = new DialogManagerModel();
-    final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
+    DialogManager dialogManager = new DialogManager(dialogViews, dialogManagerModel);
+
+    private final HashMap<String, JPanel> partialViews = new HashMap<>();
+    private final PartialViewModel partialViewModel = new PartialViewModel();
+    PartialViewManager partialViewManager = new PartialViewManager(partialViews, partialViewModel);
+    // set which data access implementation to use, can be any
+    // of the classes from the data_access package
+
+    // DAO version using local file storage
+    final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.json");
     final FileSubgoalDataAccessObject subgoalDataAccessObject = new FileSubgoalDataAccessObject(
             "subgoals.json",
             new SubgoalBuilder());
+    // DAO version using a shared external database
+
+    // Plan data access object - loads from JSON file
+    // To use JSON file: new InMemoryPlanDataAccessObject("plans.json")
+    // To use demo data: new InMemoryPlanDataAccessObject()
     final FilePlanDataAccessObject planDataAccessObject = new FilePlanDataAccessObject("plans.json");
-    final GeminiApiDataAccessObject generatePlanDataAccessObject = new GeminiApiDataAccessObject();
-    private final JPanel cardPanel = new JPanel();
-    private final CardLayout cardLayout = new CardLayout();
-    private final HashMap<String, JPanel> dialogViews = new HashMap<>();
-    private final HashMap<String, JPanel> partialViews = new HashMap<>();
-    private final PartialViewModel partialViewModel = new PartialViewModel();
-    ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
-    DialogManager dialogManager = new DialogManager(dialogViews, dialogManagerModel);
-    PartialViewManager partialViewManager = new PartialViewManager(partialViews, partialViewModel);
+
     private ShowPlansView showPlansView;
     private ShowPlansViewModel showPlansViewModel;
-    private MainPageView mainPageView;
+    // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
+
+    final GeminiApiDataAccessObject generatePlanDataAccessObject = new GeminiApiDataAccessObject();
+
+    private MainPageView  mainPageView;
     private SignupView signupView;
     private SignupViewModel signupViewModel;
     private LoginViewModel loginViewModel;
@@ -129,6 +143,7 @@ public class AppBuilder {
     private LoginView loginView;
     private GeneratePlanView generatePlanView;
     private ShowPlanView showPlanView;
+    private SavePlanView savePlanView;
     private CalendarView calendarView;
     private ShowSubgoalView showSubgoalView;
     private SubgoalQnaView subgoalQnaView;
@@ -139,7 +154,8 @@ public class AppBuilder {
         cardPanel.setLayout(cardLayout);
     }
 
-    public AppBuilder addMainView() {
+    public AppBuilder addMainView()
+    {
         mainPageView = new MainPageView(viewManagerModel,
                 partialViewModel,
                 showPlansViewModel,
@@ -174,11 +190,10 @@ public class AppBuilder {
     }
 
     public AppBuilder addLoggedInView() {
-
+        // LoggedInViewModel is still needed by presenters, but we don't need the view anymore
         loggedInViewModel = new LoggedInViewModel();
         return this;
     }
-
     public AppBuilder addCalendarView() {
         calendarViewModel = new CalendarViewModel();
         calendarView = new CalendarView(calendarViewModel, subgoalDataAccessObject);
@@ -216,7 +231,7 @@ public class AppBuilder {
 
     public AppBuilder addSavePlanView() {
         savePlanViewModel = new SavePlanViewModel();
-        SavePlanView savePlanView = new SavePlanView(savePlanViewModel);
+        savePlanView = new SavePlanView(savePlanViewModel);
         dialogViews.put(savePlanView.getViewName(), savePlanView);
         return this;
     }
@@ -246,7 +261,6 @@ public class AppBuilder {
 
     /**
      * Adds the Show Plans Use Case to the application.
-     *
      * @return this builder
      */
     public AppBuilder addShowPlansUseCase() {
@@ -268,6 +282,7 @@ public class AppBuilder {
                 new FilterSubgoalsInteractor(subgoalDataAccessObject, filterSubgoalsPresenter);
         filterSubgoalsController = new FilterSubgoalsController(filterSubgoalsInteractor);
 
+        System.out.println("AppBuilder: Created filterSubgoalsController: " + filterSubgoalsController);
 
         calendarView.setFilterSubgoalsController(filterSubgoalsController);
         return this;
@@ -275,7 +290,6 @@ public class AppBuilder {
 
     /**
      * Adds the Delete Plan Use Case to the application.
-     *
      * @return this builder
      */
     public AppBuilder addDeletePlanUseCase() {
@@ -322,10 +336,14 @@ public class AppBuilder {
         ShowSubgoalOutputBoundary showSubgoalPresenter = new ShowSubgoalPresenter(
                 showSubgoalViewModel, dialogManagerModel, calendarViewModel);
 
-
+        // Pass FilterSubgoalsController so presenter can re-apply filters after changes
+        System.out.println("AppBuilder.addShowSubgoalUseCase: filterSubgoalsController is " +
+                (filterSubgoalsController == null ? "NULL" : "NOT NULL"));
         if (filterSubgoalsController != null) {
             ((ShowSubgoalPresenter) showSubgoalPresenter).setFilterSubgoalsController(filterSubgoalsController);
-
+            System.out.println("AppBuilder: Set filterSubgoalsController on ShowSubgoalPresenter");
+        } else {
+            System.out.println("AppBuilder: WARNING - filterSubgoalsController is null! Cannot set on presenter.");
         }
 
         ShowSubgoalInputBoundary showSubgoalInteractor = new ShowSubgoalInteractor(
@@ -361,7 +379,6 @@ public class AppBuilder {
 
     /**
      * Adds the Logout Use Case to the application.
-     *
      * @return this builder
      */
     public AppBuilder addLogoutUseCase() {
@@ -390,6 +407,8 @@ public class AppBuilder {
 
         return application;
     }
+
+
 
 
 }

@@ -1,10 +1,10 @@
 package use_case.subgoal.qna;
 
+import data_access.interfaces.subgoal.SubgoalDataAccessInterface;
 import data_access.interfaces.subgoal.SubgoalQnaDataAccessInterface;
 import data_access.interfaces.subgoal.SubgoalQnaGeminiDataAccessInterface;
 import entity.subgoal.Subgoal;
 import entity.subgoal.SubgoalQuestionAnswer;
-import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
 
 import java.util.ArrayList;
 import java.util.Collections;

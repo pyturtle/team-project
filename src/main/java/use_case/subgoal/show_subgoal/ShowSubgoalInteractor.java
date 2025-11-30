@@ -1,5 +1,6 @@
 package use_case.subgoal.show_subgoal;
 
+import data_access.interfaces.subgoal.SubgoalDataAccessInterface;
 import entity.subgoal.Subgoal;
 import interface_adapter.subgoal.show_subgoal.ShowSubgoalPresenter;
 

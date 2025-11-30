@@ -39,7 +39,7 @@ public class CompleteSubgoalInteractor implements CompleteSubgoalInputBoundary {
         );
 
 
-        subgoalDAO.saveUpdatedSubgoal(updated);
+        subgoalDAO.saveSubgoal(updated);
 
 
         presenter.present(new CompleteSubgoalOutputData(updated.getId()));
