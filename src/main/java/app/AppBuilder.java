@@ -9,6 +9,8 @@ import interface_adapter.DialogManagerModel;
 import interface_adapter.PartialViewModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.calendar.CalendarViewModel;
+import interface_adapter.edit_plan.EditPlanController;
+import interface_adapter.edit_plan.EditPlanPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
@@ -38,6 +40,9 @@ import interface_adapter.signup.SignupViewModel;
 import interface_adapter.subgoal_qna.SubgoalQnaController;
 import interface_adapter.subgoal_qna.SubgoalQnaPresenter;
 import interface_adapter.subgoal_qna.SubgoalQnaViewModel;
+import use_case.edit_plan.EditPlanInputBoundary;
+import use_case.edit_plan.EditPlanInteractor;
+import use_case.edit_plan.EditPlanOutputBoundary;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -241,6 +246,21 @@ public class AppBuilder {
         signupView.setSignupController(controller);
         return this;
     }
+
+    public AppBuilder addEditPlanUseCase() {
+        final EditPlanOutputBoundary editPlanOutputBoundary =
+                new EditPlanPresenter(showPlansViewModel);
+
+        final EditPlanInputBoundary editPlanInteractor =
+                new EditPlanInteractor(planDataAccessObject, editPlanOutputBoundary);
+
+        final EditPlanController editPlanController =
+                new EditPlanController(editPlanInteractor);
+
+        showPlansView.setEditPlanController(editPlanController);
+        return this;
+    }
+
 
     public AppBuilder addLoginUseCase() {
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel,

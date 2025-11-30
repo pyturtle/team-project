@@ -7,6 +7,7 @@ import use_case.plan.delete_plan.DeletePlanDataAccessInterface;
 import use_case.plan.save_plan.SavePlanDataAccessInterface;
 import use_case.plan.show_plan.ShowPlanDataAccessInterface;
 import use_case.plan.show_plans.ShowPlansDataAccessInterface;
+import use_case.edit_plan.EditPlanDataAccessInterface;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,7 +23,8 @@ import java.util.stream.Collectors;
  * Loads plans from a flat JSON array and filters by username.
  */
 public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
-        DeletePlanDataAccessInterface, SavePlanDataAccessInterface, ShowPlanDataAccessInterface {
+        DeletePlanDataAccessInterface, SavePlanDataAccessInterface, ShowPlanDataAccessInterface,
+        EditPlanDataAccessInterface {
 
     private final List<Plan> allPlans = new ArrayList<>();
     private final Map<String, List<Plan>> cachedUserPlans = new HashMap<>();
@@ -202,11 +204,26 @@ public class FilePlanDataAccessObject implements ShowPlansDataAccessInterface,
      * @param planId the plan ID
      * @return the plan, or null if not found
      */
+
+    @Override
     public Plan getPlanById(String planId) {
         return allPlans.stream()
                 .filter(plan -> plan.getId().equals(planId))
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Override
+    public void updatePlan(Plan updatedPlan) {
+        for (int i = 0; i < allPlans.size(); i++) {
+            if (allPlans.get(i).getId().equals(updatedPlan.getId())) {
+                allPlans.set(i, updatedPlan);
+                cachedUserPlans.clear();
+                savePlansToJson();
+                return;
+            }
+        }
+        throw new RuntimeException("Plan with id " + updatedPlan.getId() + " not found");
     }
 
     @Override
