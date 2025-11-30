@@ -199,45 +199,79 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         // Each grid in the calendar is one button, also added the mini buttons!
         for (int day = 1; day <= daysInMonth; day++) {
             LocalDate buttonDate = displayedMonth.withDayOfMonth(day);
-            JPanel dayCell = new JPanel();
-            dayCell.setLayout(new BoxLayout(dayCell, BoxLayout.Y_AXIS));
+
+            // Main day cell panel
+            JPanel dayCell = new JPanel(new BorderLayout());
             dayCell.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             dayCell.setBackground(Color.WHITE);
             dayCell.setOpaque(true);
-
-            JLabel dayLabel = new JLabel(String.valueOf(day));
-            dayLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            dayCell.add(dayLabel);
 
             if (buttonDate.equals(viewModel.getCalendarState().getSelectedDate())) {
                 dayCell.setBackground(Color.CYAN);
             }
 
+            // Day number at the top
+            JLabel dayLabel = new JLabel(String.valueOf(day), SwingConstants.CENTER);
+            dayLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+            dayCell.add(dayLabel, BorderLayout.NORTH);
+
+            // Subgoals panel with scrolling
             List<Subgoal> subgoalsForDate = subgoalsByDate.getOrDefault(buttonDate, Collections.emptyList());
-            for (int i = 0; i < subgoalsForDate.size(); i++) {
-                Subgoal subgoal = subgoalsForDate.get(i);
 
-                JButton subgoalBtn = new JButton(
-                        (i + 1) + ". " +
-                                (subgoal.getName().length() > 8 ? subgoal.getName().substring(0, 8) + "…" : subgoal.getName())
-                );
+            if (!subgoalsForDate.isEmpty()) {
+                JPanel subgoalsPanel = new JPanel();
+                subgoalsPanel.setLayout(new BoxLayout(subgoalsPanel, BoxLayout.Y_AXIS));
+                subgoalsPanel.setBackground(Color.WHITE);
+                subgoalsPanel.setOpaque(true);
 
-                subgoalBtn.setFont(new Font("SansSerif", Font.PLAIN, 9));
-                subgoalBtn.setMargin(new Insets(2, 2, 2, 2));
-                subgoalBtn.setPreferredSize(new Dimension(60, 18));
-                subgoalBtn.setMaximumSize(new Dimension(60, 18));
-                subgoalBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+                // Add each subgoal as a clickable button
+                for (int i = 0; i < subgoalsForDate.size(); i++) {
+                    Subgoal subgoal = subgoalsForDate.get(i);
 
-                subgoalBtn.addActionListener(ev -> {
-                    if (showSubgoalController != null) {
-                        showSubgoalController.execute(subgoal.getId());
+                    // Create button with better text formatting
+                    String buttonText = (i + 1) + ". ";
+                    if (subgoal.getName().length() > 10) {
+                        buttonText += subgoal.getName().substring(0, 10) + "…";
+                    } else {
+                        buttonText += subgoal.getName();
                     }
-                });
 
-                dayCell.add(subgoalBtn);
+                    JButton subgoalBtn = new JButton(buttonText);
+                    subgoalBtn.setFont(new Font("SansSerif", Font.PLAIN, 9));
+                    subgoalBtn.setMargin(new Insets(1, 2, 1, 2));
+                    subgoalBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    subgoalBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
+
+                    // Color code based on priority and completion
+                    if (subgoal.isCompleted()) {
+                        subgoalBtn.setBackground(new Color(144, 238, 144)); // Light green
+                        subgoalBtn.setOpaque(true);
+                    } else if (subgoal.isPriority()) {
+                        subgoalBtn.setBackground(new Color(255, 200, 200)); // Light red
+                        subgoalBtn.setOpaque(true);
+                    }
+
+                    // Set tooltip to show full name
+                    subgoalBtn.setToolTipText(subgoal.getName());
+
+                    subgoalBtn.addActionListener(ev -> {
+                        if (showSubgoalController != null) {
+                            showSubgoalController.execute(subgoal.getId());
+                        }
+                    });
+
+                    subgoalsPanel.add(subgoalBtn);
+                }
+
+                // Add scroll pane if there are many subgoals
+                JScrollPane scrollPane = new JScrollPane(subgoalsPanel);
+                scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+                scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                scrollPane.setBorder(null);
+                scrollPane.setBackground(Color.WHITE);
+
+                dayCell.add(scrollPane, BorderLayout.CENTER);
             }
-
-
 
             calendarGrid.add(dayCell);
         }
