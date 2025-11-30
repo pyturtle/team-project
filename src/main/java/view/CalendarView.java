@@ -211,7 +211,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         for (int day = 1; day <= daysInMonth; day++) {
             LocalDate buttonDate = displayedMonth.withDayOfMonth(day);
             JPanel dayCell = new JPanel();
-            dayCell.setLayout(new BoxLayout(dayCell, BoxLayout.X_AXIS));
+            dayCell.setLayout(new BoxLayout(dayCell, BoxLayout.Y_AXIS));
             dayCell.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             dayCell.setBackground(Color.WHITE);
             dayCell.setOpaque(true);
@@ -227,12 +227,16 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
             List<Subgoal> subgoalsForDate = subgoalsByDate.getOrDefault(buttonDate, Collections.emptyList());
             for (int i = 0; i < subgoalsForDate.size(); i++) {
                 Subgoal subgoal = subgoalsForDate.get(i);
-                JButton subgoalBtn = new JButton(String.valueOf(i + 1));
+
+                JButton subgoalBtn = new JButton(
+                        (i + 1) + ". " +
+                                (subgoal.getName().length() > 8 ? subgoal.getName().substring(0, 8) + "…" : subgoal.getName())
+                );
 
                 subgoalBtn.setFont(new Font("SansSerif", Font.PLAIN, 9));
                 subgoalBtn.setMargin(new Insets(2, 2, 2, 2));
-                subgoalBtn.setPreferredSize(new Dimension(18, 18)); // tiny square button
-                subgoalBtn.setMaximumSize(new Dimension(18, 18));
+                subgoalBtn.setPreferredSize(new Dimension(60, 18));
+                subgoalBtn.setMaximumSize(new Dimension(60, 18));
                 subgoalBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
 
                 subgoalBtn.addActionListener(ev -> {
@@ -243,6 +247,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
 
                 dayCell.add(subgoalBtn);
             }
+
 
 
             calendarGrid.add(dayCell);
