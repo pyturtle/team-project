@@ -6,6 +6,7 @@ import interface_adapter.logout.LogoutController;
 import interface_adapter.plan.show_plans.ShowPlansController;
 import interface_adapter.plan.show_plans.ShowPlansState;
 import interface_adapter.plan.show_plans.ShowPlansViewModel;
+import view.view_manager.PartialViewManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,15 +20,15 @@ public class MainPageView extends JPanel implements ActionListener, PropertyChan
 
     private static final int PLANS_PER_PAGE = 6;
 
-    private JButton calendarButton;
-    private JButton myPlansButton;
-    private JButton createPlanButton;
-    private JButton logoutButton;
+    private final JButton calendarButton;
+    private final JButton myPlansButton;
+    private final JButton createPlanButton;
+    private final JButton logoutButton;
 
     private ShowPlansController showPlansController;
     private LogoutController logoutController;
 
-    private JPanel contentPane;
+    private final JPanel contentPane;
 
     public MainPageView(ViewManagerModel viewManagerModel,
                         PartialViewModel partialViewModel,
@@ -38,10 +39,10 @@ public class MainPageView extends JPanel implements ActionListener, PropertyChan
 
         this.setLayout(new BorderLayout());
 
-        // View navigation buttons (Calendar, My Plans, Create Plan)
+
         final JPanel topPanel = new JPanel(new BorderLayout());
 
-        // Navigation buttons on the left
+
         final JPanel navButtons = new JPanel();
         calendarButton = new JButton("Calendar");
         myPlansButton = new JButton("My Plans");
@@ -53,7 +54,7 @@ public class MainPageView extends JPanel implements ActionListener, PropertyChan
         });
 
         myPlansButton.addActionListener(e -> {
-            // Reload plans for current user before switching view
+
             final ShowPlansState state = showPlansViewModel.getState();
             final String currentUsername = state.getUsername();
             if (currentUsername != null && !currentUsername.isEmpty() && showPlansController != null) {
@@ -75,7 +76,7 @@ public class MainPageView extends JPanel implements ActionListener, PropertyChan
         navButtons.add(createPlanButton);
         topPanel.add(navButtons, BorderLayout.WEST);
 
-        // Logout button on the right
+
         final JPanel logoutPanel = new JPanel();
         logoutButton = new JButton("Logout");
         logoutButton.addActionListener(e -> {

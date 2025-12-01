@@ -1,6 +1,7 @@
 package use_case.plan.show_plans;
 
 import entity.plan.Plan;
+
 import java.util.List;
 
 /**
@@ -17,12 +18,13 @@ public class ShowPlansOutputData {
 
     /**
      * Creates output data for showing plans.
-     * @param plans the list of plans for the current page
-     * @param currentPage the current page number
-     * @param totalPages the total number of pages
-     * @param hasNextPage whether there is a next page
+     *
+     * @param plans           the list of plans for the current page
+     * @param currentPage     the current page number
+     * @param totalPages      the total number of pages
+     * @param hasNextPage     whether there is a next page
      * @param hasPreviousPage whether there is a previous page
-     * @param username the username whose plans are being displayed
+     * @param username        the username whose plans are being displayed
      */
     public ShowPlansOutputData(List<Plan> plans, int currentPage, int totalPages,
                                boolean hasNextPage, boolean hasPreviousPage, String username) {

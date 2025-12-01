@@ -15,8 +15,9 @@ public class DeletePlanPresenter implements DeletePlanOutputBoundary {
 
     /**
      * Creates a new Delete Plan Presenter.
+     *
      * @param showPlansViewModel the show plans view model
-     * @param calendarViewModel the calendar view model
+     * @param calendarViewModel  the calendar view model
      */
     public DeletePlanPresenter(ShowPlansViewModel showPlansViewModel, CalendarViewModel calendarViewModel) {
         this.showPlansViewModel = showPlansViewModel;
@@ -25,10 +26,10 @@ public class DeletePlanPresenter implements DeletePlanOutputBoundary {
 
     @Override
     public void prepareSuccessView(DeletePlanOutputData outputData) {
-        // Trigger a refresh of the Show Plans view
+
         showPlansViewModel.firePropertyChange();
 
-        // Refresh the calendar view to remove deleted subgoals
+
         if (calendarViewModel != null) {
             calendarViewModel.firePropertyChanged();
         }
@@ -36,7 +37,7 @@ public class DeletePlanPresenter implements DeletePlanOutputBoundary {
 
     @Override
     public void prepareFailView(String errorMessage) {
-        // Trigger error notification (could display via state if needed)
+
         showPlansViewModel.firePropertyChange();
     }
 }

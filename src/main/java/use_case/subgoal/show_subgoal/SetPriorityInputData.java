@@ -12,7 +12,7 @@ public class SetPriorityInputData {
      * Constructs a new SetPriorityInputData.
      *
      * @param subgoalId the ID of the subgoal whose priority should be updated
-     * @param priority the new priority value
+     * @param priority  the new priority value
      */
     public SetPriorityInputData(String subgoalId, boolean priority) {
         this.subgoalId = subgoalId;

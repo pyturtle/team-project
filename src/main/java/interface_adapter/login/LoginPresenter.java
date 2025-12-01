@@ -5,7 +5,6 @@ import interface_adapter.calendar.CalendarState;
 import interface_adapter.calendar.CalendarViewModel;
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.plan.generate_plan.GeneratePlanState;
 import interface_adapter.plan.show_plan.ShowPlanState;
 import interface_adapter.plan.show_plan.ShowPlanViewModel;
 import interface_adapter.plan.show_plans.ShowPlansState;
@@ -13,7 +12,6 @@ import interface_adapter.plan.show_plans.ShowPlansViewModel;
 import interface_adapter.signup.SignupViewModel;
 import use_case.login.LoginOutputBoundary;
 import use_case.login.LoginOutputData;
-import view.plan.ShowPlanView;
 
 /**
  * The Presenter for the Login Use Case.
@@ -46,12 +44,12 @@ public class LoginPresenter implements LoginOutputBoundary {
 
     @Override
     public void prepareSuccessView(LoginOutputData response) {
-        // On success, update the loggedInViewModel's state
+
         final LoggedInState loggedInState = loggedInViewModel.getState();
         loggedInState.setUsername(response.getUsername());
         this.loggedInViewModel.firePropertyChange();
 
-        // Set username in CalendarState and ShowPlansState
+
         final CalendarState calendarState = calendarViewModel.getCalendarState();
         calendarState.setUsername(response.getUsername());
         calendarViewModel.firePropertyChanged();
@@ -63,10 +61,10 @@ public class LoginPresenter implements LoginOutputBoundary {
         final ShowPlanState showPlanState = showPlanViewModel.getState();
         showPlanState.setUsername(response.getUsername());
 
-        // and clear everything from the LoginViewModel's state
+
         loginViewModel.setState(new LoginState());
 
-        // switch to the calendar view
+
         this.viewManagerModel.setState("main page");
         this.viewManagerModel.firePropertyChange();
     }

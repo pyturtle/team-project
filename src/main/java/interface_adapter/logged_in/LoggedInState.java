@@ -15,7 +15,7 @@ public class LoggedInState {
         passwordError = copy.passwordError;
     }
 
-    // Because of the previous copy constructor, the default constructor must be explicit.
+
     public LoggedInState() {
 
     }
@@ -28,19 +28,19 @@ public class LoggedInState {
         this.username = username;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getPassword() {
         return password;
     }
 
-    public void setPasswordError(String passwordError) {
-        this.passwordError = passwordError;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getPasswordError() {
         return passwordError;
+    }
+
+    public void setPasswordError(String passwordError) {
+        this.passwordError = passwordError;
     }
 }

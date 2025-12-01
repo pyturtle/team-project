@@ -1,6 +1,8 @@
 package use_case.plan.show_plans;
 
+import data_access.interfaces.plan.ShowPlansDataAccessInterface;
 import entity.plan.Plan;
+
 import java.util.List;
 
 /**
@@ -13,8 +15,9 @@ public class ShowPlansInteractor implements ShowPlansInputBoundary {
 
     /**
      * Creates a new Show Plans Interactor.
+     *
      * @param dataAccess the data access interface
-     * @param presenter the output boundary
+     * @param presenter  the output boundary
      */
     public ShowPlansInteractor(ShowPlansDataAccessInterface dataAccess,
                                ShowPlansOutputBoundary presenter) {
@@ -41,8 +44,7 @@ public class ShowPlansInteractor implements ShowPlansInputBoundary {
             );
 
             presenter.prepareSuccessView(outputData);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             presenter.prepareFailView("Failed to load plans: " + ex.getMessage());
         }
     }

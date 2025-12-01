@@ -7,7 +7,6 @@ import interface_adapter.signup.SignupViewModel;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -23,10 +22,9 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
     private final JTextField usernameInputField = new JTextField(15);
     private final JPasswordField passwordInputField = new JPasswordField(15);
     private final JPasswordField repeatPasswordInputField = new JPasswordField(15);
-    private SignupController signupController = null;
-
     private final JButton signUp;
     private final JButton toLogin;
+    private SignupController signupController = null;
 
     public SignupView(SignupViewModel signupViewModel) {
         this.signupViewModel = signupViewModel;
@@ -46,7 +44,7 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
         buttons.add(signUp);
 
         signUp.addActionListener(
-                // This creates an anonymous subclass of ActionListener and instantiates it.
+
                 new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         if (evt.getSource().equals(signUp)) {

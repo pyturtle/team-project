@@ -7,6 +7,7 @@ public interface ShowPlansInputBoundary {
 
     /**
      * Executes the show plans use case.
+     *
      * @param showPlansInputData the input data
      */
     void execute(ShowPlansInputData showPlansInputData);

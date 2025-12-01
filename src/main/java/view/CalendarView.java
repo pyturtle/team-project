@@ -1,11 +1,11 @@
 package view;
 
+import data_access.interfaces.subgoal.SubgoalDataAccessInterface;
 import entity.subgoal.Subgoal;
 import interface_adapter.calendar.CalendarViewModel;
 import interface_adapter.calendar.CalendarState;
-import interface_adapter.filter_subgoals.FilterSubgoalsController;
-import interface_adapter.show_subgoal.ShowSubgoalController;
-import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
+import interface_adapter.subgoal.filter_subgoals.FilterSubgoalsController;
+import interface_adapter.subgoal.show_subgoal.ShowSubgoalController;
 
 import javax.swing.*;
 import java.awt.*;

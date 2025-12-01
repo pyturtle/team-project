@@ -10,6 +10,7 @@ public class CalendarPresenter {
     public CalendarPresenter(CalendarViewModel calendarViewModel) {
         this.calendarViewModel = calendarViewModel;
     }
+
     public void addGoal(String goalDescription) {
         CalendarState calendarState = calendarViewModel.getState();
         LocalDate selectedDate = calendarState.getSelectedDate();
@@ -17,6 +18,7 @@ public class CalendarPresenter {
         calendarViewModel.setState(calendarState);
         calendarViewModel.firePropertyChange();
     }
+
     public void removeGoal(String goalDescription) {
         CalendarState calendarState = calendarViewModel.getState();
         LocalDate selectedDate = calendarState.getSelectedDate();
@@ -29,6 +31,7 @@ public class CalendarPresenter {
             handleInputError("No Goals Here: " + goalDescription);
         }
     }
+
     public void changeDate(LocalDate newDate) {
         CalendarState calendarState = calendarViewModel.getState();
         calendarState.setSelectedDate(newDate);

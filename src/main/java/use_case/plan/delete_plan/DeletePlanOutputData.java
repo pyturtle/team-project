@@ -10,8 +10,9 @@ public class DeletePlanOutputData {
 
     /**
      * Creates output data for deleting a plan.
+     *
      * @param deletedPlanId the ID of the deleted plan
-     * @param success whether the deletion was successful
+     * @param success       whether the deletion was successful
      */
     public DeletePlanOutputData(String deletedPlanId, boolean success) {
         this.deletedPlanId = deletedPlanId;

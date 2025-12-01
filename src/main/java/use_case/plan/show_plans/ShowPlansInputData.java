@@ -11,8 +11,9 @@ public class ShowPlansInputData {
 
     /**
      * Creates input data for showing plans.
+     *
      * @param username the username whose plans to show
-     * @param page the page number (0-indexed)
+     * @param page     the page number (0-indexed)
      * @param pageSize the number of plans per page
      */
     public ShowPlansInputData(String username, int page, int pageSize) {

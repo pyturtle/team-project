@@ -6,9 +6,9 @@ package use_case.subgoal.qna;
  */
 public interface SubgoalQnaOutputBoundary {
 
-    void presentInitial(SubgoalQnaOutputData outputData); // open dialog + show history
+    void presentInitial(SubgoalQnaOutputData outputData);
 
-    void presentUpdate(SubgoalQnaOutputData outputData);  // just update history
+    void presentUpdate(SubgoalQnaOutputData outputData);
 
     void presentError(String message);
 }

@@ -14,8 +14,19 @@ public class FilterSubgoalsInputData {
 
     }
 
-    public String getPlanId() { return planId; }
-    public boolean isPriorityOnly() { return priorityOnly; }
-    public String getUserId() { return userId; }
-    public String getSubgoalName() { return subgoalName; }
+    public String getPlanId() {
+        return planId;
+    }
+
+    public boolean isPriorityOnly() {
+        return priorityOnly;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getSubgoalName() {
+        return subgoalName;
+    }
 }

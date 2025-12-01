@@ -1,6 +1,7 @@
 package interface_adapter.plan.show_plans;
 
 import entity.plan.Plan;
+
 import java.util.ArrayList;
 import java.util.List;
 

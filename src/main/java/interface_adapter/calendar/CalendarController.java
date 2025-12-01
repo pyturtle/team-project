@@ -8,6 +8,7 @@ public class CalendarController {
     public CalendarController(CalendarPresenter calendarPresenter) {
         this.calendarPresenter = calendarPresenter;
     }
+
     public void addGoal(String goalDescription) {
         if (goalDescription == null || goalDescription.trim().isEmpty()) {
             calendarPresenter.handleInputError("Goals can't be empty!");
@@ -25,6 +26,7 @@ public class CalendarController {
 
         calendarPresenter.removeGoal(goalDescription.trim());
     }
+
     public void changeDate(LocalDate newDate) {
         if (newDate == null) {
             calendarPresenter.handleInputError("Date Invalid!");
