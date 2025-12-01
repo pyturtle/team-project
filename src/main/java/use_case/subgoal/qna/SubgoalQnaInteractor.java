@@ -65,19 +65,13 @@ public class SubgoalQnaInteractor implements SubgoalQnaInputBoundary {
             Collections.sort(planSubgoals, new Comparator<Subgoal>() {
                 @Override
                 public int compare(Subgoal a, Subgoal b) {
-                    if (a.getDeadline() == null && b.getDeadline() == null) {
-                        return a.getName().compareToIgnoreCase(b.getName());
-                    } else if (a.getDeadline() == null) {
-                        return 1;
-                    } else if (b.getDeadline() == null) {
-                        return -1;
-                    } else {
-                        int cmp = a.getDeadline().compareTo(b.getDeadline());
-                        if (cmp != 0) {
-                            return cmp;
-                        }
-                        return a.getName().compareToIgnoreCase(b.getName());
+                    // Deadlines are guaranteed non-null by Subgoal.
+                    int cmp = a.getDeadline().compareTo(b.getDeadline());
+                    if (cmp != 0) {
+                        return cmp;
                     }
+                    // Same deadline → order by name
+                    return a.getName().compareToIgnoreCase(b.getName());
                 }
             });
         }
