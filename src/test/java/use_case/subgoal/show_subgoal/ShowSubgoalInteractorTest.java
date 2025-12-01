@@ -2,6 +2,7 @@ package use_case.subgoal.show_subgoal;
 
 import entity.subgoal.Subgoal;
 import org.junit.jupiter.api.Test;
+import data_access.interfaces.subgoal.SubgoalDataAccessInterface;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -84,19 +85,18 @@ public class ShowSubgoalInteractorTest {
     /**
      * In-memory DAO used only for this test.
      * It implements ALL methods from SubgoalDataAccessInterface,
-     * but only getSubgoalById / save / saveUpdatedSubgoal actually do work.
+     * but only getSubgoalById and saveSubgoal actually do work.
      */
     private static class InMemorySubgoalDAO implements SubgoalDataAccessInterface {
 
         private final Map<String, Subgoal> storage = new HashMap<>();
 
-        // --- methods we actually use in the test / interactor ---
-
-        @Override
-        public void save(Subgoal subgoal) {
-            // assumes Subgoal has getId(); if not, change accordingly
+        // Helper method for test setup (not part of interface)
+        void save(Subgoal subgoal) {
             storage.put(subgoal.getId(), subgoal);
         }
+
+        // --- methods we actually use in the test / interactor ---
 
         @Override
         public Subgoal getSubgoalById(String id) {
@@ -104,16 +104,11 @@ public class ShowSubgoalInteractorTest {
         }
 
         @Override
-        public void saveUpdatedSubgoal(Subgoal subgoal) {
+        public void saveSubgoal(Subgoal subgoal) {
             storage.put(subgoal.getId(), subgoal);
         }
 
         // --- methods required by the interface but not used in this test ---
-
-        @Override
-        public void save() {
-            // no-op
-        }
 
         @Override
         public void updatePriority(String id, boolean priority) {
@@ -127,6 +122,21 @@ public class ShowSubgoalInteractorTest {
 
         @Override
         public List<Subgoal> getSubgoalsByPlan(String planId, String userId) {
+            return List.of();  // stub
+        }
+
+        @Override
+        public List<Subgoal> getSubgoalsByName(String name, String userId) {
+            return List.of();  // stub
+        }
+
+        @Override
+        public List<Subgoal> getCompletedSubgoals(String userId) {
+            return List.of();  // stub
+        }
+
+        @Override
+        public List<Subgoal> getIncompleteSubgoals(String userId) {
             return List.of();  // stub
         }
 
