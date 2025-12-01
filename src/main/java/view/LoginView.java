@@ -4,7 +4,7 @@ import entity.user.SavedUser;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
-import use_case.remember_me.RememberMe;
+import use_case.remember_me.RememberMeInteractor;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -22,7 +22,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
 
     private final String viewName = "log in";
     private final LoginViewModel loginViewModel;
-    private final RememberMe rememberMeUseCase;
+    private final RememberMeInteractor rememberMeUseCase;
 
     private final JTextField usernameInputField = new JTextField(15);
     private final JLabel usernameErrorField = new JLabel();
@@ -36,7 +36,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
     private final JButton signUp;
     private LoginController loginController = null;
 
-    public LoginView(LoginViewModel loginViewModel, RememberMe rememberMeUseCase) {
+    public LoginView(LoginViewModel loginViewModel, RememberMeInteractor rememberMeUseCase) {
         this.loginViewModel = loginViewModel;
         this.rememberMeUseCase = rememberMeUseCase;
         this.loginViewModel.addPropertyChangeListener(this);

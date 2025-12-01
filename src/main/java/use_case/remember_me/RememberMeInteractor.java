@@ -3,11 +3,11 @@ package use_case.remember_me;
 import data_access.PreferenceRepository;
 import entity.user.SavedUser;
 
-public class RememberMe {
+public class RememberMeInteractor {
 
     private final PreferenceRepository prefs;
 
-    public RememberMe(PreferenceRepository prefs) {
+    public RememberMeInteractor(PreferenceRepository prefs) {
         this.prefs = prefs;
     }
 

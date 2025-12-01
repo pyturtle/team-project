@@ -71,7 +71,7 @@ import use_case.plan.show_plan.ShowPlanOutputBoundary;
 import use_case.plan.show_plans.ShowPlansInputBoundary;
 import use_case.plan.show_plans.ShowPlansInteractor;
 import use_case.plan.show_plans.ShowPlansOutputBoundary;
-import use_case.remember_me.RememberMe;
+import use_case.remember_me.RememberMeInteractor;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -187,7 +187,7 @@ public class AppBuilder {
         loginViewModel = new LoginViewModel();
 
         PreferenceRepository preferenceRepository = new PreferenceRepository();
-        RememberMe rememberMeUseCase = new RememberMe(preferenceRepository);
+        RememberMeInteractor rememberMeUseCase = new RememberMeInteractor(preferenceRepository);
 
         loginView = new LoginView(loginViewModel, rememberMeUseCase);
         cardPanel.add(loginView, loginView.getViewName());
