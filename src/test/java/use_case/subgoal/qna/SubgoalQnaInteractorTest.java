@@ -1,9 +1,13 @@
 package use_case.subgoal.qna;
 
-import entity.SubgoalQuestionAnswer;
+import entity.subgoal.SubgoalQuestionAnswer;
 import entity.subgoal.Subgoal;
 import org.junit.jupiter.api.Test;
-import use_case.subgoal.show_subgoal.SubgoalDataAccessInterface;
+import data_access.interfaces.subgoal.SubgoalDataAccessInterface;
+import data_access.interfaces.subgoal.SubgoalQnaDataAccessInterface;
+import data_access.interfaces.subgoal.SubgoalQnaGeminiDataAccessInterface;
+
+
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -194,19 +198,18 @@ public class SubgoalQnaInteractorTest {
 
         private final Map<String, Subgoal> storage = new HashMap<>();
 
-        @Override
-        public void save() {
-            // not used in tests
-        }
-
-        @Override
-        public void save(Subgoal subgoal) {
+        void save(Subgoal subgoal) {
             storage.put(subgoal.getId(), subgoal);
         }
 
         @Override
         public Subgoal getSubgoalById(String id) {
             return storage.get(id);
+        }
+
+        @Override
+        public void saveSubgoal(Subgoal subgoal) {
+            storage.put(subgoal.getId(), subgoal);
         }
 
         @Override
@@ -225,6 +228,21 @@ public class SubgoalQnaInteractorTest {
         }
 
         @Override
+        public List<Subgoal> getSubgoalsByName(String name, String userId) {
+            return new ArrayList<>();
+        }
+
+        @Override
+        public List<Subgoal> getCompletedSubgoals(String userId) {
+            return new ArrayList<>();
+        }
+
+        @Override
+        public List<Subgoal> getIncompleteSubgoals(String userId) {
+            return new ArrayList<>();
+        }
+
+        @Override
         public List<Subgoal> getPrioritySubgoals(String userId) {
             return new ArrayList<>();
         }
@@ -239,10 +257,6 @@ public class SubgoalQnaInteractorTest {
             return new ArrayList<>();
         }
 
-        @Override
-        public void saveUpdatedSubgoal(Subgoal subgoal) {
-            storage.put(subgoal.getId(), subgoal);
-        }
 
         @Override
         public void deleteSubgoal(String id) {

@@ -1,6 +1,6 @@
 package use_case.filter_subgoals;
 
-import data_access.SubgoalDataAccessInterface;
+import data_access.interfaces.subgoal.SubgoalDataAccessInterface;
 import entity.subgoal.Subgoal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -195,11 +195,31 @@ class FilterSubgoalsInteractorTest {
             return null;
         }
 
+        @Override
+        public void saveSubgoal(Subgoal subgoal) {
+            lastCalledMethod = "saveSubgoal";
+        }
 
         @Override
-        public void saveUpdatedSubgoal(Subgoal subgoal) {
-            // Implement this method - it can be empty for testing
-            lastCalledMethod = "saveUpdatedSubgoal";
+        public void deleteSubgoal(String id) {
+            lastCalledMethod = "deleteSubgoal";
+        }
+
+        @Override
+        public void updatePriority(String id, boolean priority) {
+            lastCalledMethod = "updatePriority";
+        }
+
+        @Override
+        public void updateCompleted(String id, boolean completed) {
+            lastCalledMethod = "updateCompleted";
+        }
+
+        @Override
+        public List<Subgoal> getSubgoalsByUsername(String username) {
+            lastCalledMethod = "getSubgoalsByUsername";
+            lastUserId = username;
+            return new ArrayList<>();
         }
 
         @Override
