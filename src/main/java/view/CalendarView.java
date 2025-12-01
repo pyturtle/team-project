@@ -33,6 +33,10 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     private final JList<String> goalList;
     private ShowSubgoalController showSubgoalController;
 
+    //calendar buttons: below is the map to store if each date has a goal
+    private Map<LocalDate, List<Subgoal>> subgoalsByDate = new HashMap<>();
+
+
     // Pagination for upcoming subgoals
     private int subgoalPageOffset = 0;
     private static final int SUBGOALS_PER_PAGE = 6;
@@ -49,8 +53,6 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     private CalendarViewModel viewModel;
     private LocalDate displayedMonth;
 
-    // For switching views. This is not a button
-
     //filter
     private JButton filterButton;
     private FilterSubgoalsController filterSubgoalsController;
@@ -58,6 +60,16 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
     // Subgoal data access for fetching actual subgoals
     private SubgoalDataAccessInterface subgoalDataAccess;
     //private ShowSubgoalController showSubgoalController;
+
+    //new function for calendar buttons
+    private void mapSubgoalsByDate(List<Subgoal> allSubgoals) {
+        subgoalsByDate.clear();
+        for (Subgoal subgoal : allSubgoals) {
+            LocalDate deadline = subgoal.getDeadline();
+            subgoalsByDate.computeIfAbsent(deadline, k -> new ArrayList<>()).add(subgoal);
+        }
+    }
+
 
     public CalendarView(CalendarViewModel viewModel,
                         SubgoalDataAccessInterface subgoalDataAccess) {
@@ -151,6 +163,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         viewModel.addPropertyChangeListener(this);
 
         //defined below: this is to make the correct grid for calendar.
+        mapSubgoalsByDate(subgoalDataAccess.getSubgoalsByUsername(viewModel.getCalendarState().getUsername()));
         updateCalendar();
 
         // Initial load of upcoming subgoals if username is already set
@@ -183,20 +196,87 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
             calendarGrid.add(new JLabel(""));
         }
 
-        // Each grid in the calendar is one button.
+        // Each grid in the calendar is one button, also added the mini buttons!
         for (int day = 1; day <= daysInMonth; day++) {
-            JButton dayButton = new JButton(String.valueOf(day));
             LocalDate buttonDate = displayedMonth.withDayOfMonth(day);
 
-            // Show us that we chose a day, by highlighting
+            // Main day cell panel
+            JPanel dayCell = new JPanel(new BorderLayout());
+            dayCell.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            dayCell.setBackground(Color.WHITE);
+            dayCell.setOpaque(true);
+
             if (buttonDate.equals(viewModel.getCalendarState().getSelectedDate())) {
-                dayButton.setBackground(Color.CYAN);
+                dayCell.setBackground(Color.CYAN);
             }
 
-            dayButton.addActionListener(this);
-            dayButtons.add(dayButton);
-            calendarGrid.add(dayButton);
+            // Day number at the top
+            JLabel dayLabel = new JLabel(String.valueOf(day), SwingConstants.CENTER);
+            dayLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+            dayCell.add(dayLabel, BorderLayout.NORTH);
+
+            // Subgoals panel with scrolling
+            List<Subgoal> subgoalsForDate = subgoalsByDate.getOrDefault(buttonDate, Collections.emptyList());
+
+            if (!subgoalsForDate.isEmpty()) {
+                JPanel subgoalsPanel = new JPanel();
+                subgoalsPanel.setLayout(new BoxLayout(subgoalsPanel, BoxLayout.Y_AXIS));
+                subgoalsPanel.setBackground(Color.WHITE);
+                subgoalsPanel.setOpaque(true);
+
+                // Add each subgoal as a clickable button
+                for (int i = 0; i < subgoalsForDate.size(); i++) {
+                    Subgoal subgoal = subgoalsForDate.get(i);
+
+                    // Create button with better text formatting
+                    String buttonText = (i + 1) + ". ";
+                    if (subgoal.getName().length() > 10) {
+                        buttonText += subgoal.getName().substring(0, 10) + "…";
+                    } else {
+                        buttonText += subgoal.getName();
+                    }
+
+                    JButton subgoalBtn = new JButton(buttonText);
+                    subgoalBtn.setFont(new Font("SansSerif", Font.PLAIN, 9));
+                    subgoalBtn.setMargin(new Insets(1, 2, 1, 2));
+                    subgoalBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    subgoalBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
+
+                    // Color code based on priority and completion
+                    if (subgoal.isCompleted()) {
+                        subgoalBtn.setBackground(new Color(144, 238, 144)); // Light green
+                        subgoalBtn.setOpaque(true);
+                    } else if (subgoal.isPriority()) {
+                        subgoalBtn.setBackground(new Color(255, 200, 200)); // Light red
+                        subgoalBtn.setOpaque(true);
+                    }
+
+                    // Set tooltip to show full name
+                    subgoalBtn.setToolTipText(subgoal.getName());
+
+                    subgoalBtn.addActionListener(ev -> {
+                        if (showSubgoalController != null) {
+                            showSubgoalController.execute(subgoal.getId());
+                        }
+                    });
+
+                    subgoalsPanel.add(subgoalBtn);
+                }
+
+                // Add scroll pane if there are many subgoals
+                JScrollPane scrollPane = new JScrollPane(subgoalsPanel);
+                scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+                scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                scrollPane.setBorder(null);
+                scrollPane.setBackground(Color.WHITE);
+
+                dayCell.add(scrollPane, BorderLayout.CENTER);
+            }
+
+            calendarGrid.add(dayCell);
         }
+
+
 
         calendarGrid.revalidate();
         calendarGrid.repaint();
@@ -328,6 +408,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
 
         // Get all subgoals for the current user
         List<Subgoal> allSubgoals = subgoalDataAccess.getSubgoalsByUsername(state.getUsername());
+        mapSubgoalsByDate(allSubgoals);
         System.out.println("CalendarView: Found " + allSubgoals.size() + " total subgoals for user");
 
         // Filter to upcoming subgoals (deadline is today or in the future - include completed ones)
@@ -367,6 +448,7 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
         // Enable/disable navigation buttons
         prevSubgoalsButton.setEnabled(subgoalPageOffset > 0);
         nextSubgoalsButton.setEnabled(endIdx < upcomingSubgoals.size());
+        updateCalendar();
     }
     public String getViewName() {
         return "CalendarView";
@@ -384,10 +466,10 @@ public class CalendarView extends JPanel implements ActionListener, PropertyChan
                 options[0]);
 
         switch (choice) {
-            case 0: filterByPlanId(); break;        // "By Plan ID"
-            case 1: filterBySubgoalName(); break;   // "By Subgoal Name"
-            case 2: filterByPriority(); break;      // "Priority Only" - THIS WAS WRONG
-            case 3: clearFilter(); break;           // "Clear Filter"
+            case 0: filterByPlanId(); break;
+            case 1: filterBySubgoalName(); break;
+            case 2: filterByPriority(); break;
+            case 3: clearFilter(); break;
             // case 4: Cancel - do nothing
         }
     }

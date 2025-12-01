@@ -1,0 +1,332 @@
+[
+  {
+    "name": "Research Guitar Types and Styles",
+    "description": "Explore different types of guitars (acoustic, electric, classical) and playing styles to decide which best suits your interests.",
+    "id": "54291ccd-0893-4933-aa7a-4296e6a00621",
+    "completed": false,
+    "deadline": "2026-01-10",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Introduction to Unit Testing (JUnit)",
+    "description": "Understand the importance of testing in software development. Learn how to write and run basic unit tests for Java code using the JUnit framework.",
+    "id": "57638a5e-e6c7-4529-b272-cd712b625311",
+    "completed": false,
+    "deadline": "2026-05-04",
+    "priority": false,
+    "plan_id": "c0b52812-1b5e-4807-b753-14024866061e",
+    "username": "ilian"
+  },
+  {
+    "name": "Understand Control Flow and Loops",
+    "description": "Learn and practice `if-else` statements, `switch` statements, `for` loops, `while` loops, and `do-while` loops. Solve problems requiring conditional logic and iteration.",
+    "id": "7c4e98cb-f50e-49f5-ad68-37a558acc07f",
+    "completed": false,
+    "deadline": "2025-12-29",
+    "priority": false,
+    "plan_id": "c0b52812-1b5e-4807-b753-14024866061e",
+    "username": "ilian"
+  },
+  {
+    "name": "Establish a Consistent Practice Routine",
+    "description": "Set up a regular schedule for guitar practice to ensure continuous improvement and make playing a habit.",
+    "id": "5f1cab01-2b87-4bdd-b913-31ea846e5211",
+    "completed": false,
+    "deadline": "2026-04-25",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Web Development with ASP.NET Core",
+    "description": "Learn the fundamentals of building web APIs and web applications using ASP.NET Core (MVC or Razor Pages). Understand HTTP, REST principles, and basic routing.",
+    "id": "42ad476e-fa3a-4ea1-b765-ce3b9e79aca5",
+    "completed": false,
+    "deadline": "2026-09-30",
+    "priority": false,
+    "plan_id": "4c607e75-f420-4565-ba3b-7a0a493e04d8",
+    "username": "ilian"
+  },
+  {
+    "name": "Initial Prototyping/Drafting",
+    "description": "Begin with a small-scale prototype, a proof of concept, or the initial draft/layout of your creation. This step helps validate your design and identify potential issues early.",
+    "id": "34fb4c7c-b6d4-4415-ac66-ef4ed04b9bd9",
+    "completed": false,
+    "deadline": "2026-01-22",
+    "priority": false,
+    "plan_id": "fa76f501-4f8d-4c15-8a62-86317991e153",
+    "username": "1"
+  },
+  {
+    "name": "Fundamentals of Programming & C# Basics",
+    "description": "Understand core programming concepts (variables, data types, operators, control flow), C# syntax, console applications, and basic input/output. Focus on setting up your development environment (Visual Studio Code or Visual Studio).",
+    "id": "dc61eea0-dbf4-42cc-a3db-e9394851f4e3",
+    "completed": false,
+    "deadline": "2026-01-31",
+    "priority": false,
+    "plan_id": "4c607e75-f420-4565-ba3b-7a0a493e04d8",
+    "username": "ilian"
+  },
+  {
+    "name": "Learn Your First Simple Song",
+    "description": "Apply your learned chords and strumming patterns to play a complete, simple song from start to finish.",
+    "id": "7bc9ac9f-695d-49b2-9c5f-54cdf5dbab9d",
+    "completed": false,
+    "deadline": "2026-04-11",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Ideation & Brainstorming",
+    "description": "Dedicate time to brainstorm various ideas for what you want to make. Consider your interests, available resources, and desired outcome. Select one specific idea to pursue.",
+    "id": "401b4936-6e4e-4d3a-867e-1361e7368596",
+    "completed": false,
+    "deadline": "2025-12-11",
+    "priority": false,
+    "plan_id": "fa76f501-4f8d-4c15-8a62-86317991e153",
+    "username": "1"
+  },
+  {
+    "name": "Learn Core Java APIs (Collections, Strings, Exceptions)",
+    "description": "Explore essential Java APIs, including the Collections Framework (`ArrayList`, `HashMap`, `HashSet`), String manipulation methods, and robust exception handling using `try-catch-finally` blocks.",
+    "id": "0244e377-9709-4e00-8326-3b9f7afc7b47",
+    "completed": false,
+    "deadline": "2026-02-09",
+    "priority": false,
+    "plan_id": "c0b52812-1b5e-4807-b753-14024866061e",
+    "username": "ilian"
+  },
+  {
+    "name": "Testing & Evaluation",
+    "description": "Thoroughly test your creation to ensure it functions as intended. Gather feedback if applicable. Make any final adjustments or improvements based on testing results.",
+    "id": "68bc6e6f-39fb-41f6-9026-9d58ab62999e",
+    "completed": true,
+    "deadline": "2026-03-12",
+    "priority": false,
+    "plan_id": "fa76f501-4f8d-4c15-8a62-86317991e153",
+    "username": "1"
+  },
+  {
+    "name": "Research & Planning",
+    "description": "Once an idea is chosen, research how to make it. Identify necessary steps, techniques, materials, and tools. Create a detailed plan or design sketch.",
+    "id": "3d47df2c-e420-4a83-816b-20da6d2b3245",
+    "completed": true,
+    "deadline": "2025-12-25",
+    "priority": true,
+    "plan_id": "fa76f501-4f8d-4c15-8a62-86317991e153",
+    "username": "1"
+  },
+  {
+    "name": "Set Up Development Environment and Basic Syntax",
+    "description": "Install Java Development Kit (JDK) and an Integrated Development Environment (IDE) like IntelliJ IDEA or Eclipse. Write your first 'Hello, World!' program. Understand variables, data types, operators, and basic input/output operations.",
+    "id": "53f517c3-8943-400f-a7c6-bfa5dde463e8",
+    "completed": false,
+    "deadline": "2025-12-15",
+    "priority": false,
+    "plan_id": "c0b52812-1b5e-4807-b753-14024866061e",
+    "username": "ilian"
+  },
+  {
+    "name": "Learn Basic Database Connectivity (JDBC)",
+    "description": "Understand how to connect Java applications to relational databases (e.g., H2, MySQL, PostgreSQL) using JDBC (Java Database Connectivity) for performing CRUD (Create, Read, Update, Delete) operations.",
+    "id": "a4b5885b-1ad5-425f-92b6-89b81b74cf80",
+    "completed": false,
+    "deadline": "2026-05-25",
+    "priority": false,
+    "plan_id": "c0b52812-1b5e-4807-b753-14024866061e",
+    "username": "ilian"
+  },
+  {
+    "name": "Learn Basic Guitar Fundamentals",
+    "description": "Understand how to properly hold the guitar, fret notes, and perform basic strumming techniques.",
+    "id": "a9fc606a-b9ad-44b5-b2b1-ab92bc4da308",
+    "completed": false,
+    "deadline": "2026-02-14",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Unit Testing & Best Practices",
+    "description": "Understand the importance of testing. Learn to write unit tests using frameworks like NUnit or xUnit. Explore coding best practices, common design patterns, and SOLID principles.",
+    "id": "933ca65f-a290-4485-99d0-837c49c6f40f",
+    "completed": false,
+    "deadline": "2027-01-31",
+    "priority": false,
+    "plan_id": "4c607e75-f420-4565-ba3b-7a0a493e04d8",
+    "username": "ilian"
+  },
+  {
+    "name": "Practice Regular Strumming and Fingerpicking Patterns",
+    "description": "Develop rhythm and dexterity by practicing various strumming patterns and simple fingerpicking exercises.",
+    "id": "fb46ea83-b544-44e5-bc30-52cebecf2eb5",
+    "completed": false,
+    "deadline": "2026-03-28",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Database Integration & ORMs",
+    "description": "Learn to connect C# applications to databases (e.g., SQL Server, SQLite) using ADO.NET and an Object-Relational Mapper (ORM) like Entity Framework Core. Practice CRUD operations.",
+    "id": "e0e282d9-c11c-4731-b870-b06ffc8abc44",
+    "completed": false,
+    "deadline": "2026-11-30",
+    "priority": false,
+    "plan_id": "4c607e75-f420-4565-ba3b-7a0a493e04d8",
+    "username": "ilian"
+  },
+  {
+    "name": "Introduction to Advanced Java Concepts",
+    "description": "Get familiar with Generics for type-safe code, Lambda expressions for functional programming, and basic concurrency concepts using Threads.",
+    "id": "8bccc851-4998-43fe-bb9a-f28ebdf635ce",
+    "completed": false,
+    "deadline": "2026-03-16",
+    "priority": false,
+    "plan_id": "c0b52812-1b5e-4807-b753-14024866061e",
+    "username": "ilian"
+  },
+  {
+    "name": "Gathering Materials & Tools",
+    "description": "Acquire all the materials, components, and tools identified in the planning phase. Ensure you have everything ready before starting the hands-on creation.",
+    "id": "552fd287-00bd-46aa-be02-2553bba2f865",
+    "completed": false,
+    "deadline": "2026-01-08",
+    "priority": false,
+    "plan_id": "fa76f501-4f8d-4c15-8a62-86317991e153",
+    "username": "1"
+  },
+  {
+    "name": "Advanced C# Features",
+    "description": "Explore LINQ (Language Integrated Query), Generics, Collections, Delegates, Events, Asynchronous Programming (async/await), and Error Handling (try-catch-finally).",
+    "id": "dd03c2cc-14a4-40bb-9704-9628b6f8e6c0",
+    "completed": false,
+    "deadline": "2026-05-31",
+    "priority": false,
+    "plan_id": "4c607e75-f420-4565-ba3b-7a0a493e04d8",
+    "username": "ilian"
+  },
+  {
+    "name": "Master Object-Oriented Programming (OOP) Fundamentals",
+    "description": "Deeply understand core OOP concepts: classes, objects, constructors, encapsulation, inheritance, polymorphism, and abstraction. Create simple class hierarchies and interfaces.",
+    "id": "aa71d683-5bc8-4029-bd20-022d6764e8fe",
+    "completed": false,
+    "deadline": "2026-01-19",
+    "priority": false,
+    "plan_id": "c0b52812-1b5e-4807-b753-14024866061e",
+    "username": "ilian"
+  },
+  {
+    "name": "Find Learning Resources",
+    "description": "Identify and choose your primary learning resources, such as online tutorials, beginner books, or a local guitar instructor.",
+    "id": "f23bd1e5-41bb-48e6-9807-d878d5c1312d",
+    "completed": false,
+    "deadline": "2026-01-31",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": ".NET Ecosystem & Desktop Applications (WPF/WinForms)",
+    "description": "Understand the .NET platform (.NET Framework/.NET), CLR, and BCL. Learn to build basic graphical user interface (GUI) applications using either WPF or Windows Forms.",
+    "id": "8d0cc2d7-82ac-4130-935a-2299f46b5de8",
+    "completed": false,
+    "deadline": "2026-07-31",
+    "priority": false,
+    "plan_id": "4c607e75-f420-4565-ba3b-7a0a493e04d8",
+    "username": "ilian"
+  },
+  {
+    "name": "Explore Build Tools and Version Control",
+    "description": "Learn to use a build automation tool like Maven or Gradle for project management and dependency handling. Understand the basics of Git for version control and integrate with GitHub.",
+    "id": "6ed52e11-c40d-494b-a15a-99eaad3bc827",
+    "completed": false,
+    "deadline": "2026-04-20",
+    "priority": false,
+    "plan_id": "c0b52812-1b5e-4807-b753-14024866061e",
+    "username": "ilian"
+  },
+  {
+    "name": "Ideation & NOT Brainstorming",
+    "description": "DONT Dedicate time to brainstorm various ideas for what you want to make. Consider your interests, available resources, and desired outcome. Select one specific idea to pursue.",
+    "id": "401b4936-6e4e-4d3a-867e-1361e73685967",
+    "completed": false,
+    "deadline": "2025-12-11",
+    "priority": false,
+    "plan_id": "fa76f501-4f8d-4c15-8a62-86317991e153",
+    "username": "1"
+  },
+  {
+    "name": "Construction & Execution",
+    "description": "Proceed with the main construction or implementation of your 'something' based on your plan and any lessons learned from prototyping. Focus on building the core structure or functionality.",
+    "id": "b1772e04-2377-41cb-b7b8-4f0bf05e7bf0",
+    "completed": false,
+    "deadline": "2026-02-12",
+    "priority": true,
+    "plan_id": "fa76f501-4f8d-4c15-8a62-86317991e153",
+    "username": "1"
+  },
+  {
+    "name": "Acquire a Guitar and Essential Gear",
+    "description": "Purchase or borrow a guitar along with necessary accessories such as picks, a tuner, a strap, and an amplifier (if electric).",
+    "id": "5e663df0-6735-4179-b8d3-f4b5a6063216",
+    "completed": false,
+    "deadline": "2026-01-24",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Work with File I/O and Streams",
+    "description": "Learn how to read from and write to files using various stream classes (e.g., `FileInputStream`, `FileOutputStream`, `BufferedReader`, `BufferedWriter`) and path manipulation.",
+    "id": "1204df15-56a1-4337-91ce-3ead216ff8ff",
+    "completed": false,
+    "deadline": "2026-02-23",
+    "priority": false,
+    "plan_id": "c0b52812-1b5e-4807-b753-14024866061e",
+    "username": "ilian"
+  },
+  {
+    "name": "Build a Simple Command-Line Application",
+    "description": "Apply all learned concepts to develop a small, practical command-line application such as a to-do list manager, a simple calculator, or a contact book.",
+    "id": "14d9a68f-6080-4255-812e-d14c683470ce",
+    "completed": false,
+    "deadline": "2026-04-06",
+    "priority": false,
+    "plan_id": "c0b52812-1b5e-4807-b753-14024866061e",
+    "username": "ilian"
+  },
+  {
+    "name": "Project Development & Deployment",
+    "description": "Apply all learned concepts by building a complete, small-to-medium-sized project (e.g., a full-stack web application, a desktop utility, or a simple game). Learn basic deployment strategies for your chosen application type.",
+    "id": "7bc00bb9-3ee5-4574-a2cd-524f157af390",
+    "completed": false,
+    "deadline": "2027-03-31",
+    "priority": false,
+    "plan_id": "4c607e75-f420-4565-ba3b-7a0a493e04d8",
+    "username": "ilian"
+  },
+  {
+    "name": "Master Basic Chords and Scales",
+    "description": "Learn and practice common open chords (e.g., G, C, D, E, A, Em, Am) and a simple major or minor scale.",
+    "id": "43f48f85-81c4-4f09-9219-f92f8bf4d99f",
+    "completed": false,
+    "deadline": "2026-03-07",
+    "priority": false,
+    "plan_id": "ce807b23-7609-4ff5-b6a3-c7006fea4004",
+    "username": "123"
+  },
+  {
+    "name": "Object-Oriented Programming (OOP) in C#",
+    "description": "Master classes, objects, encapsulation, inheritance, polymorphism, interfaces, and abstract classes. Practice creating simple object-oriented models.",
+    "id": "72ff9c3f-9699-47a9-83a4-226938088ada",
+    "completed": false,
+    "deadline": "2026-03-31",
+    "priority": false,
+    "plan_id": "4c607e75-f420-4565-ba3b-7a0a493e04d8",
+    "username": "ilian"
+  }
+]

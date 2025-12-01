@@ -1,0 +1,74 @@
+[
+  {
+    "question": "Can i change somehtign about this \n",
+    "response": "Sorry, I couldn't get an answer from Gemini right now.",
+    "id": "bfe4e756-b599-43ee-a321-df13c7869b71",
+    "subgoal_id": "1293a935-f30d-4460-8a7d-e205031d2e2b"
+  },
+  {
+    "question": "what subgoal is this",
+    "response": "Initial Prototyping/Drafting",
+    "id": "f3f636eb-67ff-43b7-b7f3-78a4742f2a4e",
+    "subgoal_id": "34fb4c7c-b6d4-4415-ac66-ef4ed04b9bd9"
+  },
+  {
+    "question": "what is the next subgoals description",
+    "response": "Proceed with the main construction or implementation of your 'something' based on your plan and any lessons learned from prototyping. Focus on building the core structure or functionality.",
+    "id": "9a8f8221-e88d-41c1-80a4-8439f96a7c27",
+    "subgoal_id": "34fb4c7c-b6d4-4415-ac66-ef4ed04b9bd9"
+  },
+  {
+    "question": "what is the best way to get started with my current subgoal\n",
+    "response": "The best way to get started with Initial Prototyping/Drafting is to immediately begin creating a small-scale version, proof of concept, or initial draft/layout of your creation. Use the materials and tools you've gathered to validate your design and identify potential issues early, focusing on the core ideas rather than the complete final product.",
+    "id": "d1f4458e-c9ce-4265-bc56-6432c23ee60a",
+    "subgoal_id": "34fb4c7c-b6d4-4415-ac66-ef4ed04b9bd9"
+  },
+  {
+    "question": "Hi can you edit this subgial and make it poop ",
+    "response": "poop",
+    "id": "cb7068e7-d964-4014-9773-e4f2823a6ec0",
+    "subgoal_id": "00694df5-75c1-4616-8092-5c59c6ab006a"
+  },
+  {
+    "question": "What am I supposed to do in this subgial\n",
+    "response": "You are supposed to identify what your current subgoal is.",
+    "id": "922ff2d9-2d77-405d-850d-5f91980a121e",
+    "subgoal_id": "00694df5-75c1-4616-8092-5c59c6ab006a"
+  },
+  {
+    "question": "wait so what is the job here ?",
+    "response": "The job is to act as a helpful assistant, specifically to help a user with a subgoal in their plan. This involves understanding the user's need and providing clear, concise, and direct answers to their questions, without any additional formatting.",
+    "id": "7f34fb5a-c3ad-451b-9141-56ba7eec5a42",
+    "subgoal_id": "00694df5-75c1-4616-8092-5c59c6ab006a"
+  },
+  {
+    "question": "what does this subgoal do ",
+    "response": "This subgoal breaks down a larger problem into smaller, more manageable parts, making it easier to solve.",
+    "id": "383f82e5-8295-40b6-8181-32dce95ffb85",
+    "subgoal_id": "00694df5-75c1-4616-8092-5c59c6ab006a"
+  },
+  {
+    "question": "lol ",
+    "response": "Sorry, I couldn't get an answer from Gemini right now.",
+    "id": "144120bf-64c6-4f8d-bade-cea777d67b59",
+    "subgoal_id": "401b4936-6e4e-4d3a-867e-1361e7368596"
+  },
+  {
+    "question": "Tell me more about the research process",
+    "response": "The research process typically involves several key stages. It starts with identifying a research problem or question, which often comes from existing literature, observations, or practical needs. This is followed by a literature review, where you explore what is already known about the topic to understand current knowledge, identify gaps, and refine your research question. Next, you define your research objectives and develop a methodology, which includes choosing a research design (e.g., experimental, correlational, qualitative), identifying your participants or data sources, and selecting data collection methods (e.g., surveys, interviews, experiments, observations). After developing the methodology, you collect the data according to your plan. Once data is collected, it needs to be analyzed, often using statistical methods for quantitative data or thematic analysis for qualitative data, to extract meaningful insights. Finally, you interpret your findings in relation to your research question and objectives, draw conclusions, and communicate your results, usually through a written report, presentation, or publication. This process is often iterative, with steps potentially being revisited as new insights emerge.",
+    "id": "b58d4831-21a3-4dd5-bb17-05f7d3234975",
+    "subgoal_id": "3d47df2c-e420-4a83-816b-20da6d2b3245"
+  },
+  {
+    "question": "save this stuff",
+    "response": "As an AI, I cannot save information or files. Please copy and paste any content you wish to keep.",
+    "id": "bb415679-5c99-4d43-a13e-3dfb8a56ab75",
+    "subgoal_id": "a3f081f6-73b9-4202-ba6e-596d19e567d3"
+  },
+  {
+    "question": "what is this subgoal? \n",
+    "response": "To clearly and concisely state what this subgoal is.",
+    "id": "5a767218-8998-4dcb-88c0-c50bf0a293f5",
+    "subgoal_id": "a3f081f6-73b9-4202-ba6e-596d19e567d3"
+  }
+]
