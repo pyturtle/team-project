@@ -19,7 +19,7 @@ import data_access.interfaces.subgoal.SubgoalQnaGeminiDataAccessInterface;
 public class GeminiApiDataAccessObject
         implements GeneratePlanDataAccessInterface, SubgoalQnaGeminiDataAccessInterface {
 
-    private final String apiKey = "INSERT YOUR KEY HERE";
+    private final String apiKey = "INSERT API";
     private final Client client;
 
     /**
