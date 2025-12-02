@@ -29,6 +29,7 @@ class FilterSubgoalsInteractorTest {
         interactor = new FilterSubgoalsInteractor(subgoalDAO, presenter);
     }
 
+    // ==================== PRIORITY FILTER TEST ====================
     @Test
     void testFilterByPriorityOnly() {
         // Arrange
@@ -50,7 +51,30 @@ class FilterSubgoalsInteractorTest {
         assertTrue(presenter.lastOutputData.getPriorityOnly());
     }
 
+    // ==================== PLAN FILTER TEST ====================
+    @Test
+    void testFilterByPlanId() {
+        // Arrange
+        FilterSubgoalsInputData inputData = new FilterSubgoalsInputData(
+                USER_ID, PLAN_ID, null, false
+        );
 
+        Subgoal mockSubgoal = createMockSubgoal("subgoal1", "Plan Subgoal");
+        subgoalDAO.setSubgoalsByPlanTestData(Arrays.asList(mockSubgoal));
+
+        // Act
+        interactor.filter(inputData);
+
+        // Assert
+        assertEquals("getSubgoalsByPlan", subgoalDAO.lastCalledMethod);
+        assertEquals(PLAN_ID, subgoalDAO.lastPlanId);
+        assertEquals(USER_ID, subgoalDAO.lastUserId);
+        assertEquals(1, presenter.lastOutputData.getFilteredSubgoals().size());
+        assertEquals(PLAN_ID, presenter.lastOutputData.getPlanId());
+        assertFalse(presenter.lastOutputData.getPriorityOnly());
+    }
+
+    // ==================== NAME FILTER TEST ====================
     @Test
     void testFilterBySubgoalName() {
         // Arrange
@@ -73,6 +97,7 @@ class FilterSubgoalsInteractorTest {
         assertFalse(presenter.lastOutputData.getPriorityOnly());
     }
 
+    // ==================== ALL SUBGOALS TEST ====================
     @Test
     void testFilterAllSubgoals() {
         // Arrange
@@ -96,6 +121,7 @@ class FilterSubgoalsInteractorTest {
         assertFalse(presenter.lastOutputData.getPriorityOnly());
     }
 
+    // ==================== PRIORITY PRECEDENCE TEST ====================
     @Test
     void testPriorityTakesPrecedenceOverPlanId() {
         // Arrange
@@ -111,11 +137,11 @@ class FilterSubgoalsInteractorTest {
 
         // Assert
         assertEquals("getPrioritySubgoals", subgoalDAO.lastCalledMethod);
-        // Verify plan-based method was NOT called
-        assertNotEquals("getSubgoalsByPlanId", subgoalDAO.lastCalledMethod);
+        assertNotEquals("getSubgoalsByPlan", subgoalDAO.lastCalledMethod);
         assertTrue(presenter.lastOutputData.getPriorityOnly());
     }
 
+    // ==================== EMPTY RESULTS TEST ====================
     @Test
     void testEmptyResults() {
         // Arrange
@@ -133,7 +159,47 @@ class FilterSubgoalsInteractorTest {
         assertTrue(presenter.lastOutputData.getPriorityOnly());
     }
 
-    // Helper method to create subgoals with the correct constructor
+    // ==================== EDGE CASE: ALL NULL/EMPTY ====================
+    @Test
+    void testAllFiltersNullReturnsAllSubgoals() {
+        // Arrange
+        FilterSubgoalsInputData inputData = new FilterSubgoalsInputData(
+                USER_ID, null, null, false
+        );
+
+        Subgoal mockSubgoal1 = createMockSubgoal("subgoal1", "Subgoal 1");
+        Subgoal mockSubgoal2 = createMockSubgoal("subgoal2", "Subgoal 2");
+        subgoalDAO.setAllSubgoals(Arrays.asList(mockSubgoal1, mockSubgoal2));
+
+        // Act
+        interactor.filter(inputData);
+
+        // Assert
+        assertEquals("getAllSubgoalsForUser", subgoalDAO.lastCalledMethod);
+        assertEquals(2, presenter.lastOutputData.getFilteredSubgoals().size());
+    }
+
+    // ==================== EDGE CASE: NULL USER ID ====================
+    @Test
+    void testNullUserIdHandledGracefully() {
+        // Arrange
+        FilterSubgoalsInputData inputData = new FilterSubgoalsInputData(
+                null, PLAN_ID, null, false
+        );
+
+        Subgoal mockSubgoal = createMockSubgoal("subgoal1", "Plan Subgoal");
+        subgoalDAO.setSubgoalsByPlanTestData(Arrays.asList(mockSubgoal));
+
+        // Act
+        interactor.filter(inputData);
+
+        // Assert - Should still call the method with null userId
+        assertEquals("getSubgoalsByPlan", subgoalDAO.lastCalledMethod);
+        assertEquals(PLAN_ID, subgoalDAO.lastPlanId);
+        assertNull(subgoalDAO.lastUserId);
+    }
+
+    // ==================== HELPER METHOD ====================
     private Subgoal createMockSubgoal(String id, String name) {
         return new Subgoal(
                 id,                    // id
@@ -147,9 +213,7 @@ class FilterSubgoalsInteractorTest {
         );
     }
 
-
-
-    // Test Double Implementations
+    // ==================== TEST DOUBLE IMPLEMENTATIONS ====================
     static class TestSubgoalDataAccess implements SubgoalDataAccessInterface {
         public String lastCalledMethod;
         public String lastUserId;
@@ -157,15 +221,16 @@ class FilterSubgoalsInteractorTest {
         public String lastSubgoalName;
 
         private List<Subgoal> prioritySubgoals;
-        private List<Subgoal> subgoalsByPlanId;
+        private List<Subgoal> subgoalsByPlanTestData;
         private List<Subgoal> subgoalsByName;
         private List<Subgoal> allSubgoals;
+        private List<Subgoal> subgoalsByPlanId;
 
         public void setPrioritySubgoals(List<Subgoal> subgoals) { this.prioritySubgoals = subgoals; }
-        public void setSubgoalsByPlanId(List<Subgoal> subgoals) { this.subgoalsByPlanId = subgoals; }
+        public void setSubgoalsByPlanTestData(List<Subgoal> subgoals) { this.subgoalsByPlanTestData = subgoals; }
         public void setSubgoalsByName(List<Subgoal> subgoals) { this.subgoalsByName = subgoals; }
         public void setAllSubgoals(List<Subgoal> subgoals) { this.allSubgoals = subgoals; }
-
+        public void setSubgoalsByPlanId(List<Subgoal> subgoals) { this.subgoalsByPlanId = subgoals; }
 
         @Override
         public List<Subgoal> getPrioritySubgoals(String userId) {
@@ -175,17 +240,43 @@ class FilterSubgoalsInteractorTest {
         }
 
         @Override
+        public List<Subgoal> getSubgoalsByPlan(String planId, String userId) {
+            lastCalledMethod = "getSubgoalsByPlan";
+            lastPlanId = planId;
+            lastUserId = userId;
+            return subgoalsByPlanTestData != null ? subgoalsByPlanTestData : new ArrayList<>();
+        }
+
+        @Override
+        public List<Subgoal> getSubgoalsByName(String subgoalName, String userId) {
+            lastCalledMethod = "getSubgoalsByName";
+            lastSubgoalName = subgoalName;
+            lastUserId = userId;
+            return subgoalsByName;
+        }
+
+        @Override
+        public List<Subgoal> getAllSubgoalsForUser(String userId) {
+            lastCalledMethod = "getAllSubgoalsForUser";
+            lastUserId = userId;
+            return allSubgoals;
+        }
+
+        @Override
+        public List<Subgoal> getSubgoalsByPlanId(String planId) {
+            lastCalledMethod = "getSubgoalsByPlanId";
+            lastPlanId = planId;
+            return subgoalsByPlanId;
+        }
+
+        // ===== UNUSED METHODS (required by interface but not by interactor) =====
+        @Override
         public List<Subgoal> getIncompleteSubgoals(String parentGoalId) {
-            // Return test data or an empty list for testing purposes
             return new ArrayList<>();
         }
 
         @Override
         public List<Subgoal> getCompletedSubgoals(String parentGoalId) {
-            return new ArrayList<>();
-        }
-        @Override
-        public List<Subgoal> getSubgoalsByPlan(String planId, String userId) {
             return new ArrayList<>();
         }
 
@@ -221,28 +312,6 @@ class FilterSubgoalsInteractorTest {
             lastUserId = username;
             return new ArrayList<>();
         }
-
-        @Override
-        public List<Subgoal> getSubgoalsByPlanId(String planId) {
-            lastCalledMethod = "getSubgoalsByPlanId";
-            lastPlanId = planId;
-            return subgoalsByPlanId;
-        }
-
-        @Override
-        public List<Subgoal> getSubgoalsByName(String subgoalName, String userId) {
-            lastCalledMethod = "getSubgoalsByName";
-            lastSubgoalName = subgoalName;
-            lastUserId = userId;
-            return subgoalsByName;
-        }
-
-        @Override
-        public List<Subgoal> getAllSubgoalsForUser(String userId) {
-            lastCalledMethod = "getAllSubgoalsForUser";
-            lastUserId = userId;
-            return allSubgoals;
-        }
     }
 
     static class TestPresenter implements FilterSubgoalsOutputBoundary {
@@ -253,6 +322,4 @@ class FilterSubgoalsInteractorTest {
             this.lastOutputData = outputData;
         }
     }
-
-
 }
