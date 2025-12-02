@@ -3,8 +3,13 @@ package use_case.subgoal.show_subgoal;
 import entity.subgoal.Subgoal;
 import org.junit.jupiter.api.Test;
 import data_access.interfaces.subgoal.SubgoalDataAccessInterface;
+import interface_adapter.DialogManagerModel;
+import interface_adapter.calendar.CalendarViewModel;
+import interface_adapter.subgoal.show_subgoal.ShowSubgoalPresenter;
+import interface_adapter.subgoal.show_subgoal.ShowSubgoalViewModel;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +83,230 @@ public class ShowSubgoalInteractorTest {
         assertTrue(presenter.errorMessage.contains("missing-id"));
     }
 
+    @Test
+    void setPriority_existingSubgoal_updatesPriorityAndPresentsUpdate() {
+        InMemorySubgoalDAO dao = new InMemorySubgoalDAO();
+
+        Subgoal subgoal = new Subgoal(
+                "s1",
+                "plan1",
+                "user1",
+                "Task",
+                "Desc",
+                LocalDate.of(2025, 1, 1),
+                false,
+                false   // initial priority = false
+        );
+        dao.save(subgoal);
+
+        TestPresenter presenter = new TestPresenter();
+        ShowSubgoalInteractor interactor = new ShowSubgoalInteractor(dao, presenter);
+
+        SetPriorityInputData input = new SetPriorityInputData("s1", true);
+
+        // Act
+        interactor.setPriority(input);
+
+        // Assert
+        assertNull(presenter.errorMessage);
+
+        Subgoal updated = dao.getSubgoalById("s1");
+        assertTrue(updated.isPriority(), "DAO should store the updated priority.");
+    }
+
+    @Test
+    void setCompleted_existingSubgoal_updatesCompletedAndPresentsUpdate() {
+        InMemorySubgoalDAO dao = new InMemorySubgoalDAO();
+
+        Subgoal subgoal = new Subgoal(
+                "s2",
+                "plan1",
+                "user1",
+                "Another task",
+                "Desc",
+                LocalDate.of(2025, 1, 2),
+                false,   // initial completed = false
+                true
+        );
+        dao.save(subgoal);
+
+        TestPresenter presenter = new TestPresenter();
+        ShowSubgoalInteractor interactor = new ShowSubgoalInteractor(dao, presenter);
+
+        SetCompletedInputData input = new SetCompletedInputData("s2", true);
+
+        // Act
+        interactor.setCompleted(input);
+
+        // Assert
+        assertNull(presenter.errorMessage);
+
+        Subgoal updated = dao.getSubgoalById("s2");
+        assertTrue(updated.isCompleted(), "DAO should store the updated completion state.");
+    }
+
+    @Test
+    void getSubgoalsByPlan_returnsOnlyMatchingSubgoals() {
+        InMemorySubgoalDAO dao = new InMemorySubgoalDAO();
+
+        Subgoal s1 = new Subgoal(
+                "a",
+                "planX",
+                "user1",
+                "Task A",
+                "Desc A",
+                LocalDate.of(2025, 1, 1),
+                false,
+                false
+        );
+        Subgoal s2 = new Subgoal(
+                "b",
+                "planX",
+                "user1",
+                "Task B",
+                "Desc B",
+                LocalDate.of(2025, 1, 2),
+                false,
+                true
+        );
+        Subgoal s3 = new Subgoal(
+                "c",
+                "planY",          // different plan
+                "user1",
+                "Task C",
+                "Desc C",
+                LocalDate.of(2025, 1, 3),
+                false,
+                false
+        );
+
+        dao.save(s1);
+        dao.save(s2);
+        dao.save(s3);
+
+        TestPresenter presenter = new TestPresenter();
+        ShowSubgoalInteractor interactor = new ShowSubgoalInteractor(dao, presenter);
+
+        // Act
+        List<Subgoal> result = interactor.getSubgoalsByPlan("planX", "user1");
+
+        // Assert
+        assertEquals(2, result.size());
+        assertTrue(result.stream().anyMatch(s -> s.getId().equals("a")));
+        assertTrue(result.stream().anyMatch(s -> s.getId().equals("b")));
+    }
+
+    @Test
+    void setPriority_missingSubgoal_presentsError() {
+        InMemorySubgoalDAO dao = new InMemorySubgoalDAO();
+        TestPresenter presenter = new TestPresenter();
+        ShowSubgoalInteractor interactor = new ShowSubgoalInteractor(dao, presenter);
+
+        // We never save "missing" into dao, so getSubgoalById("missing") returns null.
+        SetPriorityInputData input = new SetPriorityInputData("missing", true);
+
+        interactor.setPriority(input);
+
+        assertEquals(
+                "Subgoal with id missing was not found after updating priority.",
+                presenter.errorMessage
+        );
+    }
+
+    @Test
+    void setCompleted_missingSubgoal_presentsError() {
+        InMemorySubgoalDAO dao = new InMemorySubgoalDAO();
+        TestPresenter presenter = new TestPresenter();
+        ShowSubgoalInteractor interactor = new ShowSubgoalInteractor(dao, presenter);
+
+        SetCompletedInputData input = new SetCompletedInputData("missing", true);
+
+        interactor.setCompleted(input);
+
+        assertEquals(
+                "Subgoal with id missing was not found after updating completion.",
+                presenter.errorMessage
+        );
+    }
+
+    /**
+     * Happy-path for setPriority using the real ShowSubgoalPresenter so that
+     * the instanceof ShowSubgoalPresenter branch is exercised.
+     */
+    @Test
+    void setPriority_withShowSubgoalPresenter_triggersPresenterUpdate() {
+        InMemorySubgoalDAO dao = new InMemorySubgoalDAO();
+
+        Subgoal subgoal = new Subgoal(
+                "sp1",
+                "plan-presenter",
+                "user1",
+                "Presenter test subgoal",
+                "Presenter branch description",
+                LocalDate.of(2025, 1, 10),
+                false,
+                false
+        );
+        dao.save(subgoal);
+
+        ShowSubgoalViewModel viewModel = new ShowSubgoalViewModel();
+        DialogManagerModel dialogManagerModel = new DialogManagerModel();
+        CalendarViewModel calendarViewModel = new CalendarViewModel();
+        ShowSubgoalPresenter presenter =
+                new ShowSubgoalPresenter(viewModel, dialogManagerModel, calendarViewModel);
+
+        ShowSubgoalInteractor interactor = new ShowSubgoalInteractor(dao, presenter);
+        SetPriorityInputData inputData = new SetPriorityInputData("sp1", true);
+
+        // Act
+        interactor.setPriority(inputData);
+
+        // Assert: the DAO should now store the updated priority.
+        Subgoal updated = dao.getSubgoalById("sp1");
+        assertNotNull(updated);
+        assertTrue(updated.isPriority());
+    }
+
+    /**
+     * Uses the real ShowSubgoalPresenter so that the instanceof
+     * ShowSubgoalPresenter branch in setCompleted is exercised.
+     */
+    @Test
+    void setCompleted_withShowSubgoalPresenter_triggersPresenterUpdate() {
+        InMemorySubgoalDAO dao = new InMemorySubgoalDAO();
+
+        // Existing subgoal so s != null
+        Subgoal subgoal = new Subgoal(
+                "sc1",
+                "plan-presenter",
+                "user1",
+                "Presenter completed test subgoal",
+                "Presenter branch description for completed",
+                LocalDate.of(2025, 1, 15),
+                false,   // completed = false initially
+                false    // priority
+        );
+        dao.save(subgoal);
+
+        // Real presenter → instanceof ShowSubgoalPresenter is true
+        ShowSubgoalViewModel viewModel = new ShowSubgoalViewModel();
+        DialogManagerModel dialogManagerModel = new DialogManagerModel();
+        CalendarViewModel calendarViewModel = new CalendarViewModel();
+        ShowSubgoalPresenter presenter =
+                new ShowSubgoalPresenter(viewModel, dialogManagerModel, calendarViewModel);
+
+        ShowSubgoalInteractor interactor = new ShowSubgoalInteractor(dao, presenter);
+        SetCompletedInputData inputData = new SetCompletedInputData("sc1", true);
+
+        // Act
+        interactor.setCompleted(inputData);
+
+        // Assert: DAO reflects the updated completion state
+        Subgoal updated = dao.getSubgoalById("sc1");
+        assertNotNull(updated);
+        assertTrue(updated.isCompleted());
+    }
+
     // =====================================================================
     // Test doubles
     // =====================================================================
@@ -112,17 +341,47 @@ public class ShowSubgoalInteractorTest {
 
         @Override
         public void updatePriority(String id, boolean priority) {
-            // no-op for this test
+            Subgoal existing = storage.get(id);
+            if (existing != null) {
+                storage.put(id, new Subgoal(
+                        existing.getId(),
+                        existing.getPlanId(),
+                        existing.getUsername(),
+                        existing.getName(),
+                        existing.getDescription(),
+                        existing.getDeadline(),
+                        existing.isCompleted(),
+                        priority
+                ));
+            }
         }
 
         @Override
         public void updateCompleted(String id, boolean completed) {
-            // no-op for this test
+            Subgoal existing = storage.get(id);
+            if (existing != null) {
+                storage.put(id, new Subgoal(
+                        existing.getId(),
+                        existing.getPlanId(),
+                        existing.getUsername(),
+                        existing.getName(),
+                        existing.getDescription(),
+                        existing.getDeadline(),
+                        completed,
+                        existing.isPriority()
+                ));
+            }
         }
 
         @Override
         public List<Subgoal> getSubgoalsByPlan(String planId, String userId) {
-            return List.of();  // stub
+            List<Subgoal> result = new ArrayList<>();
+            for (Subgoal s : storage.values()) {
+                if (s.getPlanId().equals(planId) && s.getUsername().equals(userId)) {
+                    result.add(s);
+                }
+            }
+            return result;
         }
 
         @Override
