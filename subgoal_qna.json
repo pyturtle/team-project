@@ -70,5 +70,35 @@
     "response": "To clearly and concisely state what this subgoal is.",
     "id": "5a767218-8998-4dcb-88c0-c50bf0a293f5",
     "subgoal_id": "a3f081f6-73b9-4202-ba6e-596d19e567d3"
+  },
+  {
+    "question": "hello how do i do ghis one\n",
+    "response": "To complete \"Choose a Learning Method & Instructor,\" follow these steps:\n\n1.  Research different learning methods:\n    *   Private Teacher: Offers personalized feedback and structured lessons. Search for local teachers or online instructors (e.g., through music school websites, online marketplaces).\n    *   Online Courses/Platforms: Websites or apps like Flowkey, Simply Piano, Pianote, Skoove, Udemy, or Coursera offer structured video lessons.\n    *   Self-Study Books: Purchase beginner piano method books from music stores or online retailers. Combine with free YouTube tutorials for visual learning.\n\n2.  Consider your personal preferences and constraints:\n    *   Budget: How much are you willing to spend? Private lessons are usually the most expensive, while self-study books are the least.\n    *   Time: How much time can you commit to lessons and practice each week?\n    *   Learning Style: Do you prefer direct instruction, self-paced learning, or interactive apps?\n    *   Goals: Are you looking for a casual hobby or more structured progress?\n\n3.  Decide on your primary learning approach and potentially a supplementary one. For instance, you might choose a private teacher for guidance and use an app for daily practice, or start with an online course and add self-study books.\n\n4.  Enroll, subscribe, or purchase: Once you've made your decision, sign up for lessons, subscribe to the chosen app or online course, or acquire the necessary self-study materials. This marks the completion of the subgoal and sets you up for learning basic music theory.",
+    "id": "04e6a62f-90c1-4eab-8ef6-c841bab3790c",
+    "subgoal_id": "a7ba8134-1749-4965-996c-2e01174f6692"
+  },
+  {
+    "question": "how to do this?\n",
+    "response": "To achieve the \"Understand Kitchen Basics & Safety\" subgoal, break it down into these steps:\n\n1.  Research essential kitchen tools and their uses: Look up common kitchen tools (e.g., different types of knives, cutting boards, pots, pans, measuring cups, spatulas) and understand what each is for. Identify what you already have and what you might need.\n2.  Stock basic pantry staples: Create a list of fundamental pantry items (e.g., olive oil, salt, pepper, flour, sugar, rice, pasta, canned goods, common spices) and ensure you have them on hand.\n3.  Learn about food safety practices: Research safe food handling, storage temperatures, proper hygiene (handwashing, cleaning surfaces), and how to prevent cross-contamination (e.g., using separate cutting boards for raw meat and vegetables, proper refrigeration).\n4.  Organize your kitchen space for efficiency: Assess your kitchen layout and arrange tools and ingredients logically for easy access while cooking. Declutter and clean your space.",
+    "id": "b4bf5302-b906-4972-9ab2-878266f003d0",
+    "subgoal_id": "d1ed8253-296a-4493-84fd-3db1713f5acb"
+  },
+  {
+    "question": "how do i get ready and what is the next subgoal?",
+    "response": "To get ready for \"Understand Kitchen Basics & Safety\", you should research essential kitchen tools, stock basic pantry staples, learn about food safety practices, and organize your kitchen space for efficiency.\n\nThe next subgoal in your plan is \"Master Foundational Techniques\".",
+    "id": "6bfd7622-3fc8-4e47-a633-126201eb37fa",
+    "subgoal_id": "d1ed8253-296a-4493-84fd-3db1713f5acb"
+  },
+  {
+    "question": "how to do this plan\n",
+    "response": "To achieve the \"Research and Acquire Piano/Keyboard\" subgoal, follow these steps:\n\n1.  **Research Instrument Types:** Investigate the differences between acoustic pianos (upright, grand) and digital keyboards (portable, console). Pay close attention to the concept of weighted keys and why it's important for learning.\n2.  **Set a Budget:** Determine a realistic financial range for your purchase, considering both the instrument and accessories.\n3.  **Compare and Decide:** Based on your research and budget, narrow down your options to a specific type and model of piano or keyboard that best suits your needs and learning goals.\n4.  **Acquire the Instrument:** Purchase your chosen piano or keyboard from a reputable retailer.\n5.  **Acquire Essential Accessories:** Buy a suitable piano bench (preferably adjustable), a stand (if needed for a portable keyboard), and a metronome. Consider a sustain pedal and headphones if not included with a digital instrument.",
+    "id": "9f16ddea-1f3d-44d1-913c-cf179c848bdc",
+    "subgoal_id": "6b8c0e02-c085-4e02-9cb2-0ca933354199"
+  },
+  {
+    "question": "how can i get ready for this plan, and what subgoal comes after this one?",
+    "response": "To get ready for the \"Research and Acquire Piano/Keyboard\" subgoal, you can start by considering the space you have available for an instrument and thinking about your general financial comfort level to help set a budget. The next subgoal in your plan is Learn Basic Music Fundamentals.",
+    "id": "fa7be0c0-654b-425b-8a5a-438e7d1a1abd",
+    "subgoal_id": "6b8c0e02-c085-4e02-9cb2-0ca933354199"
   }
 ]
