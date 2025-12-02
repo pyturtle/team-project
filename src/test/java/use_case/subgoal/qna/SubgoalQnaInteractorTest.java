@@ -117,7 +117,7 @@ public class SubgoalQnaInteractorTest {
                 "sg2", planId, "user1",
                 "Another subgoal",
                 "Another thing.",
-                LocalDate.of(2025, 1, 2),
+                LocalDate.of(2025, 1, 1),
                 false,
                 false
         );
@@ -154,6 +154,135 @@ public class SubgoalQnaInteractorTest {
         assertEquals(newQuestion, latest.getQuestionMessage());
         assertEquals("FAKE_ANSWER", latest.getResponseMessage());
     }
+
+    @Test
+    void ask_whenCurrentHasPrevAndNext_includesPrevContext_andUsesDeadlineOrdering() {
+        // Arrange
+        InMemoryQnaDAO qnaDAO = new InMemoryQnaDAO();
+        InMemorySubgoalDAO subgoalDAO = new InMemorySubgoalDAO();
+        FakeGeminiGateway gemini = new FakeGeminiGateway();
+        TestPresenter presenter = new TestPresenter();
+
+        String planId = "plan-ordered";
+        String currentId = "sg-current";
+
+        // earliest deadline
+        Subgoal early = new Subgoal(
+                "sg-early", planId, "user1",
+                "Early subgoal",
+                "First deadline.",
+                LocalDate.of(2025, 1, 1),
+                false,
+                false
+        );
+        subgoalDAO.save(early);
+
+        // middle deadline = CURRENT
+        Subgoal current = new Subgoal(
+                currentId, planId, "user1",
+                "Current subgoal",
+                "The one we are asking about.",
+                LocalDate.of(2025, 1, 5),
+                false,
+                true
+        );
+        subgoalDAO.save(current);
+
+        // latest deadline
+        Subgoal late = new Subgoal(
+                "sg-late", planId, "user1",
+                "Late subgoal",
+                "Last deadline.",
+                LocalDate.of(2025, 1, 10),
+                false,
+                false
+        );
+        subgoalDAO.save(late);
+
+        SubgoalQnaInteractor interactor =
+                new SubgoalQnaInteractor(qnaDAO, subgoalDAO, gemini, presenter);
+
+        String question = "How should I work on this subgoal?";
+        SubgoalQnaAskInputData input =
+                new SubgoalQnaAskInputData(currentId, question);
+
+        // Act
+        interactor.ask(input);
+
+        // Assert – no error, Gemini called
+        assertNull(presenter.errorMessage);
+        assertNotNull(presenter.updateData);
+        assertTrue(gemini.called);
+
+        // Check the prompt that was sent to Gemini
+        String prompt = gemini.lastPrompt;
+
+        // This forces lines 126–129 to execute
+        assertTrue(prompt.contains("The previous subgoal in this plan is: " + early.getName()),
+                "Prompt should mention the previous subgoal by name");
+
+        // (Optional) also check next context – you probably already hit this, but harmless:
+        assertTrue(prompt.contains("The next subgoal in this plan is: " + late.getName()),
+                "Prompt should mention the next subgoal by name");
+    }
+
+    /**
+     * If the Gemini gateway returns a blank answer, the interactor should
+     * fall back to the default apology message.
+     *
+     * This covers line 167.
+     */
+    @Test
+    void ask_whenGeminiReturnsBlank_usesFallbackMessage() {
+        InMemoryQnaDAO qnaDAO = new InMemoryQnaDAO();
+        InMemorySubgoalDAO subgoalDAO = new InMemorySubgoalDAO();
+        TestPresenter presenter = new TestPresenter();
+
+        String subgoalId = "sg1";
+        String planId = "plan-fallback";
+
+        Subgoal subgoal = new Subgoal(
+                subgoalId, planId, "user1",
+                "Fallback subgoal",
+                "Testing Gemini fallback.",
+                LocalDate.of(2025, 1, 1),
+                false,
+                true
+        );
+        subgoalDAO.save(subgoal);
+
+        // Gemini stub that returns only whitespace
+        SubgoalQnaGeminiDataAccessInterface blankGemini =
+                new SubgoalQnaGeminiDataAccessInterface() {
+                    @Override
+                    public String getAnswerForQuestion(String question) {
+                        return "   "; // blank, triggers fallback
+                    }
+                };
+
+        SubgoalQnaInteractor interactor =
+                new SubgoalQnaInteractor(qnaDAO, subgoalDAO, blankGemini, presenter);
+
+        String question = "Will this trigger the fallback?";
+        SubgoalQnaAskInputData input =
+                new SubgoalQnaAskInputData(subgoalId, question);
+
+        // Act
+        interactor.ask(input);
+
+        // Assert
+        assertNull(presenter.errorMessage);
+        assertNotNull(presenter.updateData);
+
+        List<SubgoalQuestionAnswer> history = presenter.updateData.getHistory();
+        assertEquals(1, history.size());
+
+        SubgoalQuestionAnswer entry = history.get(0);
+        assertEquals(question, entry.getQuestionMessage());
+        assertEquals("Sorry, I couldn't get an answer from Gemini.",
+                entry.getResponseMessage());
+    }
+
 
     // =====================================================================
     // Test doubles
