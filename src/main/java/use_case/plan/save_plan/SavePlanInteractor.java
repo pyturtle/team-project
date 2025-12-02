@@ -72,7 +72,7 @@ public class SavePlanInteractor implements SavePlanInputBoundary {
             success = true;
             message = "Plan was created successfully";
         }
-        // -@cs[IllegalCatch] catch generic exception to show user-friendly error message
+
         catch (Exception ex) {
             message = "Something went wrong";
             success = false;

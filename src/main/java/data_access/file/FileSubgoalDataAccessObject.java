@@ -42,6 +42,11 @@ public class FileSubgoalDataAccessObject extends JsonDataAccess<Subgoal>
         }
     }
 
+    public FileSubgoalDataAccessObject() {
+        super("");
+        this.subgoalBuilder = new SubgoalBuilder();
+    }
+
     /**
      * Returns a subgoal with the given ID or null if none exists.
      * @param id the subgoal identifier
